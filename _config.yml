@@ -9,7 +9,7 @@ description: 'Everything will be ok'
 keywords: jokerbyrant
 author: sxh
 language: zh-CN
-timezone: 'GMT-8'
+timezone: 'Asia/Shanghai'
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'

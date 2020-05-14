@@ -88,14 +88,14 @@ $font-family-monospace    = get_font_family('codes'), consolas, Menlo, monospace
 
 
 // Font size
-$font-size-base           = (hexo-config('font.enable') and hexo-config('font.global.size') is a 'unit') ? unit(hexo-config('font.global.size'), em) : 1em;
+$font-size-base           = (hexo-config('font.enable') and hexo-config('font.global.size') is a 'unit') ? unit(hexo-config('font.global.size'), em) : 0.9em;
 $font-size-smallest       = .75em;
 $font-size-smaller        = .8125em;
 $font-size-small          = .875em;
 $font-size-medium         = 1em;
-$font-size-large          = 1.125em;
-$font-size-larger         = 1.25em;
-$font-size-largest        = 1.5em;
+$font-size-large          = 1.125em; // 正文
+$font-size-larger         = 1.35em;
+$font-size-largest        = 1.6em; // 标题
 
 
 // Headings font size
@@ -176,7 +176,7 @@ $content-desktop                = 700px;
 $content-desktop-large          = 800px;
 $content-desktop-largest        = 900px;
 
-$content-desktop-padding        = 40px;
+$content-desktop-padding        = 40px; // 正文padding
 $content-tablet-padding         = 10px;
 $content-mobile-padding         = 8px;
 
