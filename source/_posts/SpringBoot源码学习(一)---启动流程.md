@@ -299,7 +299,7 @@ public void multicastEvent(ApplicationEvent event, @Nullable ResolvableType even
 }
 ```
 
-这个执行方法会接收一个ApplicationEvent，并根据这个event来获取对应的监听器listener，SpringBoot也自带一些这个类的实例，用来区分执行SpringBoot启动程序的不同阶段。
+这个执行方法会接收一个`ApplicationEvent`，并根据这个event来获取对应的监听器listener，SpringBoot也自带一些这个类的实例，用来区分执行SpringBoot启动程序的不同阶段。
 
 回过头来看看`SpringApplicationRunListeners.class`，通过构造一个`SpringApplicationRunListeners`来对获取到的实例完成一次封装，之后就可以通过`SpringApplicationRunListeners`统一完成对这些监听器的调用
 
@@ -431,7 +431,7 @@ public interface SpringApplicationRunListener {
 ```
 
 ### 2. 准备环境
-这里完成的工作主要是配置Spring容器需要的环境信息，比如profile、命令行参数等
+这里完成的工作主要是配置Spring容器需要的环境信息，比如`profile`、`命令行参数`等
 
 ```
 private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
@@ -457,7 +457,7 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 }
 ```
     
-根据前面初始化SpringApplication时确定的服务类型`webApplicationType`配置`ConfigurableEnvironment`
+根据前面初始化`SpringApplication`时确定的服务类型`webApplicationType`配置`ConfigurableEnvironment`
 
 ```
 private ConfigurableEnvironment getOrCreateEnvironment() {
@@ -511,11 +511,11 @@ public void environmentPrepared(ConfigurableEnvironment environment) {
          .multicastEvent(new ApplicationEnvironmentPreparedEvent(this.application, this.args, environment));
 }
 ```
-这个阶段获取到的监听器中包含一个叫`ConfigFileApplicationListener`的监听器，这个监听器主要完成了对properties和yml文件配置的加载，下一篇文章会单独讲一讲。
+这个阶段获取到的监听器中包含一个叫`ConfigFileApplicationListener`的监听器，这个监听器主要完成了对`properties`和`yml`文件配置的加载，下一篇文章会单独讲一讲。
 
 
 ### 3. 创建Spring容器
-根据`webApplicationType`来创建Spring容器，web项目对应的服务类型是SERVLET，那么创建的Spring容器即是`AnnotationConfigServletWebServerApplicationContext`
+根据`webApplicationType`来创建Spring容器，web项目对应的服务类型是`SERVLET`，那么创建的Spring容器即是`AnnotationConfigServletWebServerApplicationContext`
 
 ```
 protected ConfigurableApplicationContext createApplicationContext() {
@@ -630,7 +630,7 @@ protected void applyInitializers(ConfigurableApplicationContext context) {
 ```
 
 ### 5. 容器刷新
-Spring容器的刷新refresh方法内部会做很多很多的事情：比如BeanFactory的设置、BeanFactoryPostProcessor接口的执行、BeanPostProcessor接口的执行、自动化配置类的解析、条件注解的解析、国际化的初始化等等
+Spring容器的刷新refresh方法内部会做很多很多的事情：比如`BeanFactory`的设置、`BeanFactoryPostProcessor`接口的执行、`BeanPostProcessor`接口的执行、自动化配置类的解析、条件注解的解析、国际化的初始化等等
 
 ```
 private void refreshContext(ConfigurableApplicationContext context) {
@@ -866,4 +866,4 @@ private void callRunner(CommandLineRunner runner, ApplicationArguments args) {
    }
 }
 ```
-最后，在容器启动完成前的最后一刻调用listeners.running(context)方法，通知大家Spring容器启动成功，然后将容器返回。到此为止，Spring容器的启动流程分析就结束了。
+最后，在容器启动完成前的最后一刻调用`listeners.running(context)`方法，通知大家Spring容器启动成功，然后将容器返回。到此为止，Spring容器的启动流程分析就结束了。
