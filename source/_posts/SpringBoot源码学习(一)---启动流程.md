@@ -430,7 +430,7 @@ public interface SpringApplicationRunListener {
 }
 ```
 
-### 2. 准备环境
+### 2. prepareEnvironment()---准备环境
 这里完成的工作主要是配置Spring容器需要的环境信息，比如`profile`、`命令行参数`等
 
 ```
@@ -511,10 +511,10 @@ public void environmentPrepared(ConfigurableEnvironment environment) {
          .multicastEvent(new ApplicationEnvironmentPreparedEvent(this.application, this.args, environment));
 }
 ```
-这个阶段获取到的监听器中包含一个叫`ConfigFileApplicationListener`的监听器，这个监听器主要完成了对`properties`和`yml`文件配置的加载，下一篇文章会单独讲一讲。
+这个阶段获取到的监听器中包含一个叫`ConfigFileApplicationListener`的监听器，这个监听器主要完成了对`properties`和`yml`文件配置的加载，下面会单独讲一讲这个类的执行流程，具体见SpringBoot源码学习(三)---配置环境的构造过程。
 
 
-### 3. 创建Spring容器
+### 3. createApplicationContext()---创建Spring容器
 根据`webApplicationType`来创建Spring容器，web项目对应的服务类型是`SERVLET`，那么创建的Spring容器即是`AnnotationConfigServletWebServerApplicationContext`
 
 ```
@@ -545,7 +545,7 @@ protected ConfigurableApplicationContext createApplicationContext() {
 }
 ```
 
-### 4. 准备Spring容器
+### 4. prepareContext()---准备Spring容器
 这一步主要对之前创建的Spring容器进行一些配置，例如配置容器环境、执行初始化器等操作
 
 ```
@@ -586,7 +586,7 @@ private void prepareContext(ConfigurableApplicationContext context, Configurable
    //加载我们的启动类，将启动类注入容器
    load(context, sources.toArray(new Object[0]));
    
-   // 容器完成加载，通知监听器
+   // 容器完成加载，通知监听器，这一步会将之前SpringApplication初始化时获取到的监听器添加到Spring容器中
    listeners.contextLoaded(context);
 }
 ```
@@ -629,7 +629,7 @@ protected void applyInitializers(ConfigurableApplicationContext context) {
 }
 ```
 
-### 5. 容器刷新
+### 5. refreshContext()---容器刷新
 Spring容器的刷新refresh方法内部会做很多很多的事情：比如`BeanFactory`的设置、`BeanFactoryPostProcessor`接口的执行、`BeanPostProcessor`接口的执行、自动化配置类的解析、条件注解的解析、国际化的初始化等等
 
 ```
@@ -748,7 +748,7 @@ public void refresh() throws BeansException, IllegalStateException {
 ```
 `refresh`方法在spring整个源码体系中举足轻重，是实现 `ioc` 和 `aop` 的关键，下面会单独讲一讲这个刷新过程。
     
-### 6. Spring容器后置处理
+### 6. afterRefresh()---Spring容器后置处理
 这是一个扩展接口，使用了模板方法，默认为空实现。如果有自定义需求，可以重写该方法。比如打印一些启动结束log，或者一些其它后置处理。
 ```
 protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {}
