@@ -87,6 +87,7 @@ pagination_dir: page
 # Include / Exclude file(s)
 ## include:/exclude: options only apply to the 'source/' folder
 include:
+  - .nojekyll
 exclude:
 ignore:
 
@@ -101,7 +102,3 @@ deploy:
   type: git
   repo: https://github.com/JokerByrant/JokerByrant.github.io  # blog 的 git 地址
   branch: master                                              # 发布至 master 分支，如果该分支不存在，就会自动创建它
-
-include:
-  - .nojekyll
-
