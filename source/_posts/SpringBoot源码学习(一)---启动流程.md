@@ -6,7 +6,7 @@ tags: SpringBoot
 ---
 工作中接触的最多的框架就是 SpringBoot 了，但对它一直处于一种一知半解的状态，就去学习了一下它的源码，接下来几篇文章就来记录一下，也正好加强一下理解。
 
-```
+```java
 @SpringBootApplication
 public class MySpringBootApplication {
     public static void main(String[] args) {
@@ -14,9 +14,9 @@ public class MySpringBootApplication {
     }
 }
 ```
-上面的代码就是 SpringBoot 的入口类，从代码上可以看出主要就是调用了 SpringApplication 的 `run()` 方法，并将我们的启动类作为参数传了进去，下面我们就进到源码里面看看这个run方法。
+上面的代码就是 SpringBoot 的入口类，从代码上可以看出主要就是调用了 `SpringApplication` 的 `run()` 方法，并将我们的启动类作为参数传了进去，下面我们就进到源码里面看看这个run方法。
 
-```
+```java
 public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
    // 分两步->1.new一个SpringApplication  2.执行run()方法
    return new SpringApplication(primarySources).run(args);
@@ -24,13 +24,13 @@ public static ConfigurableApplicationContext run(Class<?>[] primarySources, Stri
 ```
 
 可以看到主要分成两步：
-1. 构造一个SpringApplication的实例
-2. 执行实例的run()方法
+1. 构造一个 `SpringApplication` 的实例
+2. 执行实例的 `run()` 方法
 
 ---
 
-## 1.构造SpringApplication
-```
+## 1.构造 `SpringApplication`
+```java
 public SpringApplication(Class<?>... primarySources) {
    this(null, primarySources);
 }
@@ -51,14 +51,14 @@ public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySourc
 }
 ```
 
-在SpringApplication的构造器中，主要就做了这么几件事：
+在 `SpringApplication` 的构造器中，主要就做了这么几件事：
 1. 存储主程序class 
 2. 判断当前启动服务的类型(Servlet/Reactive) 
 3. 设置程序初始化器 
 4. 设置监听器
     
 ### `deduceFromClasspath()`方法用来判断程序类型
-```
+```java
 static WebApplicationType deduceFromClasspath() {
    // 判断能否从类加载器中获取到org.springframework.web.reactive.DispatcherHandler，这个类在spring-webflux包下，如果存在则表示当前项目是一个webflux项目
    // 反之，如果能从类加载器中获取到org.springframework.web.servlet.DispatcherServlet，这个类在spring-webmvc包下，则表示当前项目是一个webmvc项目
@@ -84,14 +84,14 @@ private static final String WEBFLUX_INDICATOR_CLASS = "org." + "springframework.
 
 private static final String JERSEY_INDICATOR_CLASS = "org.glassfish.jersey.servlet.ServletContainer";
 ```
-判断服务是Servlet还是Reactive就是通过下面两个类进行判断
+判断服务是 `Servlet` 还是 `Reactive` 就是通过下面两个类进行判断
 ![avatar](http://ww1.sinaimg.cn/large/006jvOIfgy1gfjpe76j3qj30cv0jygm3.jpg)
 ![avatar](http://ww1.sinaimg.cn/large/006jvOIfgy1gfjpfi5hbzj30cq0a90su.jpg)
 
 ### `getSpringFactoriesInstances()`用于从`spring.factories`中获取指定类对应的实例
 在设置初始化器和程序事件监听器时，都调用了`getSpringFactoriesInstances()`，这个方法主要的功能是从`spring.factories`中获取指定类对应的实例，初始化器和程序事件监听器就分别从`spring.factories`中获取`ApplicationContextInitializer.class`和`ApplicationListener.class`的实现类
 
-```
+```java
 private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
    ClassLoader classLoader = getClassLoader();
    // Use names and ensure unique to protect against duplicates
@@ -106,7 +106,7 @@ private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] 
 ```
 
 ### 初始化器对应的实例
-```
+```yml
 # Application Context Initializers
 # 在Spring上下文被刷新之前进行的初始化操作，比如在web容器中 [注册配置文件] 或者 [激活profiles]-->profiles就是为了在不同环境下加载不同配置抽象出的实体(application-dev.yml...)
 org.springframework.context.ApplicationContextInitializer=\
@@ -132,8 +132,8 @@ org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener
 我们也可以自定义初始化器和程序监听器，只要实现对应的抽象类，并在`spring.factories`中添加配置即可
 
 ## 2.执行`run()`方法
-SpringApplication构造完成后，就开始执行其下的run()方法，通过8个子步骤完成了Spring容器的创建和启动，下面来一个个分析
-```
+`SpringApplication` 构造完成后，就开始执行其下的 `run()` 方法，通过8个子步骤完成了 Spring 容器的创建和启动，下面来一个个分析
+```java
 public ConfigurableApplicationContext run(String... args) {
    // 计时工具
    StopWatch stopWatch = new StopWatch();
@@ -215,11 +215,13 @@ public ConfigurableApplicationContext run(String... args) {
 ```
 
 ### 1. 获取并启动监听器。
-```
+```java
 SpringApplicationRunListeners listeners = getRunListeners(args);
 listeners.starting();
-从spirng.factories中读取SpringApplicationRunListener.class对应的实例，并构造了一个SpringApplicationRunListeners来封装这些实例
+```
+从 `spirng.factories` 中读取 `SpringApplicationRunListener.class` 对应的实例，并构造了一个 `SpringApplicationRunListeners` 来封装这些实例
 
+```java
 /**
 * 获取监听器，利用getSpringFactoriesInstances()方法获取SpringApplicationRunListener实现类对应的实例，它的内部只有一个类EventPublishingRunListener
 * EventPublishingRunListener内部有一个广播器，在构造它时，它会将之前SpringApplication初始化时设置的11个监听器添加到这个广播器中
@@ -231,13 +233,17 @@ private SpringApplicationRunListeners getRunListeners(String[] args) {
    return new SpringApplicationRunListeners(logger,
          getSpringFactoriesInstances(SpringApplicationRunListener.class, types, this, args));
 }
-通过查看spring.factories发现SpringApplicationRunListener.class默认只有一个实例EventPublishingRunListener
+```
+通过查看 `spring.factories` 发现 `SpringApplicationRunListener.class` 默认只有一个实例 `EventPublishingRunListener`
 
+```yml
 # Run Listeners
 org.springframework.boot.SpringApplicationRunListener=\
 org.springframework.boot.context.event.EventPublishingRunListener
-EventPublishingRunListener内部有一个广播器，在构造它时，它会将之前SpringApplication初始化时设置的11个监听器添加到这个广播器中
+```
+`EventPublishingRunListener` 内部有一个广播器，在构造它时，它会将之前 `SpringApplication` 初始化时设置的11个监听器添加到这个广播器中
 
+```java
 // 广播器
 private final SimpleApplicationEventMulticaster initialMulticaster;
 
@@ -255,7 +261,7 @@ public EventPublishingRunListener(SpringApplication application, String[] args) 
 
 监听器执行某个事件时，传入事件对应的类---`ApplicationEvent.class`的实现类，到监听器的`multicastEvent()`方法中完成事件的调用。
 
-```
+```java
 @Override
 public void starting() {
    // 1.在run()方法执行前执行，创建application启动事件`ApplicationStartingEvent`
@@ -274,8 +280,10 @@ public void contextPrepared(ConfigurableApplicationContext context) {
    this.initialMulticaster
          .multicastEvent(new ApplicationContextInitializedEvent(this.application, this.args, context));
 }
-具体的事件执行方法multicastEvent()
+```
 
+具体的事件执行方法 `multicastEvent()`
+```java
 public void multicastEvent(ApplicationEvent event, @Nullable ResolvableType eventType) {
     ResolvableType type = eventType != null ? eventType : this.resolveDefaultEventType(event);
     // 获取线程池
@@ -299,11 +307,11 @@ public void multicastEvent(ApplicationEvent event, @Nullable ResolvableType even
 }
 ```
 
-这个执行方法会接收一个`ApplicationEvent`，并根据这个event来获取对应的监听器listener，SpringBoot也自带一些这个类的实例，用来区分执行SpringBoot启动程序的不同阶段。
+这个执行方法会接收一个`ApplicationEvent`，并根据这个 `event` 来获取对应的监听器 `listener` ，SpringBoot也自带一些这个类的实例，用来区分执行SpringBoot启动程序的不同阶段。
 
 回过头来看看`SpringApplicationRunListeners.class`，通过构造一个`SpringApplicationRunListeners`来对获取到的实例完成一次封装，之后就可以通过`SpringApplicationRunListeners`统一完成对这些监听器的调用
 
-```
+```java
 // SpringApplicationRunListeners内部持有SpringApplicationRunListener集合和1个Log日志类，用于SpringApplicationRunListener监听器的批量执行。
 SpringApplicationRunListeners(Log log, Collection<? extends SpringApplicationRunListener> listeners) {
    this.log = log;
@@ -349,10 +357,8 @@ public void running(ConfigurableApplicationContext context) {
 ```
 
 `SpringApplicationRunListener.class`
-```
+```java
 public interface SpringApplicationRunListener {
-
-
    /**
     * 在run()方法开始执行时，该方法就立即被调用，可用于在初始化最早期时做一些工作。
     *
@@ -360,7 +366,6 @@ public interface SpringApplicationRunListener {
     * early initialization.
     */
    void starting();
-
 
    /**
     * 当environment构建完成，ApplicationContext创建之前，该方法被调用。
@@ -371,7 +376,6 @@ public interface SpringApplicationRunListener {
     */
    void environmentPrepared(ConfigurableEnvironment environment);
 
-
    /**
     * 当ApplicationContext构建完成时，该方法被调用
     *
@@ -381,7 +385,6 @@ public interface SpringApplicationRunListener {
     */
    void contextPrepared(ConfigurableApplicationContext context);
 
-
    /**
     * 在ApplicationContext完成加载，但没有被刷新前，该方法被调用
     *
@@ -390,7 +393,6 @@ public interface SpringApplicationRunListener {
     * @param context the application context
     */
    void contextLoaded(ConfigurableApplicationContext context);
-
 
    /**
     * 在ApplicationContext刷新并启动后，CommandLineRunners和ApplicationRunner未被调用前，该方法被调用
@@ -403,7 +405,6 @@ public interface SpringApplicationRunListener {
     */
    void started(ConfigurableApplicationContext context);
 
-
    /**
     * 在run()方法执行完成前该方法被调用
     *
@@ -414,7 +415,6 @@ public interface SpringApplicationRunListener {
     * @since 2.0.0
     */
    void running(ConfigurableApplicationContext context);
-
 
    /**
     * 当应用运行出错时该方法被调用
@@ -430,10 +430,10 @@ public interface SpringApplicationRunListener {
 }
 ```
 
-### 2. prepareEnvironment()---准备环境
+### 2. `prepareEnvironment()`---准备环境
 这里完成的工作主要是配置Spring容器需要的环境信息，比如`profile`、`命令行参数`等
 
-```
+```java
 private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
       ApplicationArguments applicationArguments) {
    // Create and configure the environment
@@ -459,7 +459,7 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
     
 根据前面初始化`SpringApplication`时确定的服务类型`webApplicationType`配置`ConfigurableEnvironment`
 
-```
+```java
 private ConfigurableEnvironment getOrCreateEnvironment() {
    if (this.environment != null) {
       return this.environment;
@@ -477,7 +477,7 @@ private ConfigurableEnvironment getOrCreateEnvironment() {
     
 通过`configureEnvironment()`方法完成一些环境的配置，例如profiles
 
-```
+```java
 protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
    if (this.addConversionService) {
       ConversionService conversionService = ApplicationConversionService.getSharedInstance();
@@ -490,7 +490,7 @@ protected void configureEnvironment(ConfigurableEnvironment environment, String[
 
 配置`profiles`
 
-```
+```java
 protected void configureProfiles(ConfigurableEnvironment environment, String[] args) {
    // 获取spring.profiles.active配置的参数
    environment.getActiveProfiles(); // ensure they are initialized
@@ -504,7 +504,7 @@ protected void configureProfiles(ConfigurableEnvironment environment, String[] a
     
 下面看一下`listeners.environmentPrepared(environment)`这行代码，这里执行了监听器的`environmentPrepared()`方法，表示发布环境已经准备完毕，下面方法与上面的`starting()`类似，传入了一个`ApplicationEnvironmentPreparedEvent`事件到广播器中，在广播器中会获取支持这个事件的监听器并依次遍历调用。
 
-```
+```java
 @Override
 public void environmentPrepared(ConfigurableEnvironment environment) {
    this.initialMulticaster
@@ -514,10 +514,10 @@ public void environmentPrepared(ConfigurableEnvironment environment) {
 这个阶段获取到的监听器中包含一个叫`ConfigFileApplicationListener`的监听器，这个监听器主要完成了对`properties`和`yml`文件配置的加载，下面会单独讲一讲这个类的执行流程，具体见SpringBoot源码学习(三)---配置环境的构造过程。
 
 
-### 3. createApplicationContext()---创建Spring容器
+### 3. `createApplicationContext()`---创建Spring容器
 根据`webApplicationType`来创建Spring容器，web项目对应的服务类型是`SERVLET`，那么创建的Spring容器即是`AnnotationConfigServletWebServerApplicationContext`
 
-```
+```java
 protected ConfigurableApplicationContext createApplicationContext() {
    Class<?> contextClass = this.applicationContextClass;
    if (contextClass == null) {
@@ -545,10 +545,10 @@ protected ConfigurableApplicationContext createApplicationContext() {
 }
 ```
 
-### 4. prepareContext()---准备Spring容器
-这一步主要对之前创建的Spring容器进行一些配置，例如配置容器环境、执行初始化器等操作
+### 4. `prepareContext()`---准备Spring容器
+这一步主要对之前创建的 Spring 容器进行一些配置，例如配置容器环境、执行初始化器等操作
 
-```
+```java
 private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
       SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
    // 设置容器环境
@@ -593,7 +593,7 @@ private void prepareContext(ConfigurableApplicationContext context, Configurable
 
 `postProcessApplicationContext()`，检查并加载容器的一些额外配置
 
-```
+```java
 protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
    if (this.beanNameGenerator != null) { // 如果SpringApplication设置了实例命名生成器，注册到Spring容器中
       context.getBeanFactory().registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR,
@@ -617,7 +617,7 @@ protected void postProcessApplicationContext(ConfigurableApplicationContext cont
 `AutoConfigurationReportLoggingInitializer`会给应用程序添加一个条件注解解析器报告等。
 当然，我们也能定义自己的初始化器，只要实现`ApplicationContextInitializer`类的`initialize()`方法，并将自定义的类放入`META-INF/spring.factories`配置文件中即可
 
-```
+```java
 protected void applyInitializers(ConfigurableApplicationContext context) {
    // 从SpringApplication的initializers集合中获取初始化器并循环调用initialize()方法
    for (ApplicationContextInitializer initializer : getInitializers()) {
@@ -629,10 +629,10 @@ protected void applyInitializers(ConfigurableApplicationContext context) {
 }
 ```
 
-### 5. refreshContext()---容器刷新
-Spring容器的刷新refresh方法内部会做很多很多的事情：比如`BeanFactory`的设置、`BeanFactoryPostProcessor`接口的执行、`BeanPostProcessor`接口的执行、自动化配置类的解析、条件注解的解析、国际化的初始化等等
+### 5. `refreshContext()`---容器刷新
+Spring容器的刷新 refresh 方法内部会做很多很多的事情：比如`BeanFactory`的设置、`BeanFactoryPostProcessor`接口的执行、`BeanPostProcessor`接口的执行、自动化配置类的解析、条件注解的解析、国际化的初始化等等
 
-```
+```java
 private void refreshContext(ConfigurableApplicationContext context) {
    refresh(context);
    if (this.registerShutdownHook) {
@@ -658,12 +658,10 @@ public void refresh() throws BeansException, IllegalStateException {
          */
         prepareRefresh();
 
-
         /**
          * 初始化BeanFactory，解析XML，相当于之前的XmlBeanFactory的操作，
          */
         ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
-
 
         /**
          * 为上下文准备BeanFactory，即对BeanFactory的各种功能进行填充，如常用的注解@Autowired @Qualifier等
@@ -673,13 +671,11 @@ public void refresh() throws BeansException, IllegalStateException {
          */
         prepareBeanFactory(beanFactory);
 
-
         try {
             /**
              * 提供子类覆盖的额外处理，即子类处理自定义的BeanFactoryPostProcess
              */
             postProcessBeanFactory(beanFactory);
-
 
             /**
              * 激活各种BeanFactory处理器,包括BeanDefinitionRegistryBeanFactoryPostProcessor和普通的BeanFactoryPostProcessor
@@ -687,37 +683,31 @@ public void refresh() throws BeansException, IllegalStateException {
              */
             invokeBeanFactoryPostProcessors(beanFactory);
 
-
             /**
              * 注册拦截Bean创建的Bean处理器，即注册BeanPostProcessor，不是BeanFactoryPostProcessor，注意两者的区别
              * 注意，这里仅仅是注册，并不会执行对应的方法，将在bean的实例化时执行对应的方法
              */
             registerBeanPostProcessors(beanFactory);
 
-
             /**
              * 初始化上下文中的资源文件，如国际化文件的处理等
              */
             initMessageSource();
-
 
             /**
              * 初始化上下文事件广播器，并放入applicatioEventMulticaster,如ApplicationEventPublisher
              */
             initApplicationEventMulticaster();
 
-
             /**
              * 给子类扩展初始化其他Bean
              */
             onRefresh();
 
-
             /**
              * 在所有bean中查找listener bean，然后注册到广播器中
              */
             registerListeners();
-
 
             /**
              * 设置转换器
@@ -726,7 +716,6 @@ public void refresh() throws BeansException, IllegalStateException {
              * 初始化剩余的非惰性的bean，即初始化非延迟加载的bean
              */
             finishBeanFactoryInitialization(beanFactory);
-
 
             /**
              * 通过spring的事件发布机制发布ContextRefreshedEvent事件，以保证对应的监听器做进一步的处理
@@ -738,7 +727,6 @@ public void refresh() throws BeansException, IllegalStateException {
             finishRefresh();
         }
 
-
         finally {
     
             resetCommonCaches();
@@ -748,19 +736,19 @@ public void refresh() throws BeansException, IllegalStateException {
 ```
 `refresh`方法在spring整个源码体系中举足轻重，是实现 `ioc` 和 `aop` 的关键，下面会单独讲一讲这个刷新过程。
     
-### 6. afterRefresh()---Spring容器后置处理
+### 6. `afterRefresh()`---Spring容器后置处理
 这是一个扩展接口，使用了模板方法，默认为空实现。如果有自定义需求，可以重写该方法。比如打印一些启动结束log，或者一些其它后置处理。
-```
+```java
 protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {}
 ```
 
 ### 7. 触发结束执行监听事件
-```
+```java
 listeners.started(context);
 ```
 注意：这里的`started()`方法执行的是构建好的Spring容器中的`publishEvent()`方法，与前面的`starting()`有些许不同
 
-```
+```java
 @Override
 public void started(ConfigurableApplicationContext context) {
    // 这里执行的是Spring容器中的方法
@@ -770,7 +758,7 @@ public void started(ConfigurableApplicationContext context) {
 
 不过，可以看到最终还是获取了广播器并调用`multicastEvent()`方法执行了事件
 
-```
+```java
 protected void publishEvent(Object event, @Nullable ResolvableType eventType) {
    Assert.notNull(event, "Event must not be null");
 
@@ -811,13 +799,13 @@ protected void publishEvent(Object event, @Nullable ResolvableType eventType) {
 ```
 
 ### 8. 执行runners
-```
+```java
 callRunners(context, applicationArguments);
 ```
 
 检查Spring容器中是否有`ApplicationRunner`和`CommandLineRunner`类型的bean，有的话就遍历他们并执行。我们可以自定义这两个类实现，在程序执行到这一步时就会执行我们自定义的Runners。
 
-```
+```java
 private void callRunners(ApplicationContext context, ApplicationArguments args) {
    List<Object> runners = new ArrayList<>();
    // 获取容器中所有的实现了ApplicationRunner的实例

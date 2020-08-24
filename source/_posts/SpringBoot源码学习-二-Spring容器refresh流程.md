@@ -4,8 +4,8 @@ date: 2020-06-13 10:18:29
 tags:
 ---
 
-上一篇学习了SpringBoot启动流程相关的源码，在Spring容器创建完成后，会执行容器刷新 refreshContext(context) 操作，这个阶段容器会做很多事情，结合源码一起来看一下。
-```
+上一篇学习了 SpringBoot 启动流程相关的源码，在 Spring 容器创建完成后，会执行容器刷新 `refreshContext(context)` 操作，这个阶段容器会做很多事情，结合源码一起来看一下。
+```java
 private void refreshContext(ConfigurableApplicationContext context) {
    refresh(context);
    if (this.registerShutdownHook) {
@@ -25,9 +25,9 @@ protected void refresh(ApplicationContext applicationContext) {
 }
 ```
 
-还是拿最熟悉的web程序为例，对应的Spring容器是AnnotationConfigServletWebServerApplicationContext.class，上面的refresh()方法调用的是它的的父类AbstractApplicationContext.class中的refresh方法。
+还是拿最熟悉的 web 程序为例，对应的 Spring 容器是 `AnnotationConfigServletWebServerApplicationContext.class`，上面的 `refresh()` 方法调用的是它的的父类 `AbstractApplicationContext.class中的refresh` 方法。
 
-```
+```java
 public void refresh() throws BeansException, IllegalStateException {
    synchronized (this.startupShutdownMonitor) {
       // 1. 执行刷新前的一些准备操作，设置其启动日期和活动标志以及执行一些属性的初始化
@@ -96,8 +96,8 @@ public void refresh() throws BeansException, IllegalStateException {
 ---
 
 ## 1.`prepareRefresh()`方法
-表示在真正执行refresh之前需要准备的事情
-```
+表示在真正执行 `refresh` 之前需要准备的事情
+```java
 /**
 * Prepare this context for refreshing, setting its startup date and
 * active flag as well as performing any initialization of property sources.
@@ -153,8 +153,8 @@ protected void prepareRefresh() {
 ---
 
 ## 2.`obtainFreshBeanFactory()`
-创建了一个beanFactory
-```
+创建了一个 `beanFactory` 
+```java
 protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
    // 创建一个新的beanFactory，由AbstractRefreshableApplicationContext实现
    refreshBeanFactory();
@@ -162,8 +162,8 @@ protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
    return getBeanFactory();
 }
 ```
-进入AbstractRefreshableApplicationContext.class的refreshBeanFactory()方法
-```
+进入 `AbstractRefreshableApplicationContext.class` 的 `refreshBeanFactory()` 方法
+```java
 @Override
 protected final void refreshBeanFactory() throws BeansException {
    // 1. 判断是否已经存在beanFactory，如果存在则先销毁、关闭该beanFactory
@@ -188,13 +188,13 @@ protected final void refreshBeanFactory() throws BeansException {
    }
 }
 ```
-loadBeanDefinitions()方法会解析Spring的配置文件，将Spring配置文件中的所有bean封装为BeanDefinition，加载到了beanFactory中
+`loadBeanDefinitions()` 方法会解析 Spring 的配置文件，将 Spring 配置文件中的所有 bean 封装为 `BeanDefinition`，加载到了 `beanFactory` 中
 
 ---
 
-## 3.prepareBeanFactory(beanFactory)
-对上一步获取到的beanFactory进行一些配置工作，例如配置classLoader、后置处理器BeanPostProcessor等。 这个方法会注册3个默认环境 bean：environment、systemProperties 和 systemEnvironment，注册2个 bean 后置处理器：ApplicationContextAwareProcessor 和 ApplicationListenerDetector。
-```
+## 3.`prepareBeanFactory(beanFactory)`
+对上一步获取到的 `beanFactory` 进行一些配置工作，例如配置 `classLoader`、后置处理器 `BeanPostProcessor` 等。 这个方法会注册3个默认环境 `bean`：environment、systemProperties 和 systemEnvironment，注册2个 `bean` 后置处理器：`ApplicationContextAwareProcessor` 和 `ApplicationListenerDetector`。
+```java
 protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
    // Tell the internal bean factory to use the context's class loader etc.
    // 1.设置beanFactory的类加载器(用于加载bean)
@@ -255,14 +255,14 @@ protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 
 ---
 
-## 4.postProcessBeanFactory(beanFactory);
-对beanFactory进行一些后置的处理，对应的方法是一个protected修饰的空方法
-```
+## 4.`postProcessBeanFactory(beanFactory)`
+对 `beanFactory` 进行一些后置的处理，对应的方法是一个 `protected` 修饰的空方法
+```java
 protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 }
 ```
-不同的子类Spring容器会完成不同的操作吗，来看一下GenericWebApplicationContext容器做了哪些操作
-```
+不同的子类 Spring 容器会完成不同的操作吗，来看一下 `GenericWebApplicationContext` 容器做了哪些操作
+```java
 protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     // 1.与ApplicationContextAwareProcessor.class类似，添加的ServletContextAwareProcessor.class用于处理ServletContextAware.class和ServletConfigAware.class这两个bean，在它们初始化时分别调用setServletContext()和setServletConfig()方法
     if (this.servletContext != null) {
@@ -279,12 +279,11 @@ protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactor
 
 ---
 
-## 5.invokeBeanFactoryPostProcessors(beanFactory);
+## 5.`invokeBeanFactoryPostProcessors(beanFactory)`
 
-这个方法主要就是执行了BeanFactoryProcessor接口的postProcessBeanFactory()方法，Spring容器允许这个接口在容器实例化任何bean之前读取bean的定义，并可以修改它。
-BeanDefinitionRegistryPostProcessor是BeanFactoryProcessor的一个子类，它的postProcessBeanDefinitionRegistry()方法用来注册常规的 BeanFactoryPostProcessor(这个常规的是指直接实现了BeanFactoryProcessor的Bean)。这个方法会被优先执行，待所有的常规
-BeanFactoryPostProcessor都被注册到Spring容器上之后，再遍历这些processors执行postProcessBeanFactory()方法。
-```
+这个方法主要就是执行了 `BeanFactoryProcessor` 接口的 `postProcessBeanFactory()` 方法，Spring 容器允许这个接口在容器实例化任何 `bean` 之前读取 `bean` 的定义，并可以修改它。
+`BeanDefinitionRegistryPostProcessor` 是 `BeanFactoryProcessor` 的一个子类，它的 `postProcessBeanDefinitionRegistry()` 方法用来注册常规的 `BeanFactoryPostProcessor` (这个常规的是指直接实现了 `BeanFactoryProcessor` 的Bean)，这个方法会被优先执行。待所有的常规的`BeanFactoryPostProcessor` 都被注册到 Spring 容器上之后，再遍历这些 `processors` 执行 `postProcessBeanFactory()` 方法。
+```java
 protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
    // 1.在Spring容器中找出实现了BeanFactoryPostProcessor.class和 BeanDefinitionRegistryPostProcessor.class 的processor并执行
    PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
@@ -297,10 +296,10 @@ protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory b
    }
 }
 ```
-来看一下invokeBeanFactoryPostProcessors()这个方法，看似很长，但是分析一下发现逻辑还是很清晰的。
-主要的逻辑就是先处理实现了BeanDefinitionRegistryPostProcessor的Bean，再处理常规的实现了BeanFactoryProcessor的Bean。处理时根据优先级顺序，从前到后依次是 [实现了PriorityOrdered]--->[实现了Ordered]--->[其他]。
-这些处理器有两种来源，一种是外部导入的(由初始化器添加的)，通过getBeanFactoryPostProcessors()方法获得，另一种是就是Spring容器中已经注册上去的bean。
-```
+来看一下 `invokeBeanFactoryPostProcessors()` 这个方法，看似很长，但是分析一下发现逻辑还是很清晰的。
+主要的逻辑就是先处理实现了 `BeanDefinitionRegistryPostProcessor` 的 `Bean` ，再处理常规的实现了 `BeanFactoryProcessor` 的 `Bean` 。处理时根据优先级顺序，从前到后依次是：**1.实现了PriorityOrdered 2.实现了Ordered 3.其他**。
+这些处理器有两种来源，一种是 **外部导入** 的(由初始化器添加的)，通过 `getBeanFactoryPostProcessors()` 方法获得；另一种是就是**Spring容器中已经注册上去的bean**。
+```java
 public static void invokeBeanFactoryPostProcessors(
       ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -487,7 +486,7 @@ public static void invokeBeanFactoryPostProcessors(
 }
 ```
 *(注：下面这一段来自 [SpringBoot源码分析之Spring容器的refresh过程](https://fangjian0423.github.io/2017/05/10/springboot-context-refresh/) )*
-> 在这一步中有一个比较重要的类会被执行，它就是：ConfigurationClassPostProcessor.class。这个类实现了BeanDefinitionRegistryPostProcessor.class和PriorityOrdered.class，它的优先级最高，会被最先执行。它会对项目中的@Configuration注解修饰的类(@Component、@ComponentScan、@Import、@ImportResource修饰的类也会被处理)进行解析，解析完成之后把这些bean注册到BeanFactory中。需要注意的是这个时候注册进来的bean还没有实例化。这里ConfigurationClassPostProcessor最先被处理还有另外一个原因，如果程序中有自定义的BeanFactoryPostProcessor，那么这个PostProcessor首先得通过ConfigurationClassPostProcessor被解析出来，然后才能被Spring容器找到并执行。<br>(ConfigurationClassPostProcessor不先执行的话，这个Processor是不会被解析的，不会被解析的话也就不会执行了)。下图就是对ConfigurationClassPostProcessor的执行流程的解读：
+> 在这一步中有一个比较重要的类会被执行，它就是：`ConfigurationClassPostProcessor.class`。这个类实现了 `BeanDefinitionRegistryPostProcessor.class` 和 `PriorityOrdered.class`，它的优先级最高，会被最先执行。它会对项目中的 `@Configuration` 注解修饰的类(`@Component`、`@ComponentScan`、`@Import`、`@ImportResource` 修饰的类也会被处理)进行解析，解析完成之后把这些 `bean` 注册到 `BeanFactory` 中。需要注意的是这个时候注册进来的 `bean` 还没有实例化。这里 `ConfigurationClassPostProcessor` 最先被处理还有另外一个原因，如果程序中有自定义的 `BeanFactoryPostProcessor` ，那么这个 `PostProcessor` 首先得通过 `ConfigurationClassPostProcessor` 被解析出来，然后才能被 Spring 容器找到并执行。<br>(`ConfigurationClassPostProcessor`不先执行的话，这个 `Processor` 是不会被解析的，不会被解析的话也就不会执行了)。下图就是对`ConfigurationClassPostProcessor`的执行流程的解读：
 
 ![avatar](http://ww1.sinaimg.cn/large/006jvOIfgy1gfqgfpcf19j315n1c6gtr.jpg)
 
@@ -495,10 +494,10 @@ public static void invokeBeanFactoryPostProcessors(
 
 ---
 
-## 6.registerBeanPostProcessors(beanFactory);
-注册BeanPostProcessor，这个方法和上一步的处理BeanFactoryPostProcessor处理器的流程类似。
-在看具体代码之前，我们先来看看BeanPostProcessor和BeanFactoryPostProcessor这两个长得很像的接口。BeanFactoryPostProcessor是针对BeanFactory的拓展，主要用于在bean实例化之前，读取bean的定义，并可以修改甚至覆盖它，并且允许开发者在BeanFactory实例化之后修改容器内部的beanFactory。
-```
+## 6.`registerBeanPostProcessors(beanFactory)`
+注册 `BeanPostProcessor` ，这个方法和上一步的处理 `BeanFactoryPostProcessor` 处理器的流程类似。
+在看具体代码之前，我们先来看看 `BeanPostProcessor` 和 `BeanFactoryPostProcessor` 这两个长得很像的接口。 `BeanFactoryPostProcessor` 是针对 `BeanFactory` 的拓展，主要用于在 `bean` 实例化之前，读取 `bean` 的定义，并可以修改甚至覆盖它，并且允许开发者在 `BeanFactory` 实例化之后修改容器内部的 `beanFactory`。
+```java
 @FunctionalInterface
 public interface BeanFactoryPostProcessor {
    /**
@@ -512,8 +511,8 @@ public interface BeanFactoryPostProcessor {
    void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
 }
 ```
-BeanPostProcessor则是针对bean的拓展，主要用在bean实例化之后，执行初始化方法的前/后，允许开发者对bean实例进行修改。
-```
+`BeanPostProcessor` 则是针对 `bean` 的拓展，主要用在 `bean` 实例化之后，执行初始化方法的前/后，允许开发者对 `bean` 实例进行修改。
+```java
 public interface BeanPostProcessor {
    @Nullable
    default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -527,8 +526,8 @@ public interface BeanPostProcessor {
 }
 ```
 
-下面再来看看对BeanPostProcessor具体的处理流程
-```
+下面再来看看对 `BeanPostProcessor` 具体的处理流程
+```java
 public static void registerBeanPostProcessors(
       ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
@@ -617,13 +616,13 @@ public static void registerBeanPostProcessors(
    beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 }
 ```
-可以看到，registerBeanPostProcessors()仅仅只将BeanPostProcessor注册到beanFactory中的beanPostProcessors缓存中，并没有执行它们，这是因为还没到它们出场的时候。上面讲过，BeanPostProcessor是在bean实例化之后，执行初始化方法前/后，才被调用。
+可以看到，`registerBeanPostProcessors()` 仅仅只将 `BeanPostProcessor` 注册到 `beanFactory` 中的 `beanPostProcessors` 缓存中，并没有执行它们，这是因为还没到它们出场的时候。上面讲过， `BeanPostProcessor` 是在 `bean` 实例化之后，执行初始化方法前/后，才被调用。
 
 ---
 
-## 7.initMessageSource();
-初始化消息资源MessageSource，MessageSource主要用于支持消息的参数化和国际化。
-```
+## `7.initMessageSource()`
+初始化消息资源 `MessageSource` , `MessageSource` 主要用于支持消息的参数化和国际化。
+```java
 protected void initMessageSource() {
    // 1. 获取beanFactory
    ConfigurableListableBeanFactory beanFactory = getBeanFactory();
@@ -660,9 +659,9 @@ protected void initMessageSource() {
 
 ---
 
-## 8.initApplicationEventMulticaster()
-初始化事件广播器，初始过程与上面初始化MessageSource类似。在SpringBoot源码学习(一)---启动流程说到过，这个广播器承担的责任就是将SpringApplicationRunListener发出的事件，广播给各个监听器ApplicationListener。
-```
+## 8.`initApplicationEventMulticaster()`
+初始化事件广播器，初始过程与上面初始化 `MessageSource` 类似。在[SpringBoot源码学习(一)---启动流程](https://jokerbyrant.github.io/2020/06/07/SpringBoot%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0(%E4%B8%80)---%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B)说到过，这个广播器承担的责任就是将 `SpringApplicationRunListener` 发出的事件，广播给各个监听器 `ApplicationListener` 。
+```java
 protected void initApplicationEventMulticaster() {
    ConfigurableListableBeanFactory beanFactory = getBeanFactory();
    // 1.判断beanFactory中是否存在名为applicationEventMulticaster的bean
@@ -688,9 +687,9 @@ protected void initApplicationEventMulticaster() {
 
 ---
 
-## 9.onRefresh();
-一个模板方法，实现为空，由子类进行拓展。对于SpringBoot来说，会在这里创建内置的Servlet容器。这里面涉及的流程比较繁琐，具体的流程在这篇有讲到：SpringBoot源码学习(四)---内置Servlet容器加载流程
-```
+## 9.`onRefresh()`
+一个模板方法，实现为空，由子类进行拓展。对于 `SpringBoot` 来说，会在这里创建 **内置的Servlet容器** 。这里面涉及的流程比较繁琐，具体的流程在这篇有讲到：SpringBoot源码学习(四)---内置Servlet容器加载流程
+```java
 protected void onRefresh() throws BeansException {
    // For subclasses: do nothing by default.
 }
@@ -698,9 +697,9 @@ protected void onRefresh() throws BeansException {
 
 ---
 
-## 10.registerListeners();
-将事件监听器添加到第8步创建的事件广播器中，如果存在earlyEventsToProcess的话，直接将其广播出去。
-```
+## 10.`registerListeners()`
+将事件监听器添加到第8步创建的事件广播器中，如果存在 `earlyEventsToProcess` 的话，直接将其广播出去。
+```java
 protected void registerListeners() {
    // Register statically specified listeners first.
    // 1. 遍历已经存在的监听器，将其添加到广播器中
@@ -727,13 +726,13 @@ protected void registerListeners() {
    }
 }
 ```
-其中getApplicationListeners()方法获取到的监听器，我们在[SpringBoot源码学习(一)---启动流程](https://jokerbyrant.github.io/2020/06/07/SpringBoot%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0(%E4%B8%80)---%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B) 提到过，在执行run()方法的第4阶段 prepareContext()---准备Spring容器时，最后会将在SpringApplication初始化时获取到的监听器添加到Spring容器中。
+其中 `getApplicationListeners()` 方法获取到的监听器，我们在[SpringBoot源码学习(一)---启动流程](https://jokerbyrant.github.io/2020/06/07/SpringBoot%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0(%E4%B8%80)---%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B) 提到过，在执行 `run()` 方法的第4阶段  `prepareContext()` ---准备Spring容器时，最后会将在 `SpringApplication` 初始化时获取到的监听器添加到 Spring 容器中。
 
-```
+```java
 listeners.contextLoaded(context);
 ```
 
-```
+```java
 public void contextLoaded(ConfigurableApplicationContext context) {
    // 遍历SpringApplication中的监听器
    for (ApplicationListener<?> listener : this.application.getListeners()) {
@@ -749,9 +748,9 @@ public void contextLoaded(ConfigurableApplicationContext context) {
 
 ---
 
-## 11.finishBeanFactoryInitialization(beanFactory);
-实例化BeanFactory中已经注册但是没有实例化的所有非懒加载单例。除了一些内部的 bean、实现了 BeanFactoryPostProcessor 接口的 bean、实现了 BeanPostProcessor 接口的 bean，其他的非懒加载单例 bean 都会在这个方法中被实例化。既然Bean都被实例化了，那么 BeanPostProcessor 也就被触发了。
-```
+## 11.`finishBeanFactoryInitialization(beanFactory)`
+实例化 `BeanFactory` 中已经注册但是没有实例化的所有非懒加载单例。除了一些内部的 `bean` 、实现了 `BeanFactoryPostProcessor` 接口的 `bean` 、实现了 `BeanPostProcessor` 接口的 `bean` ，其他的非懒加载单例 `bean` 都会在这个方法中被实例化。既然 `Bean` 都被实例化了，那么 `BeanPostProcessor` 也就被触发了。
+```java
 /**
 * Finish the initialization of this context's bean factory,
 * initializing all remaining singleton beans.
@@ -793,13 +792,13 @@ protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory b
    beanFactory.preInstantiateSingletons();
 }
 ```
-这个方法是实现Spring IOC的核心，关于它更详细的解读参见：[Spring IoC：finishBeanFactoryInitialization 详解](https://www.zhihu.com/search?type=content&q=finishBeanFactoryInitialization(beanFactory))
+这个方法是实现`Spring IOC`的核心，关于它更详细的解读参见：[Spring IoC：finishBeanFactoryInitialization 详解](https://www.zhihu.com/search?type=content&q=finishBeanFactoryInitialization(beanFactory))
 
 ---
 
-## 12.finishRefresh();
+## 12.`finishRefresh()`
 结束当前容器的刷新操作
-```
+```java
 /**
 * Finish the refresh of this context, invoking the LifecycleProcessor's
 * onRefresh() method and publishing the
@@ -825,8 +824,8 @@ protected void finishRefresh() {
    LiveBeansView.registerApplicationContext(this);
 }
 ```
-initLifecycleProcessor()，初始化生命周期处理器，过程与第1步和第2步类似。Spring在加载和初始化所有bean后，还需要执行一些任务，那么就可以通过生命周期处理器做到。
-```
+`initLifecycleProcessor()`，初始化生命周期处理器，过程与第1步和第2步类似。Spring 在加载和初始化所有 `bean` 后，还需要执行一些任务，那么就可以通过生命周期处理器做到。
+```java
 protected void initLifecycleProcessor() {
    ConfigurableListableBeanFactory beanFactory = getBeanFactory();
    // 1. 判断beanFactory中是否存在名为lifecycleProcessor的Bean
@@ -851,8 +850,8 @@ protected void initLifecycleProcessor() {
    }
 }
 ```
-getLifecycleProcessor().onRefresh();
-```
+`getLifecycleProcessor().onRefresh();`
+```java
 @Override
 public void onRefresh() {
    startBeans(true);
@@ -895,8 +894,8 @@ private void startBeans(boolean autoStartupOnly) {
    }
 }
 ```
-最后调用这个start()方法会在SmartLifecycle类中进行，我们也可以自定义一个生命周期处理器，参考自：[Spring中的SmartLifecycle作用](https://www.jianshu.com/p/7b8f2a97c8f5)
-```
+最后调用这个 `start()` 方法会在 `SmartLifecycle` 类中进行，我们也可以自定义一个生命周期处理器，参考自：[Spring中的SmartLifecycle作用](https://www.jianshu.com/p/7b8f2a97c8f5)
+```java
 /**
 * 自定义生命周期处理器SmartLifecycle测试
 * @author sxh
@@ -968,7 +967,7 @@ public class MySimpleSmartLifeCycle implements SmartLifecycle {
 }
 ```
 
-OK，到这儿Spring容器的refresh流程就介绍完了，对各个步骤的介绍并没有深入进去，例如在finishBeanFactoryInitialization()步骤关于bean的实例化过程就没有具体的分析，这一块还是挺重要的，后续会看情况进行分析。
+OK，到这儿 Spring 容器的 `refresh` 流程就介绍完了，对各个步骤的介绍并没有深入进去，例如在 `finishBeanFactoryInitialization()` 步骤关于 `bean` 的实例化过程就没有具体的分析，这一块还是挺重要的，后续会看情况进行分析。
 
 
 
