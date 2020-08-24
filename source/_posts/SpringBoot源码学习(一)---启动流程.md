@@ -1,7 +1,7 @@
 ---
 title: SpringBoot源码学习(一)---启动流程
 date: 2020-06-07 14:08:42
-categories: SpringBoot
+categories: 后端技术
 tags: SpringBoot
 ---
 工作中接触的最多的框架就是 SpringBoot 了，但对它一直处于一种一知半解的状态，就去学习了一下它的源码，接下来几篇文章就来记录一下，也正好加强一下理解。
