@@ -5,9 +5,12 @@ categories: 后端技术
 tags: SpringBoot
 ---
 
+## 前言
+`SpringBoot` 中内置了 `Servlet` 容器，支持 `Tomcat` ， `Jetty` 和 `Undertow` 服务器，所以可以直接运行。相比之下，传统的`JavaWeb`程序则需要嵌入到`Tomcat`之类的 `Servlet` 容器中才能运行。接下来就来学习一下， `SpringBoot` 加载内置的 `Servlet` 容器的流程。
+
 ## 一、相关类介绍
 ### `WebServer` 
-SpringBoot 对内置的 Servlet 容器做了一层封装
+`SpringBoot` 对内置的 `Servlet` 容器做了一层封装
 ```java
 public interface WebServer {
    // 启动内置的Servlet容器
@@ -20,7 +23,7 @@ public interface WebServer {
    int getPort();
 }
 ```
-它目前有下图中五个实现类，对应了四种容器Jetty、Tomcat、UnderTow、Netty，其中Netty不是Servlet容器。
+它目前有下图中五个实现类，对应了四种容器 `Jetty` 、 `Tomcat` 、 `UnderTow` 、 `Netty` ，其中 `Netty` 不是 `Servlet` 容器。
 ![Java中的五中Servlet实现类](https://ae01.alicdn.com/kf/U6bea8f9a32c54e1ba5f5f607cbf5fe6d8.jpg)
 
 ### `ServletWebServerFactory` 
@@ -203,12 +206,12 @@ public interface WebServerFactoryCustomizer<T extends WebServerFactory> {
    void customize(T factory);
 }
 ```
-OK，到这为止，主要的涉及到加载 **内置Servlet容器** 的类都介绍完了，下面就以 `tomcat` 为例来看看内置 Servlet 的创建和启动流程。
+OK，到这为止，主要的涉及到加载 **内置Servlet容器** 的类都介绍完了，下面就以 `tomcat` 为例来看看内置 `Servlet` 的创建和启动流程。
 
 ---
 
 ## 二、Servlet的创建
-回到之前看的 SpringBoot 启动代码上
+回到之前看的 `SpringBoot` 启动代码上
 ```java
 public ConfigurableApplicationContext run(String... args) {
    // 计时工具
@@ -279,7 +282,7 @@ public ConfigurableApplicationContext run(String... args) {
 
 ### 容器的创建
 重点看一下第三步---**创建Spring容器**
-```
+```java
 protected ConfigurableApplicationContext createApplicationContext() {
    Class<?> contextClass = this.applicationContextClass;
    if (contextClass == null) {
@@ -304,7 +307,7 @@ protected ConfigurableApplicationContext createApplicationContext() {
    return (ConfigurableApplicationContext) BeanUtils.instantiateClass(contextClass);
 }
 ```
-根据 `webApplicationType` 判断当前服务的类型，然后创建对应的 Spring 容器，以 web 程序为例，这里就会执行
+根据 `webApplicationType` 判断当前服务的类型，然后创建对应的 `Spring` 容器，以 `web` 程序为例，这里就会执行
 ```java
 contextClass = Class.forName(DEFAULT_SERVLET_WEB_CONTEXT_CLASS);
 ```
@@ -440,7 +443,7 @@ private void createWebServer() {
    initPropertySources();
 }
 ```
-`getWebServerFactory()`,获取内置容器工厂,上面我们讲过三种内置Servlet工厂的注册过程
+`getWebServerFactory()`,获取内置容器工厂,上面我们讲过三种内置 `Servlet` 工厂的注册过程
 ```java
 protected ServletWebServerFactory getWebServerFactory() {
    // Use bean names so that we don't consider the hierarchy\
@@ -508,7 +511,7 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
    }
 }
 ```
-`addServletContextInitializerBeans()`方法，在这里获取所有`ServletContextInitializer`类型的bean，并存放到`initializers`中。
+`addServletContextInitializerBeans()`方法，在这里获取所有`ServletContextInitializer`类型的 `bean` ，并存放到`initializers`中。
 ```java
 private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) {
    for (Class<? extends ServletContextInitializer> initializerType : this.initializerTypes) {
@@ -564,7 +567,7 @@ private void addServletContextInitializerBean(Class<?> type, String beanName, Se
    }
 }
 ```
-这些 `ServletContextInitializer` 类型的 `bean` 例如 `ServletRegistrationBean.class`，通过 `SpringBoot` 的 `AutoConfiguration` 装配到 Spring容器 中，在注册时会将对应的 `Servlet` 添加到自己的参数中，我们以 `DispatchServletRegistrationBean` 为例来看一下
+这些 `ServletContextInitializer` 类型的 `bean` 例如 `ServletRegistrationBean.class`，通过 `SpringBoot` 的 `AutoConfiguration` 装配到 `Spring` 容器 中，在注册时会将对应的 `Servlet` 添加到自己的参数中，我们以 `DispatchServletRegistrationBean` 为例来看一下
 ```java
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @Configuration
@@ -832,7 +835,7 @@ private WebServer startWebServer() {
 }
 ```
 
-到此为止，内置的Servlet容器就完成了创建和启动的流程。
+到此为止，内置的 `Servlet` 容器就完成了创建和启动的流程。
 
 
 
