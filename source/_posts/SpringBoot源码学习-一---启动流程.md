@@ -4,7 +4,7 @@ date: 2020-06-07 14:08:42
 categories: 后端技术
 tags: SpringBoot
 ---
-工作中接触的最多的框架就是 SpringBoot 了，但对它一直处于一种一知半解的状态，就去学习了一下它的源码，接下来几篇文章就来记录一下，也正好加强一下理解。
+工作中接触的最多的框架就是 `SpringBoot` 了，但对它一直处于一种一知半解的状态，就去学习了一下它的源码，接下来几篇文章就来记录一下，也正好加强一下理解。
 
 ```java
 @SpringBootApplication
@@ -15,6 +15,8 @@ public class MySpringBootApplication {
 }
 ```
 上面的代码就是 SpringBoot 的入口类，从代码上可以看出主要就是调用了 `SpringApplication` 的 `run()` 方法，并将我们的启动类作为参数传了进去，下面我们就进到源码里面看看这个run方法。
+
+<!--more-->
 
 ```java
 public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {

@@ -5,7 +5,10 @@ categories: 后端技术
 tags: SpringBoot
 ---
 
-上一篇学习了 SpringBoot 启动流程相关的源码，在 Spring 容器创建完成后，会执行容器刷新 `refreshContext(context)` 操作，这个阶段容器会做很多事情，结合源码一起来看一下。
+上一篇学习了 `SpringBoot` 启动流程相关的源码，在 `Spring` 容器创建完成后，会执行容器刷新 `refreshContext(context)` 操作，这个阶段容器会做很多事情，结合源码一起来看一下。
+
+<!--more-->
+
 ```java
 private void refreshContext(ConfigurableApplicationContext context) {
    refresh(context);
@@ -26,7 +29,7 @@ protected void refresh(ApplicationContext applicationContext) {
 }
 ```
 
-还是拿最熟悉的 web 程序为例，对应的 Spring 容器是 `AnnotationConfigServletWebServerApplicationContext.class`，上面的 `refresh()` 方法调用的是它的的父类 `AbstractApplicationContext.class中的refresh` 方法。
+还是拿最熟悉的 `web` 程序为例，对应的 `Spring` 容器是 `AnnotationConfigServletWebServerApplicationContext.class`，上面的 `refresh()` 方法调用的是它的的父类 `AbstractApplicationContext.class中的refresh` 方法。
 
 ```java
 public void refresh() throws BeansException, IllegalStateException {

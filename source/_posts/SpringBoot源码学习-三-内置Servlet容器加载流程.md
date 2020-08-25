@@ -5,8 +5,9 @@ categories: 后端技术
 tags: SpringBoot
 ---
 
-## 前言
 `SpringBoot` 中内置了 `Servlet` 容器，支持 `Tomcat` ， `Jetty` 和 `Undertow` 服务器，所以可以直接运行。相比之下，传统的`JavaWeb`程序则需要嵌入到`Tomcat`之类的 `Servlet` 容器中才能运行。接下来就来学习一下， `SpringBoot` 加载内置的 `Servlet` 容器的流程。
+
+<!--more-->
 
 ## 一、相关类介绍
 ### `WebServer` 
