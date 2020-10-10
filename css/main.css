@@ -177,8 +177,8 @@ body {
 body {
   background: var(--body-bg-color);
   color: var(--text-color);
-  font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 0.9em;
+  font-family: 'Noto Serif SC', "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
   line-height: 2;
 }
 @media (max-width: 991px) {
@@ -193,7 +193,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: 'Noto Serif SC', "PingFang SC", "Microsoft YaHei", sans-serif;
   font-weight: bold;
   line-height: 1.5;
   margin: 20px 0 15px;
@@ -317,7 +317,7 @@ td {
   border-radius: 2px;
   color: var(--btn-default-color);
   display: inline-block;
-  font-size: 0.875em;
+  font-size: 14px;
   line-height: 2;
   padding: 0 20px;
   text-decoration: none;
@@ -381,6 +381,51 @@ td {
 .toggle.toggle-close .toggle-line-last {
   transform: rotate(45deg);
   top: -5px;
+}
+.highlight-container {
+  position: relative;
+}
+.highlight-container:hover .copy-btn,
+.highlight-container .copy-btn:focus {
+  opacity: 1;
+}
+.copy-btn {
+  color: #333;
+  cursor: pointer;
+  line-height: 1.6;
+  opacity: 0;
+  padding: 2px 6px;
+  position: absolute;
+  transition-delay: 0s;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+  color: #fff;
+  font-size: 14px;
+  right: 0;
+  top: 2px;
+}
+.highlight-container {
+  background: #21252b;
+  border-radius: 5px;
+  box-shadow: 0 10px 30px 0 rgba(0,0,0,0.4);
+  padding-top: 30px;
+}
+.highlight-container::before {
+  background: #fc625d;
+  border-radius: 50%;
+  box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
+  content: ' ';
+  height: 12px;
+  left: 12px;
+  margin-top: -20px;
+  position: absolute;
+  width: 12px;
+}
+.highlight-container .highlight {
+  border-radius: 0 0 5px 5px;
+}
+.highlight-container .highlight .table-container {
+  border-radius: 0 0 5px 5px;
 }
 .highlight,
 pre {
@@ -985,7 +1030,7 @@ pre .javascript .function {
   color: var(--brand-hover-color);
 }
 .site-title {
-  font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: 'Noto Serif SC', "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 1.375em;
   font-weight: normal;
   margin: 0;
@@ -1063,7 +1108,7 @@ pre .javascript .function {
 .menu-item span.exturl {
   border-bottom: 0;
   display: block;
-  font-size: 0.8125em;
+  font-size: 13px;
   transition-property: border-color;
   transition-delay: 0s;
   transition-duration: 0.2s;
@@ -1161,14 +1206,14 @@ pre .javascript .function {
 .links-of-author span.exturl {
   border-bottom-color: #555;
   display: inline-block;
-  font-size: 0.8125em;
+  font-size: 13px;
   margin-bottom: 10px;
   margin-right: 10px;
   vertical-align: middle;
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #a15de8;
+  background: #d92ebb;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -1205,11 +1250,11 @@ pre .javascript .function {
   color: #fff;
 }
 .links-of-blogroll {
-  font-size: 0.8125em;
+  font-size: 13px;
   margin-top: 10px;
 }
 .links-of-blogroll-title {
-  font-size: 0.875em;
+  font-size: 14px;
   font-weight: 600;
   margin-top: 0;
 }
@@ -1249,7 +1294,7 @@ pre .javascript .function {
   color: var(--text-color);
   cursor: pointer;
   display: inline-block;
-  font-size: 0.875em;
+  font-size: 14px;
 }
 .sidebar-nav li.sidebar-nav-overview {
   margin-left: 10px;
@@ -1294,7 +1339,7 @@ pre .javascript .function {
   background: #fc6423;
 }
 .post-toc {
-  font-size: 0.875em;
+  font-size: 14px;
 }
 .post-toc ol {
   list-style: none;
@@ -1369,7 +1414,7 @@ pre .javascript .function {
 }
 .footer {
   color: #999;
-  font-size: 0.875em;
+  font-size: 14px;
   padding: 20px 0;
 }
 .footer.footer-fixed {
@@ -1396,7 +1441,7 @@ pre .javascript .function {
 }
 .languages {
   display: inline-block;
-  font-size: 1.125em;
+  font-size: 18px;
   position: relative;
 }
 .languages .lang-select-label span {
@@ -1494,10 +1539,7 @@ pre .javascript .function {
   position: fixed;
   transition-property: bottom;
   z-index: 1300;
-  width: 24px;
-}
-.back-to-top span {
-  display: none;
+  width: initial;
 }
 .back-to-top:hover {
   color: #fc6423;
@@ -1511,24 +1553,34 @@ pre .javascript .function {
     opacity: 0.8;
   }
 }
+.reading-progress-bar {
+  background: #37C6C0;
+  display: block;
+  height: 3px;
+  left: 0;
+  position: fixed;
+  width: 0;
+  z-index: 1500;
+  top: 0;
+}
 .post-body {
-  font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: 'Noto Serif SC', "PingFang SC", "Microsoft YaHei", sans-serif;
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
 @media (min-width: 1200px) {
   .post-body {
-    font-size: 1.125em;
+    font-size: 18px;
   }
 }
 .post-body .exturl .fa {
-  font-size: 0.875em;
+  font-size: 14px;
   margin-left: 4px;
 }
 .post-body .image-caption,
 .post-body .figure .caption {
   color: #999;
-  font-size: 0.875em;
+  font-size: 14px;
   font-weight: bold;
   line-height: 1;
   margin: -20px auto 15px;
@@ -1567,7 +1619,7 @@ pre .javascript .function {
   }
 }
 .posts-collapse .collection-title {
-  font-size: 1.125em;
+  font-size: 18px;
   position: relative;
 }
 .posts-collapse .collection-title::before {
@@ -1584,7 +1636,7 @@ pre .javascript .function {
   width: 10px;
 }
 .posts-collapse .collection-year {
-  font-size: 1.6em;
+  font-size: 24px;
   font-weight: bold;
   margin: 60px 0;
   position: relative;
@@ -1628,7 +1680,7 @@ pre .javascript .function {
   left: 0;
   margin-left: -4px;
   position: absolute;
-  top: 0.75em;
+  top: 13.5px;
   transition-property: background;
   width: 6px;
   transition-delay: 0s;
@@ -1643,7 +1695,7 @@ pre .javascript .function {
 }
 .posts-collapse .post-meta {
   display: inline;
-  font-size: 0.75em;
+  font-size: 13.5px;
   margin-right: 10px;
 }
 .posts-collapse .post-title {
@@ -1655,7 +1707,7 @@ pre .javascript .function {
   color: var(--link-color);
 }
 .posts-collapse .post-title .fa-external-link-alt {
-  font-size: 0.875em;
+  font-size: 14px;
   margin-left: 5px;
 }
 .posts-collapse::before {
@@ -1769,10 +1821,10 @@ pre .javascript .function {
   margin: 0;
 }
 .posts-expand .post-header {
-  font-size: 1.125em;
+  font-size: 18px;
 }
 .posts-expand .post-title {
-  font-size: 1.6em;
+  font-size: 24px;
   font-weight: normal;
   margin: initial;
   text-align: center;
@@ -1805,18 +1857,18 @@ pre .javascript .function {
   visibility: visible;
 }
 .posts-expand .post-title-link .fa-external-link-alt {
-  font-size: 0.875em;
+  font-size: 14px;
   margin-left: 5px;
 }
 .posts-expand .post-meta {
   color: #999;
-  font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 0.75em;
+  font-family: 'Noto Serif SC', "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 13.5px;
   margin: 3px 0 60px 0;
   text-align: center;
 }
 .posts-expand .post-meta .post-description {
-  font-size: 0.875em;
+  font-size: 14px;
   margin-top: 2px;
 }
 .posts-expand .post-meta time {
@@ -1856,7 +1908,7 @@ pre .javascript .function {
 .post-nav-item a {
   border-bottom: none;
   display: block;
-  font-size: 0.875em;
+  font-size: 14px;
   line-height: 1.6;
   position: relative;
 }
@@ -1864,7 +1916,7 @@ pre .javascript .function {
   top: 2px;
 }
 .post-nav-item .fa {
-  font-size: 0.75em;
+  font-size: 13.5px;
 }
 .post-nav-item:first-child {
   margin-right: 15px;
@@ -1902,7 +1954,7 @@ pre .javascript .function {
 }
 .post-tags a {
   display: inline-block;
-  font-size: 0.8125em;
+  font-size: 13px;
 }
 .post-tags a:not(:last-child) {
   margin-right: 10px;
@@ -1921,7 +1973,7 @@ pre .javascript .function {
 }
 .social-like {
   display: flex;
-  font-size: 0.875em;
+  font-size: 14px;
   justify-content: center;
   text-align: center;
 }
@@ -2114,7 +2166,7 @@ pre .javascript .function {
   }
 }
 ul.breadcrumb {
-  font-size: 0.75em;
+  font-size: 13.5px;
   list-style: none;
   margin: 1em 0;
   padding: 0 2em;
@@ -2163,7 +2215,7 @@ ul.breadcrumb li + li:last-child {
 }
 .header-inner {
   background: var(--content-bg-color);
-  border-radius: initial;
+  border-radius: 20px 20px 20px 20px;
   box-shadow: initial;
   overflow: hidden;
   padding: 0;
@@ -2196,7 +2248,7 @@ ul.breadcrumb li + li:last-child {
 }
 .content-wrap {
   background: var(--content-bg-color);
-  border-radius: initial;
+  border-radius: 20px 20px 20px 20px;
   box-shadow: initial;
   box-sizing: border-box;
   padding: 40px;
@@ -2354,7 +2406,7 @@ ul.breadcrumb li + li:last-child {
 }
 .sidebar-inner {
   background: var(--content-bg-color);
-  border-radius: initial;
+  border-radius: 20px;
   box-shadow: initial;
   box-sizing: border-box;
   color: var(--text-color);
