@@ -56,5 +56,7 @@
   {%- if theme.pjax %}
     </div>
   {%- endif %}
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
 </body>
 </html>

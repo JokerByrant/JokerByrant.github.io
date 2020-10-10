@@ -1,0 +1,74 @@
+body {
+  background: url(https://ae01.alicdn.com/kf/Uc99710a45f0540acaea851d7bbaee9942.jpg) no-repeat;
+  /* 背景图垂直、水平均居中 */
+  background-position: center center;
+  /* 当内容高度大于图片高度时，背景图像的位置相对于viewport固定 */
+  background-attachment: fixed;
+  /* 让背景图基于容器大小伸缩 */
+  background-size: cover;
+  /* 设置背景颜色，背景图加载过程中会显示背景色 */
+  background-color: #1F2D3B;
+}
+
+// 侧边栏透明度
+.header-inner, .sidebar{ 
+	opacity: 0.8; 
+}
+
+// 正文透明度
+.content-wrap { 
+  opacity: 0.9;
+}
+.content-wrap {
+  background: initial;
+  box-shadow: initial;
+  padding: initial;
+}
+// 主页文章添加阴影
+.content  {
+   margin-top: 10px;  //大小自行调整 
+   margin-bottom: 20px; //大小自行调整
+   padding: 20px;      //大小自行调整
+   -webkit-box-shadow: 0 0 5px rgba(202, 203, 203, .5);
+   -moz-box-shadow: 0 0 5px rgba(202, 203, 204, .5);
+}
+// 正文
+.post-block {
+    background: var(--content-bg-color);
+    border-radius: 20px 20px 20px 20px;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.06), 0 1px 5px 0 rgba(0,0,0,0.12);
+    padding: 40px;
+}
+.post-block + .post-block {
+  margin-top: 15px;
+}
+.post-eof {
+    display: none;
+}
+
+// 超链接样式
+a {
+  border-bottom: none;
+}
+.post-body a:not(.btn) {
+  color: #5073b8;
+  border-bottom: none;
+  text-decoration: none;
+}
+.post-body a:not(.btn):hover {
+  border-bottom: 1px solid #5073b8;
+}
+
+// 正文小标题样式
+.post-body h1, .post-body h2, .post-body h3, .post-body h4 {
+    border-bottom: 1px solid #eee;
+}
+
+.links-of-blogroll-list a {
+    color: #5073b8;
+    font-weight: bold;
+}
+.links-of-blogroll-list a:hover {
+    color: #A166AB;
+    border-bottom: 1px solid  #A166AB;
+}
