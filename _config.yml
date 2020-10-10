@@ -49,9 +49,9 @@ post_asset_folder: false
 relative_link: false
 future: true
 highlight:
-  enable: true
-  line_number: true
-  auto_detect: false
+  enable: true # 是否开启代码高亮
+  line_number: true # 是否增加代码行号,代码块的行号显示
+  auto_detect: false #自动判断代码语言
   tab_replace: ''
   wrap: true
   hljs: false
