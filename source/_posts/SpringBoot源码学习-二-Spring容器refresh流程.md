@@ -1,8 +1,9 @@
 ---
 title: SpringBoot源码学习(二)---Spring容器refresh流程
-date: 2020-06-13 10:18:29
 categories: 后端技术
 tags: SpringBoot
+abbrlink: 34219
+date: 2020-06-13 10:18:29
 ---
 
 上一篇学习了 `SpringBoot` 启动流程相关的源码，在 `Spring` 容器创建完成后，会执行容器刷新 `refreshContext(context)` 操作，这个阶段容器会做很多事情，结合源码一起来看一下。
