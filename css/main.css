@@ -1213,7 +1213,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #e5ffcd;
+  background: #8f37a2;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2619,4 +2619,12 @@ a {
 .links-of-blogroll-list a:hover {
   color: #a166ab;
   border-bottom: 1px solid #a166ab;
+}
+ol,
+ul {
+  margin-block-start: 5px;
+  margin-block-end: 10px;
+}
+p {
+  margin: 0 0 10px 0;
 }
