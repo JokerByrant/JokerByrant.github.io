@@ -30,8 +30,9 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://ae01.alicdn.com/kf/Ufcc6435d8448449faf2cc8d0cd7b02e8E.jpg">
 <meta property="og:image" content="https://ae01.alicdn.com/kf/U0207f048a070475996912adf3d04d996s.jpg">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ue6f537b769c14b278c437d4f8e270659z.jpg">
 <meta property="article:published_time" content="2020-10-12T03:57:19.000Z">
-<meta property="article:modified_time" content="2020-10-14T02:28:05.366Z">
+<meta property="article:modified_time" content="2020-10-15T06:52:55.589Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="后端技术">
 <meta name="twitter:card" content="summary">
@@ -232,7 +233,16 @@
 <li><a href="https://opendocs.alipay.com/open/common/105366" target="_blank" rel="noopener">添加功能</a> 并 <a href="https://b.alipay.com/signing/productDetailV2.htm?productId=I1011000290000001002" target="_blank" rel="noopener">签约</a>，<a href="https://opendocs.alipay.com/open/291/105971" target="_blank" rel="noopener">配置密钥</a></li>
 <li>集成和开发</li>
 </ol>
+<h3 id="同步通知和异步通知"><a href="#同步通知和异步通知" class="headerlink" title="同步通知和异步通知"></a>同步通知和异步通知</h3><ul>
+<li>同步通知：支付宝 <code>SDK</code> 对商户的请求支付数据处理完成后，会将结果同步反馈给商户 <code>App</code> 端。</li>
+<li>异步通知：对于 <code>App</code> 支付产生的交易，支付宝会根据原始支付 <code>API</code> 中传入的异步通知地址 <code>notify_url</code> ，通过 <code>POST</code> 请求的形式将支付结果作为参数通知到商户系统。</li>
+</ul>
+<p>关于同步通知和异步通知，在支付宝的 <a href="https://opendocs.alipay.com/open/204/105301/#s0" target="_blank" rel="noopener">文档</a> 中提到了一句：</p>
+<blockquote>
+<p>由于同步通知和异步通知都可以作为支付完成的凭证，且异步通知支付宝一定会确保发送给商户服务端。为了简化集成流程，商户可以将同步结果仅仅作为一个支付结束的通知（忽略执行校验），实际支付是否成功，完全依赖服务端异步通知。</p>
+</blockquote>
 <p>在 <a href="https://opensupport.alipay.com/support/helpcenter/82?ant_source=opendoc_recommend" target="_blank" rel="noopener">案例分析</a> 中，包含了 <a href="https://opensupport.alipay.com/support/helpcenter/87/201602508314?ant_source=opendoc_recommend" target="_blank" rel="noopener">异步通知</a> 设置的方法，以及异步通知接口的一些返回参数等。</p>
+<p>另外，异步通知接口的地址需要确保公网能访问到，我现在开发的项目都是在本地进行的，并没有部署到服务器上。我的方法是通过 <a href="https://u.tools/" target="_blank" rel="noopener">utools</a> 中的内网穿透工具将项目的端口暴露出来，这样就能愉快的完成测试啦。<br><img src="https://ae01.alicdn.com/kf/Ue6f537b769c14b278c437d4f8e270659z.jpg" alt="内网穿透工具"></p>
 <hr>
 <h2 id="测试Demo"><a href="#测试Demo" class="headerlink" title="测试Demo"></a>测试Demo</h2><p><a href="https://github.com/JokerByrant/payDemo" target="_blank" rel="noopener">源码地址</a></p>
 <hr>
@@ -317,7 +327,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题记录"><span class="nav-number">1.</span> <span class="nav-text">问题记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#验签错误"><span class="nav-number">1.1.</span> <span class="nav-text">验签错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ISV权限不足"><span class="nav-number">1.2.</span> <span class="nav-text">ISV权限不足</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入APP支付"><span class="nav-number">2.</span> <span class="nav-text">接入APP支付</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试Demo"><span class="nav-number">3.</span> <span class="nav-text">测试Demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他有用的文章"><span class="nav-number">4.</span> <span class="nav-text">其他有用的文章</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题记录"><span class="nav-number">1.</span> <span class="nav-text">问题记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#验签错误"><span class="nav-number">1.1.</span> <span class="nav-text">验签错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ISV权限不足"><span class="nav-number">1.2.</span> <span class="nav-text">ISV权限不足</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入APP支付"><span class="nav-number">2.</span> <span class="nav-text">接入APP支付</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#同步通知和异步通知"><span class="nav-number">2.1.</span> <span class="nav-text">同步通知和异步通知</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试Demo"><span class="nav-number">3.</span> <span class="nav-text">测试Demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他有用的文章"><span class="nav-number">4.</span> <span class="nav-text">其他有用的文章</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
