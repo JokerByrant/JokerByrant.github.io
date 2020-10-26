@@ -11,4 +11,10 @@ categories: 后端技术
 <!--more-->
 
 ## Zookeeper的基础概念
+TODO---笔记整理
+
 这一块儿推荐看看 [可能是把 ZooKeeper 概念讲的最清楚的一篇文章](https://juejin.im/post/6844903677367418893)。
+
+### 
+
+
