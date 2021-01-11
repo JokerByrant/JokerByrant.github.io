@@ -7,7 +7,9 @@ date: 2020-12-28 16:45:22
 ---
 
 ## 前言
-最近经常接到要变更很久之前的功能的需求
+最近经常接到要变更很久之前的功能的需求，盯着自己码的代码，竟是那么的陌生，就像在看一堆Shit Mountain。之前看到一张图很形象
+![](https://img04.sogoucdn.com/app/a/100520146/3114d7a1916b7809d13e8719ab99bb97)
+优雅的代码应该做到低耦合高内聚，所以学习一下代码的优化技巧还是很有必要的。
 
 ## 软件开发原则---SOLID
 `SOLID` 是五个软件开发原则的简称，它们分别是：`单一职责SRP(Single Responsibility Principle)`、`开放封闭原则OCP(Open Closed Principle)`、`里氏替换原则LSP(Liskov Substitution Principle)`、`接口隔离原则ISL(Interface Segregation Principle)`、`依赖倒置原则DIP(Dependency-Inversion Principle)`。
@@ -65,5 +67,58 @@ IntelliJ IDEA就支持自动化重构，比如在修改一个文件名时，勾�
 * 把复杂的代码块拆分成小的单元，也就是将一个很长的方法按照功能拆分成n个小的方法，这样的主要目的是便于理解。
 * 在对相似代码进行重构时，可以使用**中转数据结构**来将公共部分代码抽象出来，使得抽象出的代码可以适应不同的场景。
 * 抽象出的代码需要注意**数据的可变状态**，如果不希望数据在公共部分中发生变化，可以传入一个数据的副本进去。
+
+### 剖解临时变量 [#](http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_6)
+不要对一个临时变量进行赋值，使用多个临时变量代替，并使用 `final` 修饰。如果一段冗长的代码中，一个临时变量承担了多件事情，那么可能会使代码阅读者疑惑，应该使用多个临时变量代替。**集用临时变量**(负责运算和收集结果) -> `i = i + 1` 和 **循环变量** -> `for(int i = 0; i < 10; i++)` 除外。
+*例：(来自《重构》)*
+```java
+// 优化前
+double temp = 2 * (_height + _width);
+System.out.println (temp);
+temp = _height * _width;
+System.out.println (temp);
+```
+```java
+//优化后
+final double perimeter = 2 * (_height + _width);
+System.out.println (perimeter);
+final double area = _height * _width;
+System.out.println (area);
+```
+
+### 将查询函数和修改函数分离 [#](http://wangvsa.github.io/refactoring-cheat-sheet/making-method-calls-simpler/#_15)
+将函数中查询操作和修改操作分离，提炼出两个函数，一个负责查询，一个负责修改。
+![](https://img02.sogoucdn.com/app/a/100520146/996608bf705e87cc5c2eb6721cd5ddc8)
+
+### 以查询取代临时变量 [#](http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_8)
+*优化前：*
+```java
+double basePrice = _quantity * _itemPrice;
+if (basePrice > 1000)
+    return basePrice * 0.95;
+else
+    return basePrice * 0.98;
+```
+*优化后：*
+```java
+if (basePrice() > 1000)
+    return basePrice() * 0.95;
+else
+    return basePrice() * 0.98;
+```
+```java
+double basePrice() {
+    return _quantity * _itemPrice;
+}
+```
+优化步骤如下：
+1. 首先确保临时变量只进行了一次赋值，使用 `final` 修饰对应的临时变量，这样如果该临时变量发生了多次赋值，编译器会给出对应的提示。
+2. 将重复赋值的临时变量使用 **剖解临时变量** 的方式将其分割为多个临时变量。
+3. 将 `=` 右侧的部分代码提炼成单独的函数，确保函数不进行任何修改操作，如果有，就对其进行 **将查询函数和修改函数分离** 的操作。
+4. 替换使用了临时变量部分的代码。
+
+### 移除参数 [#](http://wangvsa.github.io/refactoring-cheat-sheet/making-method-calls-simpler/#_7)
+函数的参数尽可能的减少，这样在后续在复用时就不用为了一个参数该传什么值而绞尽脑汁。如果是多态函数，在进行复用时可以新建一个函数，在函数中进行必要的参数赋值操作，新函数的参数就可以精简了。
+![](https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746)
 
 ## 编写单元测试
