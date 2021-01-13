@@ -11,6 +11,8 @@ date: 2020-12-28 16:45:22
 ![](https://img04.sogoucdn.com/app/a/100520146/3114d7a1916b7809d13e8719ab99bb97)
 优雅的代码应该做到低耦合高内聚，所以学习一下代码的优化技巧还是很有必要的。
 
+<!--more-->
+
 ## 软件开发原则---SOLID
 `SOLID` 是五个软件开发原则的简称，它们分别是：`单一职责SRP(Single Responsibility Principle)`、`开放封闭原则OCP(Open Closed Principle)`、`里氏替换原则LSP(Liskov Substitution Principle)`、`接口隔离原则ISL(Interface Segregation Principle)`、`依赖倒置原则DIP(Dependency-Inversion Principle)`。
 ### `单一职责SRP`
