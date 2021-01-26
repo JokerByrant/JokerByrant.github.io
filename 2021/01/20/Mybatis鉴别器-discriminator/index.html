@@ -21,24 +21,20 @@
     var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="项目中需要接入支付宝的支付功能，记录一下出现的问题，并整合一下官方的接入文档。">
+  <meta name="description" content="前言新接了一个需求，从数据库查询出的数据实体，需要根据某个字段值的变化而变化。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="支付宝支付接口对接">
-<meta property="og:url" content="https://jokerbyrant.github.io/2020/10/12/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%AF%E4%BB%98%E6%8E%A5%E5%8F%A3%E5%AF%B9%E6%8E%A5/index.html">
+<meta property="og:title" content="Mybatis鉴别器-discriminator">
+<meta property="og:url" content="https://jokerbyrant.github.io/2021/01/20/Mybatis%E9%89%B4%E5%88%AB%E5%99%A8-discriminator/index.html">
 <meta property="og:site_name" content="Sssxh BLOG">
-<meta property="og:description" content="项目中需要接入支付宝的支付功能，记录一下出现的问题，并整合一下官方的接入文档。">
+<meta property="og:description" content="前言新接了一个需求，从数据库查询出的数据实体，需要根据某个字段值的变化而变化。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ae01.alicdn.com/kf/Ufcc6435d8448449faf2cc8d0cd7b02e8E.jpg">
-<meta property="og:image" content="https://ae01.alicdn.com/kf/U0207f048a070475996912adf3d04d996s.jpg">
-<meta property="og:image" content="https://ae01.alicdn.com/kf/Ue6f537b769c14b278c437d4f8e270659z.jpg">
-<meta property="article:published_time" content="2020-10-12T03:57:19.000Z">
-<meta property="article:modified_time" content="2021-01-20T03:45:14.125Z">
+<meta property="article:published_time" content="2021-01-20T03:44:53.000Z">
+<meta property="article:modified_time" content="2021-01-26T03:27:46.422Z">
 <meta property="article:author" content="sxh">
-<meta property="article:tag" content="支付宝">
+<meta property="article:tag" content="Mybatis">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ae01.alicdn.com/kf/Ufcc6435d8448449faf2cc8d0cd7b02e8E.jpg">
 
-<link rel="canonical" href="https://jokerbyrant.github.io/2020/10/12/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%AF%E4%BB%98%E6%8E%A5%E5%8F%A3%E5%AF%B9%E6%8E%A5/">
+<link rel="canonical" href="https://jokerbyrant.github.io/2021/01/20/Mybatis%E9%89%B4%E5%88%AB%E5%99%A8-discriminator/">
 
 
 <script id="page-configurations">
@@ -51,7 +47,7 @@
   };
 </script>
 
-  <title>支付宝支付接口对接 | Sssxh BLOG</title>
+  <title>Mybatis鉴别器-discriminator | Sssxh BLOG</title>
   
 
 
@@ -167,7 +163,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2020/10/12/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%AF%E4%BB%98%E6%8E%A5%E5%8F%A3%E5%AF%B9%E6%8E%A5/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021/01/20/Mybatis%E9%89%B4%E5%88%AB%E5%99%A8-discriminator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
@@ -180,7 +176,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          支付宝支付接口对接
+          Mybatis鉴别器-discriminator
         </h1>
 
         <div class="post-meta">
@@ -190,7 +186,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-10-12 11:57:19" itemprop="dateCreated datePublished" datetime="2020-10-12T11:57:19+08:00">2020-10-12</time>
+              <time title="创建时间：2021-01-20 11:44:53" itemprop="dateCreated datePublished" datetime="2021-01-20T11:44:53+08:00">2021-01-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -213,41 +209,117 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>项目中需要接入支付宝的支付功能，记录一下出现的问题，并整合一下官方的接入文档。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>新接了一个需求，从数据库查询出的数据实体，需要根据某个字段值的变化而变化。</p>
 <a id="more"></a>
 
-<h2 id="问题记录"><a href="#问题记录" class="headerlink" title="问题记录"></a>问题记录</h2><h3 id="验签错误"><a href="#验签错误" class="headerlink" title="验签错误"></a>验签错误</h3><p><img src="https://ae01.alicdn.com/kf/Ufcc6435d8448449faf2cc8d0cd7b02e8E.jpg" alt="验签错误"></p>
-<p>根据 <a href="https://opensupport.alipay.com/support/helpcenter/192/201602472811?ant_source=antsupport" target="_blank" rel="noopener">解决方法</a> 中提到的几种错误原因一一排查，发现原因是 <strong>验签方式不正确</strong> 。应用配置的密钥类型是公钥证书，而验签对应的功能使用的是普通公钥的代码。</p>
-<h3 id="ISV权限不足"><a href="#ISV权限不足" class="headerlink" title="ISV权限不足"></a>ISV权限不足</h3><p><img src="https://ae01.alicdn.com/kf/U0207f048a070475996912adf3d04d996s.jpg" alt="ISV权限不足"></p>
-<p>有三种原因：</p>
-<ul>
-<li>应用未上线</li>
-<li>正式环境和沙箱环境网关使用错误</li>
-<li>未签约接口产品 &amp;&amp; 签约了但应用下没有添加功能包</li>
-</ul>
-<p><a href="https://openclub.alipay.com/club/history/read/11745" target="_blank" rel="noopener">官方文档</a></p>
-<hr>
-<h2 id="接入APP支付"><a href="#接入APP支付" class="headerlink" title="接入APP支付"></a>接入APP支付</h2><p>接入分三个步骤：（<a href="https://opendocs.alipay.com/open/204/105051" target="_blank" rel="noopener">接入文档</a>）</p>
-<ol>
-<li><a href="https://opendocs.alipay.com/open/200/105310" target="_blank" rel="noopener">创建应用</a></li>
-<li><a href="https://opendocs.alipay.com/open/common/105366" target="_blank" rel="noopener">添加功能</a> 并 <a href="https://b.alipay.com/signing/productDetailV2.htm?productId=I1011000290000001002" target="_blank" rel="noopener">签约</a>，<a href="https://opendocs.alipay.com/open/291/105971" target="_blank" rel="noopener">配置密钥</a></li>
-<li>集成和开发</li>
-</ol>
-<h3 id="同步通知和异步通知"><a href="#同步通知和异步通知" class="headerlink" title="同步通知和异步通知"></a>同步通知和异步通知</h3><ul>
-<li>同步通知：支付宝 <code>SDK</code> 对商户的请求支付数据处理完成后，会将结果同步反馈给商户 <code>App</code> 端。</li>
-<li>异步通知：对于 <code>App</code> 支付产生的交易，支付宝会根据原始支付 <code>API</code> 中传入的异步通知地址 <code>notify_url</code> ，通过 <code>POST</code> 请求的形式将支付结果作为参数通知到商户系统。</li>
-</ul>
-<p>关于同步通知和异步通知，在支付宝的 <a href="https://opendocs.alipay.com/open/204/105301/#s0" target="_blank" rel="noopener">文档</a> 中提到了一句：</p>
-<blockquote>
-<p>由于同步通知和异步通知都可以作为支付完成的凭证，且异步通知支付宝一定会确保发送给商户服务端。为了简化集成流程，商户可以将同步结果仅仅作为一个支付结束的通知（忽略执行校验），实际支付是否成功，完全依赖服务端异步通知。</p>
-</blockquote>
-<p>在 <a href="https://opensupport.alipay.com/support/helpcenter/82?ant_source=opendoc_recommend" target="_blank" rel="noopener">案例分析</a> 中，包含了 <a href="https://opensupport.alipay.com/support/helpcenter/87/201602508314?ant_source=opendoc_recommend" target="_blank" rel="noopener">异步通知</a> 设置的方法，以及异步通知接口的一些返回参数等。</p>
-<p>另外，异步通知接口的地址需要确保公网能访问到，我现在开发的项目都是在本地进行的，并没有部署到服务器上。我的方法是通过 <a href="https://u.tools/" target="_blank" rel="noopener">utools</a> 中的内网穿透工具将项目的端口暴露出来，这样就能愉快的完成测试啦。<br><img src="https://ae01.alicdn.com/kf/Ue6f537b769c14b278c437d4f8e270659z.jpg" alt="内网穿透工具"></p>
-<hr>
-<h2 id="测试Demo"><a href="#测试Demo" class="headerlink" title="测试Demo"></a>测试Demo</h2><p><a href="https://github.com/JokerByrant/payDemo" target="_blank" rel="noopener">源码地址</a></p>
-<hr>
-<h2 id="其他有用的文章"><a href="#其他有用的文章" class="headerlink" title="其他有用的文章"></a>其他有用的文章</h2><p><a href="https://www.cnblogs.com/javahr/p/13434997.html" target="_blank" rel="noopener">支付宝支付（三）—APP支付（alipay.trade.app.pay）</a></p>
-
+<p>举个简单的例子，<code>SQL</code> 数据如下：<br><code>User</code>表:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>id</th>
+<th>username</th>
+<th>sex</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>001</td>
+<td>张三</td>
+<td>男</td>
+</tr>
+<tr>
+<td>2</td>
+<td>002</td>
+<td>小红</td>
+<td>女</td>
+</tr>
+<tr>
+<td>3</td>
+<td>003</td>
+<td>李四</td>
+<td>男</td>
+</tr>
+</tbody></table>
+<p><code>Male</code>表:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>id</th>
+<th>user_id</th>
+<th>remark</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1</td>
+<td>001</td>
+<td>这是001的remark</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>003</td>
+<td>这是003的remark</td>
+</tr>
+</tbody></table>
+<p><code>Female</code>表:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>id</th>
+<th>user_id</th>
+<th>remark</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1</td>
+<td>002</td>
+<td>这是002的remark</td>
+</tr>
+</tbody></table>
+<p>现在需要查询用户信息，并附带remark，最终结果如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>id</th>
+<th>username</th>
+<th>sex</th>
+<th>remark</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>001</td>
+<td>张三</td>
+<td>男</td>
+<td>这是001的remark</td>
+</tr>
+<tr>
+<td>2</td>
+<td>002</td>
+<td>小红</td>
+<td>女</td>
+<td>这是002的remark</td>
+</tr>
+<tr>
+<td>3</td>
+<td>003</td>
+<td>李四</td>
+<td>男</td>
+<td>这是003的remark</td>
+</tr>
+</tbody></table>
+<p>可以看到，<code>remark</code> 来自多张表，需要根据查询结果中的 <code>sex</code> 来判断跟哪张表进行关联。如果 <code>sex</code> 是男，就要跟 <code>Male</code> 关联；如果是女，则需要跟 <code>Female</code> 进行关联。</p>
+<h2 id="使用鉴别器"><a href="#使用鉴别器" class="headerlink" title="使用鉴别器"></a>使用鉴别器</h2><p>可以通过 <code>Mybatis</code> 的鉴别器-<code>discriminator</code>来完成这个操作：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectAll"</span> <span class="attr">resultMap</span>=<span class="string">"UserResultMap"</span>&gt;</span></span><br><span class="line">        select * from user;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectRemarkByIdFromMale"</span> <span class="attr">parameterType</span>=<span class="string">"java.lang.String"</span> <span class="attr">resultType</span>=<span class="string">"java.lang.String"</span>&gt;</span></span><br><span class="line">        select remark from male</span><br><span class="line">        where user_id = #&#123;userId&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectRemarkByIdFromFemale"</span> <span class="attr">resultType</span>=<span class="string">"java.lang.String"</span>&gt;</span></span><br><span class="line">        select remark from female</span><br><span class="line">        where user_id = #&#123;userId&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"UserResultMap"</span> <span class="attr">type</span>=<span class="string">"com.sxh.entity.User"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"username"</span> <span class="attr">property</span>=<span class="string">"username"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"sex"</span> <span class="attr">property</span>=<span class="string">"sex"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">discriminator</span> <span class="attr">column</span>=<span class="string">"sex"</span> <span class="attr">javaType</span>=<span class="string">"java.lang.String"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">case</span> <span class="attr">value</span>=<span class="string">"男"</span> <span class="attr">resultType</span>=<span class="string">"com.sxh.entity.User"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"remark"</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">select</span>=<span class="string">"selectRemarkByIdFromMale"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">case</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">case</span> <span class="attr">value</span>=<span class="string">"女"</span> <span class="attr">resultType</span>=<span class="string">"com.sxh.entity.User"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"remark"</span> <span class="attr">column</span>=<span class="string">"&#123;userId=id&#125;"</span> <span class="attr">select</span>=<span class="string">"selectRemarkByIdFromFemale"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">case</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">discriminator</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>注意点: <code>&lt;discriminator&gt;</code> 中 <code>&lt;case&gt;</code> 的 <code>resultType</code> 应该与 <code>&lt;resultMap&gt;</code> 的 <code>type</code> 一致，例如上面例子中都是 <code>com.sxh.entity.User</code></p>
+<h2 id="通过sql处理"><a href="#通过sql处理" class="headerlink" title="通过sql处理"></a>通过sql处理</h2><p>除了在 <code>Mybatis</code> 端进行处理外，也可以直接通过 <code>sql</code> 进行处理，使用 <code>case when</code> 语法。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> A.*,</span><br><span class="line"><span class="keyword">case</span></span><br><span class="line">    <span class="keyword">when</span> A.sex = <span class="string">'男'</span> <span class="keyword">then</span> B.remark</span><br><span class="line">    <span class="keyword">when</span> A.sex = <span class="string">'女'</span> <span class="keyword">then</span> C.remark</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">as</span> remark</span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> A</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> male B</span><br><span class="line"><span class="keyword">on</span> A.id = B.user_id</span><br><span class="line"><span class="keyword">and</span> A.sex = <span class="string">'男'</span></span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> female C</span><br><span class="line"><span class="keyword">on</span> A.id = C.user_id</span><br><span class="line"><span class="keyword">and</span> A.sex = <span class="string">'女'</span>;</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -256,7 +328,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/" rel="tag"># 支付宝</a>
+              <a href="/tags/Mybatis/" rel="tag"># Mybatis</a>
           </div>
 
         
@@ -265,13 +337,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/08/25/Java%E5%B9%B6%E5%8F%91-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="Java并发---学习笔记">
-      <i class="fa fa-chevron-left"></i> Java并发---学习笔记
+    <a href="/2021/01/13/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%9F%E8%83%BD%E8%AE%BE%E8%AE%A1/" rel="prev" title="一个简单的抢红包功能设计">
+      <i class="fa fa-chevron-left"></i> 一个简单的抢红包功能设计
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/10/20/Zookeeper%E5%AD%A6%E4%B9%A0/" rel="next" title="Zookeeper学习">
-      Zookeeper学习 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -330,7 +399,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题记录"><span class="nav-number">1.</span> <span class="nav-text">问题记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#验签错误"><span class="nav-number">1.1.</span> <span class="nav-text">验签错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ISV权限不足"><span class="nav-number">1.2.</span> <span class="nav-text">ISV权限不足</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入APP支付"><span class="nav-number">2.</span> <span class="nav-text">接入APP支付</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#同步通知和异步通知"><span class="nav-number">2.1.</span> <span class="nav-text">同步通知和异步通知</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试Demo"><span class="nav-number">3.</span> <span class="nav-text">测试Demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他有用的文章"><span class="nav-number">4.</span> <span class="nav-text">其他有用的文章</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用鉴别器"><span class="nav-number">1.1.</span> <span class="nav-text">使用鉴别器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过sql处理"><span class="nav-number">1.2.</span> <span class="nav-text">通过sql处理</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

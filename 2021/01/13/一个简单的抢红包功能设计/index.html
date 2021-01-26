@@ -21,18 +21,20 @@
     var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Everything will be ok">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Sssxh BLOG">
-<meta property="og:url" content="https://jokerbyrant.github.io/tags/SpringBoot/index.html">
+  <meta name="description" content="前言提到抢红包，我就直摇头，这种类似秒杀的功能以前没有接触过，何况是这种直接针对金钱的操作。对于陌生的环境我一向有些抵触，因为要花好一阵儿去适应，但是一旦能嗅到其中的规则，我就会了乐此不疲。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个简单的抢红包功能设计">
+<meta property="og:url" content="https://jokerbyrant.github.io/2021/01/13/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%9F%E8%83%BD%E8%AE%BE%E8%AE%A1/index.html">
 <meta property="og:site_name" content="Sssxh BLOG">
-<meta property="og:description" content="Everything will be ok">
+<meta property="og:description" content="前言提到抢红包，我就直摇头，这种类似秒杀的功能以前没有接触过，何况是这种直接针对金钱的操作。对于陌生的环境我一向有些抵触，因为要花好一阵儿去适应，但是一旦能嗅到其中的规则，我就会了乐此不疲。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-01-13T15:31:01.000Z">
+<meta property="article:modified_time" content="2021-01-20T03:45:22.680Z">
 <meta property="article:author" content="sxh">
-<meta property="article:tag" content="jokerbyrant">
+<meta property="article:tag" content="红包">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://jokerbyrant.github.io/tags/SpringBoot/">
+<link rel="canonical" href="https://jokerbyrant.github.io/2021/01/13/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%9F%E8%83%BD%E8%AE%BE%E8%AE%A1/">
 
 
 <script id="page-configurations">
@@ -40,12 +42,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>标签: SpringBoot | Sssxh BLOG</title>
+  <title>一个简单的抢红包功能设计 | Sssxh BLOG</title>
   
 
 
@@ -154,91 +156,99 @@
         <div class="content-wrap">
           
 
-          <div class="content tag">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">SpringBoot
-          <small>标签</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021/01/13/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%9F%E8%83%BD%E8%AE%BE%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="Everything will be ok">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一个简单的抢红包功能设计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-13 23:31:01" itemprop="dateCreated datePublished" datetime="2021-01-13T23:31:01+08:00">2021-01-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
-    </div>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>提到抢红包，我就直摇头，这种类似秒杀的功能以前没有接触过，何况是这种直接针对金钱的操作。对于陌生的环境我一向有些抵触，因为要花好一阵儿去适应，但是一旦能嗅到其中的规则，我就会了乐此不疲。</p>
+<a id="more"></a>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+<h2 id="抢红包设计"><a href="#抢红包设计" class="headerlink" title="抢红包设计"></a>抢红包设计</h2><p>秒杀类功能主要是保证减库存操作的一致性，抢红包则要考虑两个方面：减库存和减金额。在不考虑性能的情况下，如果是单机架构，直接加上一层 <code>synchroized</code> 锁即可；在分布式情况下，则可以使用分布式锁，例如 <code>redisson</code>。<br>抢红包的操作其实可以分为两步：用户抢一个金额，给用户发放金额。在第一版程序中，我是通过数据库中的 <strong>已领取金额</strong> 和 <strong>已领取数量</strong> 两个字段来进行 “减库存” 和 “减金额” 操作(实际是加)，代码如下。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> t_app_wallet_record</span><br><span class="line"> <span class="keyword">set</span> received_amount = received_amount + <span class="comment">#&#123;amount&#125;</span></span><br><span class="line"> used_bags = used_bags + <span class="number">1</span></span><br><span class="line"> <span class="keyword">where</span> wallet_serial_no = <span class="comment">#&#123;walletSerialNo&#125;</span></span><br><span class="line"> <span class="keyword">and</span> used_bags &lt; bags</span><br><span class="line"> <span class="keyword">and</span> total_amount &gt;= received_amount + <span class="comment">#&#123;amount&#125;</span></span><br></pre></td></tr></table></figure>
+<p>在和同事讨论了一下之后，发现可以再优化一下。原先用户抢到的金额，是在他执行抢这个动作时才分配。现在改成发红包时直接先分配红包金额，存入 <code>redis</code> 中，抢红包时从 <code>redis</code> 中拿到一个金额，如果程序执行失败(例如修改数据库失败)，再将金额还给 <code>redis</code>。<br>最后附上代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-24T16:28:26+08:00"
-              content="2020-08-24">
-          08-24
-        </time>
-      </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/24/SpringBoot%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-%E4%B8%89-%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B/" itemprop="url">
-            <span itemprop="name">SpringBoot源码学习(三)---内置Servlet容器加载流程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-06-13T10:18:29+08:00"
-              content="2020-06-13">
-          06-13
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/06/13/SpringBoot%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-%E4%BA%8C-Spring%E5%AE%B9%E5%99%A8refresh%E6%B5%81%E7%A8%8B/" itemprop="url">
-            <span itemprop="name">SpringBoot源码学习(二)---Spring容器refresh流程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-06-07T14:08:42+08:00"
-              content="2020-06-07">
-          06-07
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/06/07/SpringBoot%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0-%E4%B8%80---%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/" itemprop="url">
-            <span itemprop="name">SpringBoot源码学习(一)---启动流程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BA%A2%E5%8C%85/" rel="tag"># 红包</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/28/%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84SHIT-MOUNTAIN/" rel="prev" title="如何优化项目中的SHIT MOUNTAIN">
+      <i class="fa fa-chevron-left"></i> 如何优化项目中的SHIT MOUNTAIN
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/20/Mybatis%E9%89%B4%E5%88%AB%E5%99%A8-discriminator/" rel="next" title="Mybatis鉴别器-discriminator">
+      Mybatis鉴别器-discriminator <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -291,6 +301,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抢红包设计"><span class="nav-number">2.</span> <span class="nav-text">抢红包设计</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
