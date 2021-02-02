@@ -124,3 +124,6 @@ double basePrice() {
 ![](https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746)
 
 ## 编写单元测试
+
+## 命名参考
+[Java命名规范参考](https://zhuanlan.zhihu.com/p/96100037)
