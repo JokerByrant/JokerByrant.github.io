@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://ae01.alicdn.com/kf/U011338060bb94fe6a0ad232a7e07a9d0h.jpg">
 <meta property="og:image" content="https://ae01.alicdn.com/kf/Ueaae6349d6ca4721ac036161ce3a83bcs.jpg">
 <meta property="article:published_time" content="2020-08-25T03:51:57.000Z">
-<meta property="article:modified_time" content="2020-10-10T06:24:28.984Z">
+<meta property="article:modified_time" content="2021-02-26T08:59:28.223Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="Java并发">
 <meta name="twitter:card" content="summary">
@@ -272,6 +272,7 @@
 <li>指令级并行的重排序。现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。 </li>
 <li>内存系统的重排序。由于处理器使用缓存和读 / 写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
 </ul>
+<h2 id="线程安全的实现方法-理论"><a href="#线程安全的实现方法-理论" class="headerlink" title="线程安全的实现方法(理论)"></a>线程安全的实现方法(理论)</h2><h3 id="互斥同步"><a href="#互斥同步" class="headerlink" title="互斥同步"></a>互斥同步</h3><h3 id="非阻塞同步"><a href="#非阻塞同步" class="headerlink" title="非阻塞同步"></a>非阻塞同步</h3><h3 id="无同步方案"><a href="#无同步方案" class="headerlink" title="无同步方案"></a>无同步方案</h3><h2 id="CAS、Unsafe和Atomicxxx"><a href="#CAS、Unsafe和Atomicxxx" class="headerlink" title="CAS、Unsafe和Atomicxxx"></a>CAS、Unsafe和Atomicxxx</h2><p>关于<code>CAS</code>和<code>Unsafe</code>相关的概念不多赘述，参考：<a href="https://www.pdai.tech/md/java/thread/java-thread-x-juc-AtomicInteger.html#cas-%e9%97%ae%e9%a2%98" target="_blank" rel="noopener">JUC原子类: CAS, Unsafe和原子类详解</a>、<a href="https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html" target="_blank" rel="noopener">美团-Java魔法类：Unsafe应用解析</a></p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.pdai.tech/md/java/thread/java-thread-x-overview.html" target="_blank" rel="noopener">Java全栈知识体系</a><br><a href="http://ifeve.com/java-concurrency-thread-directory/" target="_blank" rel="noopener">并发编程网</a></p>
 
     </div>
@@ -356,7 +357,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程的优点和缺点"><span class="nav-number">1.1.</span> <span class="nav-text">多线程的优点和缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并发编程模型"><span class="nav-number">1.2.</span> <span class="nav-text">并发编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#并行工作者模型"><span class="nav-number">1.2.1.</span> <span class="nav-text">并行工作者模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流水线并发模型"><span class="nav-number">1.2.2.</span> <span class="nav-text">流水线并发模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java是如何解决并发问题的"><span class="nav-number">2.</span> <span class="nav-text">Java是如何解决并发问题的</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#并发问题出现的根源"><span class="nav-number">2.1.</span> <span class="nav-text">并发问题出现的根源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#可见性"><span class="nav-number">2.1.1.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原子性"><span class="nav-number">2.1.2.</span> <span class="nav-text">原子性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#有序性"><span class="nav-number">2.1.3.</span> <span class="nav-text">有序性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程的优点和缺点"><span class="nav-number">1.1.</span> <span class="nav-text">多线程的优点和缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并发编程模型"><span class="nav-number">1.2.</span> <span class="nav-text">并发编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#并行工作者模型"><span class="nav-number">1.2.1.</span> <span class="nav-text">并行工作者模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流水线并发模型"><span class="nav-number">1.2.2.</span> <span class="nav-text">流水线并发模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java是如何解决并发问题的"><span class="nav-number">2.</span> <span class="nav-text">Java是如何解决并发问题的</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#并发问题出现的根源"><span class="nav-number">2.1.</span> <span class="nav-text">并发问题出现的根源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#可见性"><span class="nav-number">2.1.1.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原子性"><span class="nav-number">2.1.2.</span> <span class="nav-text">原子性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#有序性"><span class="nav-number">2.1.3.</span> <span class="nav-text">有序性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程安全的实现方法-理论"><span class="nav-number">3.</span> <span class="nav-text">线程安全的实现方法(理论)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#互斥同步"><span class="nav-number">3.1.</span> <span class="nav-text">互斥同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非阻塞同步"><span class="nav-number">3.2.</span> <span class="nav-text">非阻塞同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无同步方案"><span class="nav-number">3.3.</span> <span class="nav-text">无同步方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAS、Unsafe和Atomicxxx"><span class="nav-number">4.</span> <span class="nav-text">CAS、Unsafe和Atomicxxx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -372,20 +373,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -403,6 +404,14 @@
         
         
           <li>
+            <a href="/2021/03/02/%E5%88%A9%E7%94%A8IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84%E9%A1%B9%E7%9B%AE/" title="利用IDEA远程调试服务器上的项目" target="_blank">利用IDEA远程调试服务器上的项目</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/24/Jquery%E5%BC%80%E5%8F%91%E5%AE%9E%E8%B7%B5/" title="Jquery开发实践" target="_blank">Jquery开发实践</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/20/IDEA%20Debug%E6%A8%A1%E5%BC%8F%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/" title="IDEA Debug模式踩坑记录`" target="_blank">IDEA Debug模式踩坑记录`</a>
           </li>
         
@@ -412,14 +421,6 @@
         
           <li>
             <a href="/2021/01/20/Mybatis%E9%89%B4%E5%88%AB%E5%99%A8-discriminator/" title="Mybatis鉴别器-discriminator" target="_blank">Mybatis鉴别器-discriminator</a>
-          </li>
-        
-          <li>
-            <a href="/2021/01/13/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%9F%E8%83%BD%E8%AE%BE%E8%AE%A1/" title="一个简单的抢红包功能设计" target="_blank">一个简单的抢红包功能设计</a>
-          </li>
-        
-          <li>
-            <a href="/2020/12/28/%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84SHIT-MOUNTAIN/" title="如何优化项目中的SHIT MOUNTAIN" target="_blank">如何优化项目中的SHIT MOUNTAIN</a>
           </li>
         
       </ul>
