@@ -1,11 +1,14 @@
 ---
 title: Jquery开发实践
-date: 2021-02-24 16:33:08
 tags: Jquery
 categories: 前端技术
+abbrlink: 53737
+date: 2021-02-24 16:33:08
 ---
 ## 前言
 这篇Blog主要用来记录前端开发中碰到的一些问题，以及一些开发技巧的备忘。
+
+<!--more-->
 
 ## 调用子IFrame页面上的方法
 ```js
