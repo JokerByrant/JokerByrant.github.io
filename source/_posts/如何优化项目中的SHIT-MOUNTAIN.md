@@ -136,11 +136,13 @@ double basePrice() {
 如果是`Spring`项目，可以利用`Spring`的依赖注入结合策略模式来对代码进行优化。参考[Spring优雅的实现策略模式](https://www.jianshu.com/p/5ccf1706297d)。
 在 [去除多余的if else](https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html) 这篇文章中也提到一些重构技巧。
 
-
 ## 编写单元测试
 
 ## 命名参考
 [Java命名规范参考](https://zhuanlan.zhihu.com/p/96100037)
+
+## 其他
+变量声名在循环体内还是循环体外，这个问题困扰了我很久，我倾向于怎么方便怎么来。可以看看这篇文章的讨论：[变量声明在循环体内还是循环体外的争论，以及怎样才真正叫『避免在循环体中创建对象』](https://www.zhihu.com/question/31751468)
 
 ## 参考文章
 [10个现代的软件过度设计错误](https://zhuanlan.zhihu.com/p/22166831)
