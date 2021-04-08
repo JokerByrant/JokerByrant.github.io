@@ -8,6 +8,8 @@ tags:
 
 ## JVM相关调优参数
 
+## 变量定义在循环内对程序的影响
+
 ## 参考文章
 [从实际案例聊聊Java应用的GC优化-美团技术团队](https://tech.meituan.com/2017/12/29/jvm-optimize.html)
 
