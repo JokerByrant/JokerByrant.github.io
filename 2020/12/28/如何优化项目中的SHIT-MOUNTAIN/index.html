@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://img02.sogoucdn.com/app/a/100520146/996608bf705e87cc5c2eb6721cd5ddc8">
 <meta property="og:image" content="https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746">
 <meta property="article:published_time" content="2020-12-28T08:45:22.000Z">
-<meta property="article:modified_time" content="2021-02-02T08:59:41.395Z">
+<meta property="article:modified_time" content="2021-04-07T09:02:50.270Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="代码优化">
 <meta name="twitter:card" content="summary">
@@ -267,7 +267,15 @@
 <li>替换使用了临时变量部分的代码。</li>
 </ol>
 <h3 id="移除参数"><a href="#移除参数" class="headerlink" title="移除参数 #"></a>移除参数 <a href="http://wangvsa.github.io/refactoring-cheat-sheet/making-method-calls-simpler/#_7" target="_blank" rel="noopener">#</a></h3><p>函数的参数尽可能的减少，这样在后续在复用时就不用为了一个参数该传什么值而绞尽脑汁。如果是多态函数，在进行复用时可以新建一个函数，在函数中进行必要的参数赋值操作，新函数的参数就可以精简了。<br><img src="https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746" alt=""></p>
+<h3 id="移除对参数的赋值"><a href="#移除对参数的赋值" class="headerlink" title="移除对参数的赋值 #"></a>移除对参数的赋值 <a href="http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_7" target="_blank" rel="noopener">#</a></h3><p>传递进来的参数尽量不要改变其值，如果一定要改变，最好以 <code>return</code> 方式返回，这样代码的意图更清晰。如果要返回的值有多个，尝试将大堆数据组装成对象，或者为每一个返回值设计一个对应的独立函数。</p>
+<h3 id="提炼函数"><a href="#提炼函数" class="headerlink" title="提炼函数 #"></a>提炼函数 <a href="http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/" target="_blank" rel="noopener">#</a></h3><p>下面只记录一下 <strong>对局部变量再赋值</strong> 这个问题。<br>情况描述：在提炼出的函数中，修改了传入的局部变量的值。</p>
+<blockquote>
+<p>被赋值的临时变量也分两种情况。较简单的情况是：这个变量只在被提炼码区段中使用。果真如此，你可以将这个临时变量的声明式移到被提炼码中，然后一起提炼出去。另一种情况是：被提炼码之外的代码也使用了这个变量。这又分为两种情况： 如果这个变量在被提炼码之后未再被使用，你只需直接在目标函数中修改它就可以了；如果被提炼码之后的代码还使用了这个变量，你就需要让目标函数返回该变量改变后的值。我以下列代码说明这几种不同情况：<br>解决：如果传入的局部变量在提炼的函数中值被改变，那么这时应该将其 <code>return</code> 出去。如果要返回的变量不只一个，那么可以再次提炼，尽量让一个函数只返回一个值。</p>
+</blockquote>
+<h3 id="去除代码中多余的if-else"><a href="#去除代码中多余的if-else" class="headerlink" title="去除代码中多余的if else"></a>去除代码中多余的if else</h3><p>如果是<code>Spring</code>项目，可以利用<code>Spring</code>的依赖注入结合策略模式来对代码进行优化。参考<a href="https://www.jianshu.com/p/5ccf1706297d" target="_blank" rel="noopener">Spring优雅的实现策略模式</a>。<br>在 <a href="https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html" target="_blank" rel="noopener">去除多余的if else</a> 这篇文章中也提到一些重构技巧。</p>
 <h2 id="编写单元测试"><a href="#编写单元测试" class="headerlink" title="编写单元测试"></a>编写单元测试</h2><h2 id="命名参考"><a href="#命名参考" class="headerlink" title="命名参考"></a>命名参考</h2><p><a href="https://zhuanlan.zhihu.com/p/96100037" target="_blank" rel="noopener">Java命名规范参考</a></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>变量声名在循环体内还是循环体外，这个问题困扰了我很久，我倾向于怎么方便怎么来。可以看看这篇文章的讨论：<a href="https://www.zhihu.com/question/31751468" target="_blank" rel="noopener">变量声明在循环体内还是循环体外的争论，以及怎样才真正叫『避免在循环体中创建对象』</a></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://zhuanlan.zhihu.com/p/22166831" target="_blank" rel="noopener">10个现代的软件过度设计错误</a><br><a href="https://ronjeffries.com/xprog/articles/refactoring-not-on-the-backlog/" target="_blank" rel="noopener">Refactoring – Not on the backlog!</a><br><a href="https://www.jianshu.com/p/5ccf1706297d" target="_blank" rel="noopener">Spring优雅的实现策略模式</a><br><a href="https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html" target="_blank" rel="noopener">去除多余的if else</a></p>
 
     </div>
 
@@ -351,7 +359,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件开发原则—SOLID"><span class="nav-number">2.</span> <span class="nav-text">软件开发原则—SOLID</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单一职责SRP"><span class="nav-number">2.1.</span> <span class="nav-text">单一职责SRP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开放封闭原则OCP"><span class="nav-number">2.2.</span> <span class="nav-text">开放封闭原则OCP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#里氏替换原则LSP"><span class="nav-number">2.3.</span> <span class="nav-text">里氏替换原则LSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接口隔离原则ISL"><span class="nav-number">2.4.</span> <span class="nav-text">接口隔离原则ISL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖倒置原则DIP"><span class="nav-number">2.5.</span> <span class="nav-text">依赖倒置原则DIP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码重构"><span class="nav-number">3.</span> <span class="nav-text">代码重构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的原则"><span class="nav-number">3.1.</span> <span class="nav-text">重构的原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构和性能优化"><span class="nav-number">3.2.</span> <span class="nav-text">重构和性能优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两顶帽子"><span class="nav-number">3.3.</span> <span class="nav-text">两顶帽子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的目的"><span class="nav-number">3.4.</span> <span class="nav-text">重构的目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的手段"><span class="nav-number">3.5.</span> <span class="nav-text">重构的手段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动化重构"><span class="nav-number">3.6.</span> <span class="nav-text">自动化重构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的时机"><span class="nav-number">3.7.</span> <span class="nav-text">重构的时机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些优化技巧"><span class="nav-number">4.</span> <span class="nav-text">一些优化技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#剖解临时变量"><span class="nav-number">4.1.</span> <span class="nav-text">剖解临时变量 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将查询函数和修改函数分离"><span class="nav-number">4.2.</span> <span class="nav-text">将查询函数和修改函数分离 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以查询取代临时变量"><span class="nav-number">4.3.</span> <span class="nav-text">以查询取代临时变量 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移除参数"><span class="nav-number">4.4.</span> <span class="nav-text">移除参数 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写单元测试"><span class="nav-number">5.</span> <span class="nav-text">编写单元测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命名参考"><span class="nav-number">6.</span> <span class="nav-text">命名参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件开发原则—SOLID"><span class="nav-number">2.</span> <span class="nav-text">软件开发原则—SOLID</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单一职责SRP"><span class="nav-number">2.1.</span> <span class="nav-text">单一职责SRP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开放封闭原则OCP"><span class="nav-number">2.2.</span> <span class="nav-text">开放封闭原则OCP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#里氏替换原则LSP"><span class="nav-number">2.3.</span> <span class="nav-text">里氏替换原则LSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接口隔离原则ISL"><span class="nav-number">2.4.</span> <span class="nav-text">接口隔离原则ISL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖倒置原则DIP"><span class="nav-number">2.5.</span> <span class="nav-text">依赖倒置原则DIP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码重构"><span class="nav-number">3.</span> <span class="nav-text">代码重构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的原则"><span class="nav-number">3.1.</span> <span class="nav-text">重构的原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构和性能优化"><span class="nav-number">3.2.</span> <span class="nav-text">重构和性能优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两顶帽子"><span class="nav-number">3.3.</span> <span class="nav-text">两顶帽子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的目的"><span class="nav-number">3.4.</span> <span class="nav-text">重构的目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的手段"><span class="nav-number">3.5.</span> <span class="nav-text">重构的手段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动化重构"><span class="nav-number">3.6.</span> <span class="nav-text">自动化重构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的时机"><span class="nav-number">3.7.</span> <span class="nav-text">重构的时机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些优化技巧"><span class="nav-number">4.</span> <span class="nav-text">一些优化技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#剖解临时变量"><span class="nav-number">4.1.</span> <span class="nav-text">剖解临时变量 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将查询函数和修改函数分离"><span class="nav-number">4.2.</span> <span class="nav-text">将查询函数和修改函数分离 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以查询取代临时变量"><span class="nav-number">4.3.</span> <span class="nav-text">以查询取代临时变量 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移除参数"><span class="nav-number">4.4.</span> <span class="nav-text">移除参数 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移除对参数的赋值"><span class="nav-number">4.5.</span> <span class="nav-text">移除对参数的赋值 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提炼函数"><span class="nav-number">4.6.</span> <span class="nav-text">提炼函数 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#去除代码中多余的if-else"><span class="nav-number">4.7.</span> <span class="nav-text">去除代码中多余的if else</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写单元测试"><span class="nav-number">5.</span> <span class="nav-text">编写单元测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命名参考"><span class="nav-number">6.</span> <span class="nav-text">命名参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">7.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">8.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -367,7 +375,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -398,6 +406,14 @@
         
         
           <li>
+            <a href="/2021/05/06/%E8%82%8C%E8%82%89%E6%8B%89%E4%BC%A4%E5%92%8C%E6%81%A2%E5%A4%8D%E8%AE%AD%E7%BB%83/" title="肌肉拉伤和恢复训练" target="_blank">肌肉拉伤和恢复训练</a>
+          </li>
+        
+          <li>
+            <a href="/2021/04/08/%E4%B8%80%E6%AC%A1JVM%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5/" title="一次JVM调优实践" target="_blank">一次JVM调优实践</a>
+          </li>
+        
+          <li>
             <a href="/2021/03/02/%E5%88%A9%E7%94%A8IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84%E9%A1%B9%E7%9B%AE/" title="利用IDEA远程调试服务器上的项目" target="_blank">利用IDEA远程调试服务器上的项目</a>
           </li>
         
@@ -407,14 +423,6 @@
         
           <li>
             <a href="/2021/02/20/IDEA%20Debug%E6%A8%A1%E5%BC%8F%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/" title="IDEA Debug模式踩坑记录" target="_blank">IDEA Debug模式踩坑记录</a>
-          </li>
-        
-          <li>
-            <a href="/2021/01/29/%E4%BD%BF%E7%94%A8Redis%E5%A4%84%E7%90%86%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" title="使用Redis处理定时任务" target="_blank">使用Redis处理定时任务</a>
-          </li>
-        
-          <li>
-            <a href="/2021/01/20/Mybatis%E9%89%B4%E5%88%AB%E5%99%A8-discriminator/" title="Mybatis鉴别器-discriminator" target="_blank">Mybatis鉴别器-discriminator</a>
           </li>
         
       </ul>
