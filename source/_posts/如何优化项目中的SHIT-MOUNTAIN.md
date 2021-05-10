@@ -123,7 +123,29 @@ double basePrice() {
 函数的参数尽可能的减少，这样在后续在复用时就不用为了一个参数该传什么值而绞尽脑汁。如果是多态函数，在进行复用时可以新建一个函数，在函数中进行必要的参数赋值操作，新函数的参数就可以精简了。
 ![](https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746)
 
+### 移除对参数的赋值 [#](http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_7)
+传递进来的参数尽量不要改变其值，如果一定要改变，最好以 `return` 方式返回，这样代码的意图更清晰。如果要返回的值有多个，尝试将大堆数据组装成对象，或者为每一个返回值设计一个对应的独立函数。
+
+### 提炼函数 [#](http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/)
+下面只记录一下 **对局部变量再赋值** 这个问题。
+情况描述：在提炼出的函数中，修改了传入的局部变量的值。
+> 被赋值的临时变量也分两种情况。较简单的情况是：这个变量只在被提炼码区段中使用。果真如此，你可以将这个临时变量的声明式移到被提炼码中，然后一起提炼出去。另一种情况是：被提炼码之外的代码也使用了这个变量。这又分为两种情况： 如果这个变量在被提炼码之后未再被使用，你只需直接在目标函数中修改它就可以了；如果被提炼码之后的代码还使用了这个变量，你就需要让目标函数返回该变量改变后的值。我以下列代码说明这几种不同情况：
+解决：如果传入的局部变量在提炼的函数中值被改变，那么这时应该将其 `return` 出去。如果要返回的变量不只一个，那么可以再次提炼，尽量让一个函数只返回一个值。
+
+### 去除代码中多余的if else
+如果是`Spring`项目，可以利用`Spring`的依赖注入结合策略模式来对代码进行优化。参考[Spring优雅的实现策略模式](https://www.jianshu.com/p/5ccf1706297d)。
+在 [去除多余的if else](https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html) 这篇文章中也提到一些重构技巧。
+
 ## 编写单元测试
 
 ## 命名参考
 [Java命名规范参考](https://zhuanlan.zhihu.com/p/96100037)
+
+## 其他
+变量声名在循环体内还是循环体外，这个问题困扰了我很久，我倾向于怎么方便怎么来。可以看看这篇文章的讨论：[变量声明在循环体内还是循环体外的争论，以及怎样才真正叫『避免在循环体中创建对象』](https://www.zhihu.com/question/31751468)
+
+## 参考文章
+[10个现代的软件过度设计错误](https://zhuanlan.zhihu.com/p/22166831)
+[Refactoring -- Not on the backlog!](https://ronjeffries.com/xprog/articles/refactoring-not-on-the-backlog/)
+[Spring优雅的实现策略模式](https://www.jianshu.com/p/5ccf1706297d)
+[去除多余的if else](https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html)

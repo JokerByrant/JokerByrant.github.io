@@ -1,5 +1,5 @@
 ---
-title: IDEA Debug模式踩坑记录`
+title: IDEA Debug模式踩坑记录
 tags: IDEA
 categories: 后端技术
 abbrlink: 19066

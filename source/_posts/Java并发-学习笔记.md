@@ -83,6 +83,8 @@ date: 2020-08-25 11:51:57
 
 ### 无同步方案
 
+## CAS、Unsafe和Atomicxxx
+关于`CAS`和`Unsafe`相关的概念不多赘述，参考：[JUC原子类: CAS, Unsafe和原子类详解](https://www.pdai.tech/md/java/thread/java-thread-x-juc-AtomicInteger.html#cas-%e9%97%ae%e9%a2%98)、[美团-Java魔法类：Unsafe应用解析](https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html)
 
 
 ## 参考链接
