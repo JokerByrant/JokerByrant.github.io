@@ -31,3 +31,23 @@ function doChangeTab(i) {
   $($("#auditFlowNav li")[i]).find('a').click();
 }
 ```
+
+## 使用闭包管理变量作用域
+``` js
+(function(window, $) {
+    // 将指定方法暴露给全局
+    window.baseUtil = {
+        add: add
+    };
+
+    // 其他未暴露的方法和变量的作用域仅限当前闭包内
+    let tmpArg = '';
+
+    function add(arg1, arg2) {
+        return arg1 + arg2;
+    }
+})(window, jQuery);
+```
+
+## requireJs的使用
+参考Demo：[链接](https://github.com/JokerByrant/requirejs-demo)
