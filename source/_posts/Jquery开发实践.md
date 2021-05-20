@@ -51,3 +51,21 @@ function doChangeTab(i) {
 
 ## requireJs的使用
 参考Demo：[链接](https://github.com/JokerByrant/requirejs-demo)
+
+## 合并两个数组
+参考链接：[JS合并两个数组的方法](https://blog.csdn.net/sunshinezx8023/article/details/80080803)
+```js
+let arr1 = [1,2,3];
+let arr2 = [4,5,6];
+
+// 1.concat
+let arr3 = arr1.concat(arr2); // c=[1,2,3,4,5,6]
+
+// 2. for循环
+for(let i in arr2) {
+    arr1.push(arr2[i]); // arr1=[1,2,3,4,5,6]
+}
+
+// 3. apply
+arr1.push.apply(arr1, arr2); // arr1=[1,2,3,4,5,6]
+```
