@@ -105,7 +105,7 @@ function addHtmlElement($currentElement) {
         elementHtml += assembleHtmlElement(data); // 组装html
     });
     $currentElement[0].innerHTML += elementHtml;
-    ajaxFlag = true;
+    ajaxFlag = !isStrEmpty(elementHtml); // 加入这个判断，防止数据已拉取完仍在不断请求后台
 }
 
 // 拉取数据
@@ -130,5 +130,10 @@ function getData() {
   });
   pageNo++;
   return rows;
+}
+
+// 字符是否为空
+function isStrEmpty(str) {
+	return str == '' || str == undefined || str == null;
 }
 ```
