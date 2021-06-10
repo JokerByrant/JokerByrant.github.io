@@ -137,3 +137,70 @@ function isStrEmpty(str) {
 	return str == '' || str == undefined || str == null;
 }
 ```
+
+## css实现鼠标悬浮文字提示
+```js
+// html element
+<span data-tips="查看" class="fa fa-search-plus detail"></span>
+```
+```css
+<style>
+	.detail {
+		color: #91BD91;
+		font-size: 18px;
+		float: right;
+		position: relative;
+	}
+	.detail:hover {
+		color: #C8DBC8;
+		cursor: pointer;
+	}
+	/*悬停文字*/
+	.detail:after {
+		font-size: 14px;
+		color: #91BD91;
+		content: attr(data-tips);
+		position: absolute;
+		left: -7px;
+		white-space: nowrap;
+		opacity: 0;
+		transform: translateY(-120%);
+		transition: .1s;
+	}
+	.detail:hover:after {
+		opacity: 1;
+		transform: translateY(-100%);
+	}
+</style>
+```
+
+## 利用Promise管理多个异步请求
+浏览器端的渲染效果想要达到体验最佳，那就需要对请求进行异步处理，如果想等到所有的异步请求全部执行完毕再进行下一步操作的话，可以引入 `Promise`，Demo如下：
+```js
+// 执行Promise方法
+function executePromiseFun(urls) {
+  let apiDatas = [];
+  urls.forEach(function(url) {
+    let apiItem = getPromiseFun(url);
+    apiDatas.push(apiItem)
+  });
+  // 这里.all会将所有的异步操作一起放在队列中，等待所有异步执行完毕后才会执行.then，这就保证了我们的同步获取数据
+  return Promise.all(apiDatas).then(function (data) {
+    return data;
+  })
+}
+
+// 组装Promise方法
+function getPromiseFun(url) {
+  return new Promise(function(resolve, reject) {
+    $.ajax({
+      type: "get",
+      url: url,
+      async: true, // 异步操作
+      success: function(json) {
+        resolve(json);
+      }
+    })
+  })
+}
+```
