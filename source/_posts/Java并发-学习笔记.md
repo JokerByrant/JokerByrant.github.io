@@ -86,6 +86,16 @@ date: 2020-08-25 11:51:57
 ## CAS、Unsafe和Atomicxxx
 关于`CAS`和`Unsafe`相关的概念不多赘述，参考：[JUC原子类: CAS, Unsafe和原子类详解](https://www.pdai.tech/md/java/thread/java-thread-x-juc-AtomicInteger.html#cas-%e9%97%ae%e9%a2%98)、[美团-Java魔法类：Unsafe应用解析](https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html)
 
+## AQS
+这一块儿主要是同步器相关，是实现锁的关键，可以结合：[从ReentrantLock的实现看AQS的原理及应用-美团技术团队](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html) 和 [JUC锁: ReentrantLock详解-Java全栈知识体系](https://www.pdai.tech/md/java/thread/java-thread-x-lock-ReentrantLock.html) 两篇文章一起服用。
+
+## 线程池
+结合这篇文章：[Java线程池实现原理及其在美团业务中的实践-美团技术团队](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)，主要关注以下几点：
+* 线程池的几个核心参数 以及 在不同业务场景下参数的配置方法
+* 线程池的内部结构设计
+* 线程池的生命周期和对其的管理
+* 任务执行机制 以及 对Worker线程的管理
+* 另外可以看一下这篇文章中关于线程池监控的实现方法
 
 ## 参考链接
 [Java全栈知识体系](https://www.pdai.tech/md/java/thread/java-thread-x-overview.html)
