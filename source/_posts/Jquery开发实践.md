@@ -204,3 +204,23 @@ function getPromiseFun(url) {
   })
 }
 ```
+
+## innerHTML存在的问题
+> innerHTML的修改和添加，元素中旧的内容被移除新的内容会被重新写入元素。innerHTML内容将会被重新解析和构建元素。例如: innerHTML+ = '' 时，内容”归零” 重写，所有的图片和资源重新加载，这样会消耗更多的时间。[@[js] innerHTML有什么缺点？](https://blog.csdn.net/weixin_43392489/article/details/112142847)
+
+在 滚动条下拉加载数据 中，渲染数据是通过 `innerHTML` 完成的，如下
+![](https://i.loli.net/2021/06/18/vo24TJCPxpR78GE.png)
+
+上次的需求中加载的数据没有图片和音视频资源，因此没有问题。这次又收到一个相似的需求，但加载的数据中多了图片和音视频资源，因此出现了问题。每次加载数据后，所有的图片音视频资源都会重新加载一遍。
+因此，可以使用替代方案，我这里使用的是 `jQuery.append()` 方法，替换之后页面资源没有重新加载。
+
+`innerHTML` 方式页面资源加载情况
+![](https://i.loli.net/2021/06/18/JdHCEKVQnPxR1jT.png)
+
+
+替换为 `Jquery.append()` 后，页面资源加载情况
+![](https://i.loli.net/2021/06/18/F78AG45CIDehtqX.png)
+
+## Css子元素浮动导致父元素高度坍塌
+具体事例详解见：[子元素浮动导致父元素高度不够问题的解决方案](https://www.jianshu.com/p/d146f531c317)
+解决方案如下：为父元素加上 `display: flow-root`。
