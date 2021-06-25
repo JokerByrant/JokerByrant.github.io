@@ -221,6 +221,21 @@ function getPromiseFun(url) {
 替换为 `Jquery.append()` 后，页面资源加载情况
 ![](https://i.loli.net/2021/06/18/F78AG45CIDehtqX.png)
 
-## Css子元素浮动导致父元素高度坍塌
+## CSS子元素浮动导致父元素高度坍塌
 具体事例详解见：[子元素浮动导致父元素高度不够问题的解决方案](https://www.jianshu.com/p/d146f531c317)
 解决方案如下：为父元素加上 `display: flow-root`。
+
+## 页面元素垂直居中
+推荐下面的方法，不用考虑父元素是否设置的`height`值，代码如下：
+```css
+.parent{
+  position: relative;
+}
+.child{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+```
+
+其他的一些情况，参考：[CSS垂直居中的12种实现方式](https://juejin.cn/post/6844903550909153287)
