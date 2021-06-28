@@ -86,8 +86,109 @@ date: 2020-08-25 11:51:57
 ## CAS、Unsafe和Atomicxxx
 关于`CAS`和`Unsafe`相关的概念不多赘述，参考：[JUC原子类: CAS, Unsafe和原子类详解](https://www.pdai.tech/md/java/thread/java-thread-x-juc-AtomicInteger.html#cas-%e9%97%ae%e9%a2%98)、[美团-Java魔法类：Unsafe应用解析](https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html)
 
+### 总结
+* `CAS`全称`Compare And Swap`---比较并交换，是一条`CPU`的原子指令，其作用是让`CPU`进行如下操作：先比较两个值是否相等，然后再原子地将旧值替换为新值。
+* `Java`中在`Unsafe.class`中定义了三个`CAS`方法：`compareAndSwapObject`、`compareAndSwapInt`和`compareAndSwapLong`，三个都是`native`方法。`Unsafe.class`主要提供了一些**用于执行低级别、不安全操作的方法，如直接访问系统内存资源、自主管理内存资源等**，基本全部都是`native`方法。
+* `Java`中提供的原子类---`Atomicxxx`，主要的实现方法就是调用了`Unsafe.class`的`CAS`方法实现了修改操作的原子性，通过`volatile`实现了待更新参数的可见性。
+
 ## AQS
 这一块儿主要是同步器相关，是实现锁的关键，可以结合：[从ReentrantLock的实现看AQS的原理及应用-美团技术团队](https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html) 和 [JUC锁: ReentrantLock详解-Java全栈知识体系](https://www.pdai.tech/md/java/thread/java-thread-x-lock-ReentrantLock.html) 两篇文章一起服用。
+
+下面来看`JUC`包中基于`AQS`实现的一些类。
+
+### CountDownLatch
+关于这个的概念和源码参考[JUC工具类: CountDownLatch详解](https://www.pdai.tech/md/java/thread/java-thread-x-juc-tool-countdownlatch.html)。
+这个类可以用来替代传统的`notify()`、`wait()`线程模型，上`Demo`(例子来源于上面的链接)：
+```java
+/**
+  * 1. 利用notify()、wait()实现监控List大小
+  * notify()唤醒别的线程-不会释放锁，wait()阻塞当前线程-会释放锁。
+  * 使用这种方式切换线程会涉及线程的阻塞，当调用notify()-wait()后，线程会阻塞
+  */
+@Test
+public void fun3() {
+    LinkedList<Integer> list = new LinkedList<>();
+    Object lock = new Object();
+    new Thread(() -> {
+        synchronized (lock) {
+            System.out.println("t2 start");
+            if (list.size() != 5) {
+                try {
+                    // 阻塞当前t2
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("t2 end");
+            }
+            // 唤醒t1
+            lock.notify();
+        }
+    },"t2").start();
+
+    new Thread(() ->{
+        synchronized (lock) {
+            System.out.println("t1 start");
+            for (int i = 1; i <= 10; i++) {
+                list.add(i);
+                System.out.println("add " + i);
+                if (list.size() == 5) {
+                    // 唤醒t2
+                    lock.notify();
+                    try {
+                        // 阻塞当前t1
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }, "t1").start();
+}
+```
+```java
+/**
+  * 2. 利用CountDown实现监控List大小
+  * 这种方式不会阻塞线程，调用countDown()后，当前线程继续执行
+  */
+@Test
+public void fun2() {
+    LinkedList<Integer> list = new LinkedList<>();
+    CountDownLatch cdl = new CountDownLatch(1);
+    new Thread(() -> {
+        System.out.println("t2 start");
+        if (list.size() != 5) {
+            try {
+                // 阻塞当前线程
+                cdl.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("t2 end");
+        }
+    },"t2").start();
+
+    new Thread(() ->{
+        System.out.println("t1 start");
+        for (int i = 1; i <= 10; i++) {
+            list.add(i);
+            System.out.println("add " + i);
+            if (list.size() == 5) {
+                System.out.println("execute countDown");
+                // 操作唤醒了t2
+                cdl.countDown();
+            }
+        }
+    }, "t1").start();
+
+    try {
+        Thread.currentThread().join();
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+```
 
 ## 线程池
 结合这篇文章：[Java线程池实现原理及其在美团业务中的实践-美团技术团队](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)，主要关注以下几点：
