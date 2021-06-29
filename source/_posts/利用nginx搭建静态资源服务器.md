@@ -36,3 +36,80 @@ start nginx.exe
 然后访问链接：localhost/app，就能看到对应的文件目录了
 ![](https://i.loli.net/2021/06/28/JNFAdrePqp3cWw9.png)
 
+### 美化目录结构
+nginx默认的目录页看着让人一言难尽，感觉一下子回到了10年前，而接下来要做了就是优化这个页面。
+
+我的电脑系统是`windows`，网上关于这个的教程基本都是针对`linux`环境的，因此找了许久才找到一个合适的。
+
+#### 方法1
+借用 [美化nginx的autoindex页面](https://steemit.com/cn/@ety001/nginx-autoindex) 针对这个方法的描述：
+> 这个方案是依赖的 `Nginx` 的这个参数 `autoindex_format`，这个参数可以规定输出信息格式，默认是 `html`，我们可以设置这里为 `json`, 这样就变成了一个 `api` 接口。然后自己去开发一套自己喜欢的前端，调用这个 `api` 接口就可以了。
+
+`github`上找到一个现成的例子：[pretty-autoindex](https://github.com/spring-raining/pretty-autoindex.git)。(**务必阅读一下`Readme.md`，根据其指导修改对应的配置**)
+
+然后直接修改`nginx`的配置
+```conf
+# 转向美化后的目录页
+location / {
+    root   D:/workspace/pretty-autoindex/dist/; # 项目地址
+    index  index.html;
+    autoindex off;
+}
+
+# 作为Api使用
+location /app {
+    root   C:/cloudfish/images/; # 需要暴露的目录
+    autoindex on;
+    autoindex_localtime on;
+    autoindex_exact_size off;
+    autoindex_format    json;
+
+    # Enable your browser to access here.
+    add_header  Access-Control-Allow-Origin "*";
+    add_header  Access-Control-Allow-Methods "GET, POST, OPTIONS";
+    add_header  Access-Control-Allow-Headers "Origin, Authorization, Accept";
+    add_header  Access-Control-Allow-Credentials true;
+}
+```
+
+[pretty-autoindex](https://github.com/spring-raining/pretty-autoindex.git) 这个项目利用了`gulp`对`js`进行了打包，我对这一块儿也不是太熟，因此没有进行进一步的自定义，只在其基础上修改了一些简单的`css`和`js`，最终效果如下：
+![](https://i.loli.net/2021/06/29/rxUQ6gZ8TpLildj.png)
+
+#### 方法2
+方法1是通过请求`api`接口获取目录信息，而方法2则是通过获取网页元素的方式，来拿到目录信息。
+
+`nginx`配置:
+```conf
+location / {
+    root   D:/nginx-1.20.1/html;
+    index  index.html index.htm;
+    charset utf-8;
+    autoindex off;
+}
+
+# 只有访问该目录，样式才变化
+location /app {
+    root   C:/cloudfish/images/;
+    charset utf-8;
+
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
+
+    autoindex_format    html;
+    add_after_body /autoindex/footer.html;  # 这里指向的是 D:/nginx-1.20.1/html/autoindex/footer.html
+}
+```
+需要注意的是：`add_after_body`中配置的样式文件，必须在`nginx`的`html`文件夹下。
+![](https://i.loli.net/2021/06/29/NCcua6AWnx4qOSd.png)
+
+样式文件下载地址：[fulicat/autoindex](https://github.com/fulicat/autoindex.git)
+
+#### 方法3
+TODO，参考：[实现Nginx文件目录的排序功能](https://www.sohu.com/a/149035094_216613)
+
+## 参考文章
+[美化nginx的autoindex页面](https://steemit.com/cn/@ety001/nginx-autoindex)
+
+
+
