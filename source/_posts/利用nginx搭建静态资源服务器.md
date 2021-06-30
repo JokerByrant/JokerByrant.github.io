@@ -16,7 +16,7 @@ date: 2021-06-28 14:14:27
 
 看到这个插件，我就想我也可以为服务器搭建一个类似的资源服务器，这样以后查看日志就方便了。于是一搜，就发现其实已经有现成的轮子了，可以直接利用`nginx`完成搭建。
 
-### 搭建流程
+## 搭建流程
 访问 [nginx下载地址](http://nginx.org/en/download.html)，下载稳定版
 ![](https://i.loli.net/2021/06/28/6Je4hUVjcaTEy8C.png)
 
@@ -36,16 +36,16 @@ start nginx.exe
 然后访问链接：localhost/app，就能看到对应的文件目录了
 ![](https://i.loli.net/2021/06/28/JNFAdrePqp3cWw9.png)
 
-### 美化目录结构
+## 美化目录结构
 nginx默认的目录页看着让人一言难尽，感觉一下子回到了10年前，而接下来要做了就是优化这个页面。
 
 我的电脑系统是`windows`，网上关于这个的教程基本都是针对`linux`环境的，因此找了许久才找到一个合适的。
 
-#### 方法1
+### 方法1
 借用 [美化nginx的autoindex页面](https://steemit.com/cn/@ety001/nginx-autoindex) 针对这个方法的描述：
 > 这个方案是依赖的 `Nginx` 的这个参数 `autoindex_format`，这个参数可以规定输出信息格式，默认是 `html`，我们可以设置这里为 `json`, 这样就变成了一个 `api` 接口。然后自己去开发一套自己喜欢的前端，调用这个 `api` 接口就可以了。
 
-`github`上找到一个现成的例子：[pretty-autoindex](https://github.com/spring-raining/pretty-autoindex.git)。(**务必阅读一下`Readme.md`，根据其指导修改对应的配置**)
+`github`上找到一个现成的例子：[pretty-autoindex](https://github.com/spring-raining/pretty-autoindex.git)，`clone`下来之后，首先修改`nginx`的配置，如下：
 
 然后直接修改`nginx`的配置
 ```conf
@@ -71,14 +71,20 @@ location /app {
     add_header  Access-Control-Allow-Credentials true;
 }
 ```
+然后修改项目的配置，主要是重新设置一下url
+![](https://i.loli.net/2021/06/30/xXOy6GdS7gKsNn8.png)
 
-[pretty-autoindex](https://github.com/spring-raining/pretty-autoindex.git) 这个项目利用了`gulp`对`js`进行了打包，我对这一块儿也不是太熟，因此没有进行进一步的自定义，只在其基础上修改了一些简单的`css`和`js`，最终效果如下：
+
+[pretty-autoindex](https://github.com/spring-raining/pretty-autoindex.git) 这个项目利用了`gulp`对`js`进行了打包，我对这一块儿也不是太熟，因此没有进行进一步的自定义，只在其基础上修改了一些简单的`css`和`js`，熟悉这个的同学可以自己在其基础上再进行自定义，最终效果如下：
 ![](https://i.loli.net/2021/06/29/rxUQ6gZ8TpLildj.png)
 
-#### 方法2
+### 方法2
 方法1是通过请求`api`接口获取目录信息，而方法2则是通过获取网页元素的方式，来拿到目录信息。
 
-`nginx`配置:
+同样，在`github`上找到现成的例子：[fulicat/autoindex](https://github.com/fulicat/autoindex.git)，`clone`下来之后，将`autoindex`文件夹放入`nginx`的`html`文件夹下。
+![](https://i.loli.net/2021/06/29/NCcua6AWnx4qOSd.png)
+
+接着，修改`nginx`的配置：
 ```conf
 location / {
     root   D:/nginx-1.20.1/html;
@@ -100,12 +106,19 @@ location /app {
     add_after_body /autoindex/footer.html;  # 这里指向的是 D:/nginx-1.20.1/html/autoindex/footer.html
 }
 ```
-需要注意的是：`add_after_body`中配置的样式文件，必须在`nginx`的`html`文件夹下。
-![](https://i.loli.net/2021/06/29/NCcua6AWnx4qOSd.png)
 
-样式文件下载地址：[fulicat/autoindex](https://github.com/fulicat/autoindex.git)
+同样的，如果需要对样式自定义，可以修改对应的代码。但是如果想要引入外部的`js/css`文件可能有些困难，因为在项目中定义`js/css`文件的相对路径，最终会被解析为相对分享目录的路径，如下图：
+![](https://i.loli.net/2021/06/30/U63hAC8fZF1MmDV.png)
+```js
+<script text="javascript" src="./1.js"></script>
+```
+![](https://i.loli.net/2021/06/30/NliLjcHO7EJF84C.png)
 
-#### 方法3
+解决办法也有，那就是利用方法1中的方式，配置一个`api`，将相关文件放入，通过该`api`来引入`js/css`文件。我这边没有进行这步操作，图像样式直接利用了`windows`自带的符号，修改如下：
+![](https://i.loli.net/2021/06/30/2wV1HBANYku4I35.png)
+![](https://i.loli.net/2021/06/30/EW2DdVK6mNyQaIG.png)
+
+### 方法3
 TODO，参考：[实现Nginx文件目录的排序功能](https://www.sohu.com/a/149035094_216613)
 
 ## 参考文章
