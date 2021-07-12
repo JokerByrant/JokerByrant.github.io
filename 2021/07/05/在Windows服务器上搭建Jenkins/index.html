@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言在引入自动化部署工具之前，项目部署一般是按照如下流程进行的：①. 本地编译打包代码；②. 将打包后的 jar 包上传到服务器；③. 登录服务器，重启项目。现在可以利用自动化部署工具将这些操作自动化，实现一键部署。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Windows服务器上搭建Jenkins">
+<meta property="og:url" content="https://jokerbyrant.github.io/2021/07/05/%E5%9C%A8Windows%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E6%90%AD%E5%BB%BAJenkins/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="前言在引入自动化部署工具之前，项目部署一般是按照如下流程进行的：①. 本地编译打包代码；②. 将打包后的 jar 包上传到服务器；③. 登录服务器，重启项目。现在可以利用自动化部署工具将这些操作自动化，实现一键部署。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/abmjnPkG23SIqDg.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/uE2OxZklo7bfMCd.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/7GCsXhYDFi5blO3.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/BLOV4Cqr578YiXK.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/7XOyCpLew2FkcSb.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/7C1xyGwkgsIlYBX.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/7FfoaDVB1NvuSGm.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/7acWilqN1YmMnQK.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/G3ypUL6DRNw7c2s.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/fsrxP3FlY1zMeWu.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/FyYINxhVr2lecMA.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/nTEMxdsyhNpaHli.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/6J7BOUIYwjreLlM.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/yMd6r2WoZhftJ7c.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/NHb4ODX5MT6rAcp.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/ou5YewQG7fXBLO4.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/wYgCEiKyMekjd42.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/uAzclvpYW7kBnHj.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/c3RGvb9MIsNCpAH.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/SsWCLbeq1EIlX3t.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/Dozpy7vKRkqdSib.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/WC9KeNohgGnJA6V.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/M2n3eD4HwKzrGsx.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/NH5EdTAfMjgZpzY.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/ELCQu8XO4K9yYhd.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/iCtU8MqF14JNTcp.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/71sZWVxfO3nkDdU.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/OvWPor5gtj7kT24.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/SBPg3ajVH2vqxWT.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/jwky745EvhflDBW.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/onZEIzB5Lbkrjlm.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/GZhfpVTPLloQvBd.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/86ORrpnXNCjgf5y.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/5Tyqvp8lWZh7SM6.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/jTR5np31lk7NDL4.png">
+<meta property="og:image" content="https://i.loli.net/2021/07/12/8oZmRTLBb6NXJUE.png">
+<meta property="article:published_time" content="2021-07-05T01:11:38.000Z">
+<meta property="article:modified_time" content="2021-07-12T07:39:36.976Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="Jenkins">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/07/12/abmjnPkG23SIqDg.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2021/07/05/%E5%9C%A8Windows%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E6%90%AD%E5%BB%BAJenkins/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>在Windows服务器上搭建Jenkins | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021/07/05/%E5%9C%A8Windows%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E6%90%AD%E5%BB%BAJenkins/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在Windows服务器上搭建Jenkins
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-05 09:11:38" itemprop="dateCreated datePublished" datetime="2021-07-05T09:11:38+08:00">2021-07-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在引入自动化部署工具之前，项目部署一般是按照如下流程进行的：①. 本地编译打包代码；②. 将打包后的 <code>jar</code> 包上传到服务器；③. 登录服务器，重启项目。现在可以利用自动化部署工具将这些操作自动化，实现一键部署。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="Jenkins介绍"><a href="#Jenkins介绍" class="headerlink" title="Jenkins介绍"></a>Jenkins介绍</h2><p>提起自动化部署工具，我的第一反应就是 <code>Jenkins</code>。我的毕业设计就是基于 <code>Jenkins</code> 搭建的一个自动化部署平台，<a href="https://zh.wikipedia.org/wiki/Jenkins_(%E8%BD%AF%E4%BB%B6)" target="_blank" rel="noopener">维基百科上对Jenkins的介绍</a> 如下：</p>
+<blockquote>
+<p>Jenkins是一款由Java编写的开源的持续集成工具。它提供了软件开发的持续集成服务，它运行在Servlet容器中（例如Apache Tomcat）。它支持软件配置管理（SCM）工具（包括AccuRev SCM、CVS、Subversion、Git、Perforce、Clearcase和RTC），可以执行基于Apache Ant和Apache Maven的项目，以及任意的Shell脚本和Windows批处理命令。可以通过各种手段触发构建，例如提交给版本控制系统时被触发。也可以通过类似Cron的机制调度，也可以在其他的构建已经完成时，还可以通过一个特定的URL进行请求。</p>
+</blockquote>
+<p>按照我的理解，Jenkins可以看做是一个插件调度中心。比如上面的三步操作，第一步用到了<code>maven</code>，第二步用到了<code>ssh/ftp</code>，第三步需要执行<code>bat/shell</code>脚本。通过合理的配置，<code>Jenkins</code>就可以将这三部操作整合为一个流水<code>job</code>，只需要运行<code>job</code>就能实现一键部署操作。</p>
+<hr>
+<h2 id="Jenkins的安装"><a href="#Jenkins的安装" class="headerlink" title="Jenkins的安装"></a>Jenkins的安装</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p><code>Jenkins</code>有两种安装方式，<code>war</code>包和<code>msi</code>安装程序。通过<code>war</code>包安装，只需要将<code>war</code>包放入<code>tomcat</code>中对应位置，然后启动<code>tomcat</code>即可。我使用的是<code>msi</code>安装程序的方式，下面将介绍。</p>
+<p>安装之前首先需要保证系统中已经安装了<code>Java</code>。</p>
+<p>访问 <a href="https://www.jenkins.io/download/" target="_blank" rel="noopener">Jenkins下载地址</a>，找到对应的安装方式进行下载。<br><img src="https://i.loli.net/2021/07/12/abmjnPkG23SIqDg.png" alt=""></p>
+<p>接着打开安装程序，一路<code>next</code>。<br><img src="https://i.loli.net/2021/07/12/uE2OxZklo7bfMCd.png" alt=""></p>
+<p>碰到一个需要配置用户名密码的选项，选择不需要配置的那个选项。<br><img src="https://i.loli.net/2021/07/12/7GCsXhYDFi5blO3.png" alt=""></p>
+<p>还需要设置一下对应的端口，我设置的是<code>8888</code>。<br><img src="https://i.loli.net/2021/07/12/BLOV4Cqr578YiXK.png" alt=""></p>
+<p>配置<code>Java</code><br><img src="https://i.loli.net/2021/07/12/7XOyCpLew2FkcSb.png" alt=""></p>
+<p>之后一路<code>next</code>，安装完毕。</p>
+<h3 id="自定义工作目录"><a href="#自定义工作目录" class="headerlink" title="自定义工作目录"></a>自定义工作目录</h3><p>访问 <code>localhost:8888</code>，等待一段时间，会出现如下界面。<br><img src="https://i.loli.net/2021/07/12/7C1xyGwkgsIlYBX.png" alt=""></p>
+<p>注意红框中的内容，对应的地址是C盘，这是<code>Jenkins</code>默认的工作目录，以后创建的<code>Job</code>以及其他的一些数据都会存放在这儿。由于C盘是启动盘，这是患有”系统洁癖”的我不能忍受的。因此在进行下一步的<code>Jenkins</code>配置之前，先将对应的工作目录修改一下。</p>
+<p>打开Jenkins安装目录(安装程序时选择的位置)，找到<code>jenkins.xml</code><br><img src="https://i.loli.net/2021/07/12/7FfoaDVB1NvuSGm.png" alt=""></p>
+<p>找到三处 <code>%LocalAppData%</code>，将其修改为自定义地址，我改成了F盘<br><img src="https://i.loli.net/2021/07/12/7acWilqN1YmMnQK.png" alt=""><br><img src="https://i.loli.net/2021/07/12/G3ypUL6DRNw7c2s.png" alt=""></p>
+<p>接着，重启<code>Jenkins</code>。打开控制台，进入<code>Jenkins</code>安装目录，按对应命令进行重启：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">::重启Jenkins</span><br><span class="line">jenkins.exe restart</span><br><span class="line"></span><br><span class="line">::停止Jenkins</span><br><span class="line">jenkins.exe stop</span><br><span class="line"></span><br><span class="line">::启动Jenkins</span><br><span class="line">jenkins.exe <span class="built_in">start</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2021/07/12/fsrxP3FlY1zMeWu.png" alt=""></p>
+<p>配置完毕。</p>
+<h3 id="初始化Jenkins"><a href="#初始化Jenkins" class="headerlink" title="初始化Jenkins"></a>初始化Jenkins</h3><p>再次访问<code>localhost:8888</code><br><img src="https://i.loli.net/2021/07/12/FyYINxhVr2lecMA.png" alt=""></p>
+<p>找到红框中的文件，填充对应的密码，进入插件安装页面，选择安装推荐的插件，等待插件安装完成<br><img src="https://i.loli.net/2021/07/12/nTEMxdsyhNpaHli.png" alt=""><br><img src="https://i.loli.net/2021/07/12/6J7BOUIYwjreLlM.png" alt=""></p>
+<p>注意：</p>
+<ol>
+<li>有一些插件可能会下载失败，直接点击继续即可，之后可以手动到插件管理中将下载失败的插件重新下载一下。</li>
+<li>如果没配置账号密码，选择了以admin账户继续，则后续登录对应的账号是<code>admin</code>，密码是上一步中拿到的密码</li>
+</ol>
+<h3 id="配置安全策略"><a href="#配置安全策略" class="headerlink" title="配置安全策略"></a>配置安全策略</h3><p><code>Jenkins</code>初始化完毕后，进入主页面，首先来配置一下<code>Jenkins</code>的安全配置<br><img src="https://i.loli.net/2021/07/12/yMd6r2WoZhftJ7c.png" alt=""></p>
+<p>下面是我的配置，也就是忽略了安全配置，不需要登录即可操作<code>Jenkins</code><br><img src="https://i.loli.net/2021/07/12/NHb4ODX5MT6rAcp.png" alt=""></p>
+<h3 id="下载插件"><a href="#下载插件" class="headerlink" title="下载插件"></a>下载插件</h3><p>之后进入插件管理页，下载几个插件，如果有下载失败的插件，顺便也重新下载一下。<br><img src="https://i.loli.net/2021/07/12/ou5YewQG7fXBLO4.png" alt=""><br>我使用的版本控制工具是<code>svn</code>，因此下载一个 <code>Subversion</code> 插件。后面会用到 <code>ssh</code> 连接服务器，再下载一个 <code>Publish Over SSH</code> 插件。</p>
+<p>下载失败的插件按照如下步骤重新下载<br><img src="https://i.loli.net/2021/07/12/wYgCEiKyMekjd42.png" alt=""><br>勾选下载完毕重启<code>Jenkins</code><br><img src="https://i.loli.net/2021/07/12/uAzclvpYW7kBnHj.png" alt=""></p>
+<h3 id="配置Java、Maven"><a href="#配置Java、Maven" class="headerlink" title="配置Java、Maven"></a>配置Java、Maven</h3><p>接着打开全局工具配置，配置一下<code>Java</code>、<code>Maven</code>环境<br><img src="https://i.loli.net/2021/07/12/c3RGvb9MIsNCpAH.png" alt=""><br><img src="https://i.loli.net/2021/07/12/SsWCLbeq1EIlX3t.png" alt=""></p>
+<h3 id="配置SSH"><a href="#配置SSH" class="headerlink" title="配置SSH"></a>配置SSH</h3><p>如果需要配置<code>SSH</code>，首先需要测试目标服务器是否支持<code>SSH</code>连接。在控制台进行测试：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh 登录名@ip</span><br></pre></td></tr></table></figure>
+<p>如下就是不支持<br><img src="https://i.loli.net/2021/07/12/Dozpy7vKRkqdSib.png" alt=""></p>
+<p>一般<code>linux</code>服务器是默认开启的，只有在<code>windows</code>服务器才会出现这种，<code>windows</code>下开启方法参考链接：<a href="https://wujun.org/install-openssh-on-windows-server/" target="_blank" rel="noopener">Windows服务器配置支持SSH连接</a></p>
+<p>进入如下菜单<br><img src="https://i.loli.net/2021/07/12/WC9KeNohgGnJA6V.png" alt=""></p>
+<p>滚动条划到最底部，点击新增<br><img src="https://i.loli.net/2021/07/12/M2n3eD4HwKzrGsx.png" alt=""></p>
+<p>按照如下方式配置<br><img src="https://i.loli.net/2021/07/12/NH5EdTAfMjgZpzY.png" alt=""></p>
+<p>配置完毕，测试联通性<br><img src="https://i.loli.net/2021/07/12/ELCQu8XO4K9yYhd.png" alt=""></p>
+<h3 id="报错解决"><a href="#报错解决" class="headerlink" title="报错解决"></a>报错解决</h3><p>在<code>Manage Jenkins</code>可能看到这个报错，点击进去配置一下<br><img src="https://i.loli.net/2021/07/12/iCtU8MqF14JNTcp.png" alt=""><br><img src="https://i.loli.net/2021/07/12/71sZWVxfO3nkDdU.png" alt=""></p>
+<hr>
+<h2 id="部署方式确定"><a href="#部署方式确定" class="headerlink" title="部署方式确定"></a>部署方式确定</h2><p>TODO 介绍本地部署和远程部署</p>
+<hr>
+<h2 id="创建部署流水Job"><a href="#创建部署流水Job" class="headerlink" title="创建部署流水Job"></a>创建部署流水Job</h2><p>创建<code>Job</code><br><img src="https://i.loli.net/2021/07/12/OvWPor5gtj7kT24.png" alt=""></p>
+<p>配置对历史构建记录的保留策略<br><img src="https://i.loli.net/2021/07/12/SBPg3ajVH2vqxWT.png" alt=""></p>
+<p>配置代码仓库，需要添加一条凭据，凭据就是登陆代码仓库的账号密码。添加完之后，在下拉框中选择对应的凭据。<br><img src="https://i.loli.net/2021/07/12/jwky745EvhflDBW.png" alt=""><br><img src="https://i.loli.net/2021/07/12/onZEIzB5Lbkrjlm.png" alt=""></p>
+<p>添加<code>Maven</code>配置<br><img src="https://i.loli.net/2021/07/12/GZhfpVTPLloQvBd.png" alt=""><br><img src="https://i.loli.net/2021/07/12/86ORrpnXNCjgf5y.png" alt=""></p>
+<p>接着，配置部署脚本。我已经将几个脚本抽象出来了，因为我开发的是微服务项目，抽象出来之后可以实现脚本的复用。另外要注意的是，脚本中的路径都要写绝对路径。<br><img src="https://i.loli.net/2021/07/12/5Tyqvp8lWZh7SM6.png" alt=""><br><img src="https://i.loli.net/2021/07/12/jTR5np31lk7NDL4.png" alt=""></p>
+<p>关于命令的解释如下<br><img src="https://i.loli.net/2021/07/12/8oZmRTLBb6NXJUE.png" alt=""></p>
+<p>下面放上几个脚本<br><code>backup.bat</code>—<code>Jar</code>包备份脚本</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line">::备份jar包</span><br><span class="line"><span class="built_in">set</span> prefix=%<span class="number">1</span></span><br><span class="line"><span class="built_in">set</span> jarFile=g:\rsdun-cloudfish\<span class="variable">%prefix%</span>.jar</span><br><span class="line"><span class="built_in">echo</span> =========================================== 备份 <span class="variable">%prefix%</span>.jar ===========================================</span><br><span class="line"><span class="built_in">copy</span> <span class="variable">%prefix%</span>\target\<span class="variable">%prefix%</span>.jar <span class="variable">%jarFile%</span></span><br><span class="line"><span class="built_in">echo</span> =========================================== 成功备份至 <span class="variable">%jarFile%</span> ===========================================</span><br></pre></td></tr></table></figure>
+
+<p><code>deploy.bat</code>—部署脚本</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"></span><br><span class="line">::<span class="number">1</span>.jar包、启动日志、启动脚本、占用端口、启动成功标志</span><br><span class="line"><span class="built_in">set</span> prefix=%<span class="number">1</span></span><br><span class="line"><span class="built_in">set</span> port=%<span class="number">2</span></span><br><span class="line"><span class="built_in">set</span> profile=%<span class="number">3</span></span><br><span class="line"><span class="built_in">set</span> Xmx=%<span class="number">4</span></span><br><span class="line"><span class="built_in">set</span> successFlag=%<span class="number">5</span></span><br><span class="line"><span class="built_in">set</span> jarFile=g:\rsdun-cloudfish\<span class="variable">%prefix%</span>.jar</span><br><span class="line"><span class="built_in">set</span> startBat=g:\rsdun-cloudfish\jenkins\startJar.bat</span><br><span class="line"><span class="built_in">set</span> startLog=g:\rsdun-cloudfish\startLogs\<span class="variable">%prefix%</span>-<span class="variable">%port%</span>.log</span><br><span class="line"></span><br><span class="line">::<span class="number">2</span>.杀死正在运行的项目进程</span><br><span class="line"><span class="built_in">echo</span> =========================================== kill端口：<span class="variable">%port%</span> ===========================================</span><br><span class="line"><span class="built_in">setlocal</span> enabledelayedexpansion</span><br><span class="line"><span class="keyword">for</span> /f "tokens=<span class="number">1</span>-<span class="number">5</span>" <span class="variable">%%a</span> <span class="keyword">in</span> ('netstat -ano ^| <span class="built_in">findstr</span> "<span class="variable">%port%</span>"') <span class="keyword">do</span> (</span><br><span class="line">    <span class="keyword">if</span> "<span class="variable">%%e</span>%" == "" (</span><br><span class="line">        <span class="built_in">set</span> pid=<span class="variable">%%d</span></span><br><span class="line">    ) <span class="keyword">else</span> (</span><br><span class="line">        <span class="built_in">set</span> pid=<span class="variable">%%e</span></span><br><span class="line">    )</span><br><span class="line">)</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">NOT</span> "<span class="variable">!pid!</span>" == "" (</span><br><span class="line">   <span class="built_in">taskkill</span> /f /pid <span class="variable">!pid!</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">::<span class="number">3</span>.删除旧的日志文件</span><br><span class="line"><span class="built_in">echo</span> =========================================== 删除日志文件：<span class="variable">%startLog%</span> ===========================================</span><br><span class="line">:delFile</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">exist</span> <span class="variable">%startLog%</span> (</span><br><span class="line">  <span class="built_in">del</span> <span class="variable">%startLog%</span>&gt;<span class="built_in">nul</span> <span class="number">2</span>&gt;<span class="built_in">nul</span></span><br><span class="line">  <span class="keyword">goto</span> delFile</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">::<span class="number">4</span>.重启项目</span><br><span class="line"><span class="built_in">echo</span> =========================================== 重启项目 ===========================================</span><br><span class="line"><span class="built_in">set</span> BUILD_ID=dontKillMe</span><br><span class="line"><span class="built_in">start</span> <span class="variable">%startBat%</span> <span class="variable">%Xmx%</span> <span class="variable">%jarFile%</span> <span class="variable">%profile%</span> <span class="variable">%startLog%</span></span><br><span class="line"></span><br><span class="line">::<span class="number">5</span>.打印启动日志</span><br><span class="line"><span class="built_in">echo</span> =========================================== 开始打印启动日志 ===========================================</span><br><span class="line"><span class="built_in">set</span> line=<span class="number">0</span></span><br><span class="line">:while</span><br><span class="line"><span class="built_in">set</span> content=<span class="number">0</span></span><br><span class="line">@<span class="keyword">for</span> /f "tokens=<span class="number">1</span>* delims=:" <span class="variable">%%i</span> <span class="keyword">in</span> ('<span class="built_in">findstr</span>/n .* <span class="variable">%startLog%</span>') <span class="keyword">do</span> (</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">%%i</span> <span class="keyword">GTR</span> <span class="variable">%line%</span> (</span><br><span class="line">        <span class="built_in">set</span> line=<span class="variable">%%i</span></span><br><span class="line">        <span class="built_in">set</span> content=<span class="variable">%%j</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">%%j</span></span><br><span class="line">    )</span><br><span class="line">)</span><br><span class="line">::检查项目是否输出启动成功标志</span><br><span class="line"><span class="built_in">set</span> exists_flag=false</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">%content%</span>|<span class="built_in">find</span> <span class="variable">%successFlag%</span>&gt;<span class="built_in">nul</span>&amp;&amp;<span class="built_in">set</span> exists_flag=true</span><br><span class="line"><span class="keyword">if</span> "<span class="variable">%exists_flag%</span>"=="true" (</span><br><span class="line">   <span class="built_in">echo</span> =========================================== 项目启动成功！ ===========================================</span><br><span class="line">   <span class="keyword">exit</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">goto</span> while</span><br><span class="line"></span><br><span class="line"><span class="keyword">exit</span></span><br></pre></td></tr></table></figure>
+
+<p><code>startJar.bat</code>—<code>Jar</code>包启动脚本</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"><span class="built_in">set</span> Xmx=%<span class="number">1</span></span><br><span class="line"><span class="built_in">set</span> jarFile=%<span class="number">2</span></span><br><span class="line"><span class="built_in">set</span> options=%<span class="number">3</span></span><br><span class="line"><span class="built_in">set</span> startLogs=%<span class="number">4</span></span><br><span class="line">::由于bat中无法将=作为参数传入，因此传入@，这里替换为=</span><br><span class="line"><span class="built_in">set</span> "options=<span class="variable">%options:@==%</span>"</span><br><span class="line">java <span class="variable">%Xmx%</span> -jar <span class="variable">%jarFile%</span> <span class="variable">%options%</span> &gt; <span class="variable">%startLogs%</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="遇到的一些坑"><a href="#遇到的一些坑" class="headerlink" title="遇到的一些坑"></a>遇到的一些坑</h2>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/02/mysql%E4%B8%ADutf8%E5%92%8Cutf8mb4%E5%8C%BA%E5%88%AB%EF%BC%8C%E5%B9%B6%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%89%80%E6%9C%89%E5%AD%97%E6%AE%B5%E7%9A%84%E7%BC%96%E7%A0%81/" rel="prev" title="mysql中utf8和utf8mb4区别，并批量修改数据库中所有字段的编码">
+      <i class="fa fa-chevron-left"></i> mysql中utf8和utf8mb4区别，并批量修改数据库中所有字段的编码
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins介绍"><span class="nav-number">2.</span> <span class="nav-text">Jenkins介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins的安装"><span class="nav-number">3.</span> <span class="nav-text">Jenkins的安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">3.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义工作目录"><span class="nav-number">3.2.</span> <span class="nav-text">自定义工作目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化Jenkins"><span class="nav-number">3.3.</span> <span class="nav-text">初始化Jenkins</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置安全策略"><span class="nav-number">3.4.</span> <span class="nav-text">配置安全策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载插件"><span class="nav-number">3.5.</span> <span class="nav-text">下载插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Java、Maven"><span class="nav-number">3.6.</span> <span class="nav-text">配置Java、Maven</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置SSH"><span class="nav-number">3.7.</span> <span class="nav-text">配置SSH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#报错解决"><span class="nav-number">3.8.</span> <span class="nav-text">报错解决</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署方式确定"><span class="nav-number">4.</span> <span class="nav-text">部署方式确定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建部署流水Job"><span class="nav-number">5.</span> <span class="nav-text">创建部署流水Job</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遇到的一些坑"><span class="nav-number">6.</span> <span class="nav-text">遇到的一些坑</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+    <div class="links-of-blogroll motion-element links-of-blogroll-block">
+      <div class="links-of-blogroll-title">
+        <!-- modify icon to fire by szw -->
+        <i class="fa fa-history fa-" aria-hidden="true"></i>
+        近期文章
+      </div>
+      <ul class="links-of-blogroll-list">
+        
+        
+          <li>
+            <a href="/2021/07/05/%E5%9C%A8Windows%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E6%90%AD%E5%BB%BAJenkins/" title="在Windows服务器上搭建Jenkins" target="_blank">在Windows服务器上搭建Jenkins</a>
+          </li>
+        
+          <li>
+            <a href="/2021/07/02/mysql%E4%B8%ADutf8%E5%92%8Cutf8mb4%E5%8C%BA%E5%88%AB%EF%BC%8C%E5%B9%B6%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%89%80%E6%9C%89%E5%AD%97%E6%AE%B5%E7%9A%84%E7%BC%96%E7%A0%81/" title="mysql中utf8和utf8mb4区别，并批量修改数据库中所有字段的编码" target="_blank">mysql中utf8和utf8mb4区别，并批量修改数据库中所有字段的编码</a>
+          </li>
+        
+          <li>
+            <a href="/2021/06/28/%E5%88%A9%E7%94%A8nginx%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E6%9C%8D%E5%8A%A1%E5%99%A8/" title="利用nginx搭建静态资源服务器" target="_blank">利用nginx搭建静态资源服务器</a>
+          </li>
+        
+          <li>
+            <a href="/2021/05/28/Serverless%E5%AD%A6%E4%B9%A0/" title="Serverless学习" target="_blank">Serverless学习</a>
+          </li>
+        
+          <li>
+            <a href="/2021/05/08/%E4%BC%98%E5%8C%96%E7%BD%91%E9%A1%B5%E5%8A%A0%E8%BD%BD%E9%80%9F%E5%BA%A6/" title="优化网页加载速度" target="_blank">优化网页加载速度</a>
+          </li>
+        
+      </ul>
+    </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
