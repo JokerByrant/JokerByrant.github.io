@@ -106,6 +106,17 @@ deploy:
   repo: https://github.com/JokerByrant/JokerByrant.github.io  # blog 的 git 地址
   branch: master                                              # 发布至 master 分支，如果该分支不存在，就会自动创建它
 
-# SEO
+# Google SEO
 sitemap:
   path: sitemap.xml
+
+# Baidu SEO
+baidusitemap:
+  path: baidusitemap.xml
+
+# Baidu 主动推送
+baidu_url_submit:
+count: 5 ## 提交最新的五个链接
+host: jokerbyrant.github.io ## 在百度站长平台中注册的域名
+token: your_token ## 请注意这是您的秘钥， 所以请不要把博客源代码发布在公众仓库里!
+path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
