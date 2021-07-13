@@ -179,13 +179,6 @@
 
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Java%E5%B9%B6%E5%8F%91/</loc>
-    <lastmod>2021-07-13</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://jokerbyrant.github.io/tags/IDEA/</loc>
     <lastmod>2021-07-13</lastmod>
     <changefreq>daily</changefreq>
@@ -193,7 +186,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Jquery/</loc>
+    <loc>https://jokerbyrant.github.io/tags/Java%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2021-07-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -214,7 +207,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/mysql/</loc>
+    <loc>https://jokerbyrant.github.io/tags/Jquery/</loc>
     <lastmod>2021-07-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -235,7 +228,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Html/</loc>
+    <loc>https://jokerbyrant.github.io/tags/mysql/</loc>
     <lastmod>2021-07-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -250,6 +243,13 @@
   
   <url>
     <loc>https://jokerbyrant.github.io/tags/%E9%9A%8F%E6%83%B3/</loc>
+    <lastmod>2021-07-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://jokerbyrant.github.io/tags/Html/</loc>
     <lastmod>2021-07-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
