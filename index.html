@@ -286,16 +286,14 @@
 </blockquote>
 <h2 id="utf8和utf8mb4"><a href="#utf8和utf8mb4" class="headerlink" title="utf8和utf8mb4"></a>utf8和utf8mb4</h2><p><code>utf8</code>编码最大字符长度为3字节，三个字节的<code>UTF-8</code>最大能编码的 <code>Unicode</code>字符是<code>0xffff</code>，也就是<code>Unicode</code>中的基本多文种平面（BMP）。也就是说：<strong>任何不在基本多文本平面的<code>Unicode</code>字符，都无法使用<code>Mysql</code>的<code>utf8</code>字符集存储。包括<code>Emoji</code>表情，和很多不常用的汉字，以及任何新增的 <code>Unicode</code>字符等等</strong>。</p>
 <p><code>mysql</code>最早只支持<code>utf8</code>，<code>utf8mb4</code>是在<code>Mysql-5.5.3</code>版本后引入的，<code>mb4</code>就是<code>most bytes 4</code>的意思，专门用来兼容四字节的<code>unicode</code>。<code>utf8mb4</code>是<code>utf8</code>的超集，因此将字符编码从<code>utf8</code>变更为<code>utf8mb4</code>对原先的数据没有任何影响。</p>
-<p>另外关于<code>utf8</code>和<code>utf8mb4</code>的排序规则问题，参考<a href="https://juejin.cn/post/6844903733034221576" target="_blank" rel="noopener">mysql中utf8和utf8mb4的区别-癫Point</a>的解释：</p>
-<blockquote>
-<p><code>utf8_unicode_ci</code> 比较准确，<code>utf8_general_ci</code> 速度比较快，通常情况下 <code>utf8_general_ci</code> 的准确性就够我们用的了。如果是<code>utf8mb4</code>那么对应的就是 <code>utf8mb4_general_ci</code>、<code>utf8mb4_unicode_ci</code>。</p>
-</blockquote>
-<h2 id="批量修改数据库中所有字段的编码"><a href="#批量修改数据库中所有字段的编码" class="headerlink" title="批量修改数据库中所有字段的编码"></a>批量修改数据库中所有字段的编码</h2><p>开始的时候我是一个个手动改的，但是改了两个表之后，发现后面居然还有几十张表等着我，不由瑟瑟发抖…</p>
-<p>直接使用下面的<code>sql</code>可以生成<code>alert</code>语句，</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	<span class="keyword">CONCAT</span>(</span><br><span class="line">		<span class="string">'ALTER TABLE '</span>,</span><br><span class="line">		TABLE_NAME,</span><br><span class="line">		<span class="string">' CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;'</span></span><br><span class="line">	)</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	information_schema.<span class="string">`TABLES`</span></span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE_SCHEMA = <span class="string">'这里填数据库名'</span>;</span><br></pre></td></tr></table></figure>
-<p>执行上面语句后的结果，直接复制并执行，或者导出为<code>sql</code>文件然后执行即可。<br><img src="https://i.loli.net/2021/07/02/TkbMaYZnwGom9Ag.png" alt=""></p>
-<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://juejin.cn/post/6844903733034221576" target="_blank" rel="noopener">mysql中utf8和utf8mb4的区别-癫Point</a><br><a href="https://www.huaweicloud.com/articles/5fece55be68259e89d87989ca69ee9ce.html" target="_blank" rel="noopener">Mysql中utf8和utf8mb4区别-朽木自雕</a></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/07/02/mysql%E4%B8%ADutf8%E5%92%8Cutf8mb4%E5%8C%BA%E5%88%AB%EF%BC%8C%E5%B9%B6%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%89%80%E6%9C%89%E5%AD%97%E6%AE%B5%E7%9A%84%E7%BC%96%E7%A0%81/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

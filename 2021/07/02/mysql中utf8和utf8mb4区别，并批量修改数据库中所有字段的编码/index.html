@@ -30,7 +30,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://i.loli.net/2021/07/02/TkbMaYZnwGom9Ag.png">
 <meta property="article:published_time" content="2021-07-02T01:10:08.000Z">
-<meta property="article:modified_time" content="2021-07-12T06:03:38.919Z">
+<meta property="article:modified_time" content="2021-07-13T01:02:54.383Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -216,6 +216,8 @@
 </blockquote>
 <h2 id="utf8和utf8mb4"><a href="#utf8和utf8mb4" class="headerlink" title="utf8和utf8mb4"></a>utf8和utf8mb4</h2><p><code>utf8</code>编码最大字符长度为3字节，三个字节的<code>UTF-8</code>最大能编码的 <code>Unicode</code>字符是<code>0xffff</code>，也就是<code>Unicode</code>中的基本多文种平面（BMP）。也就是说：<strong>任何不在基本多文本平面的<code>Unicode</code>字符，都无法使用<code>Mysql</code>的<code>utf8</code>字符集存储。包括<code>Emoji</code>表情，和很多不常用的汉字，以及任何新增的 <code>Unicode</code>字符等等</strong>。</p>
 <p><code>mysql</code>最早只支持<code>utf8</code>，<code>utf8mb4</code>是在<code>Mysql-5.5.3</code>版本后引入的，<code>mb4</code>就是<code>most bytes 4</code>的意思，专门用来兼容四字节的<code>unicode</code>。<code>utf8mb4</code>是<code>utf8</code>的超集，因此将字符编码从<code>utf8</code>变更为<code>utf8mb4</code>对原先的数据没有任何影响。</p>
+<a id="more"></a>
+
 <p>另外关于<code>utf8</code>和<code>utf8mb4</code>的排序规则问题，参考<a href="https://juejin.cn/post/6844903733034221576" target="_blank" rel="noopener">mysql中utf8和utf8mb4的区别-癫Point</a>的解释：</p>
 <blockquote>
 <p><code>utf8_unicode_ci</code> 比较准确，<code>utf8_general_ci</code> 速度比较快，通常情况下 <code>utf8_general_ci</code> 的准确性就够我们用的了。如果是<code>utf8mb4</code>那么对应的就是 <code>utf8mb4_general_ci</code>、<code>utf8mb4_unicode_ci</code>。</p>
