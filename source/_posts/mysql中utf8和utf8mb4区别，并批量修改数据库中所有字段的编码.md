@@ -13,6 +13,8 @@ date: 2021-07-02 09:10:08
 
 `mysql`最早只支持`utf8`，`utf8mb4`是在`Mysql-5.5.3`版本后引入的，`mb4`就是`most bytes 4`的意思，专门用来兼容四字节的`unicode`。`utf8mb4`是`utf8`的超集，因此将字符编码从`utf8`变更为`utf8mb4`对原先的数据没有任何影响。
 
+<!--more-->
+
 另外关于`utf8`和`utf8mb4`的排序规则问题，参考[mysql中utf8和utf8mb4的区别-癫Point](https://juejin.cn/post/6844903733034221576)的解释：
 >`utf8_unicode_ci` 比较准确，`utf8_general_ci` 速度比较快，通常情况下 `utf8_general_ci` 的准确性就够我们用的了。如果是`utf8mb4`那么对应的就是 `utf8mb4_general_ci`、`utf8mb4_unicode_ci`。
 
