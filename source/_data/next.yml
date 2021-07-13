@@ -482,7 +482,7 @@ yandex_site_verification:
 
 # Baidu Webmaster tools verification.
 # See: https://ziyuan.baidu.com/site
-baidu_site_verification: code-yltW3it9oBnpm
+baidu_site_verification: code-yltW3it9oB
 
 # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO.
 #启用百度推送，这样博客会自动把网址推到百度，这对SEO很有帮助。
