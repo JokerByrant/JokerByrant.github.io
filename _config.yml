@@ -102,7 +102,8 @@ theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: baidu_url_submitter
+- type: git
   repo: https://github.com/JokerByrant/JokerByrant.github.io  # blog 的 git 地址
   branch: master                                              # 发布至 master 分支，如果该分支不存在，就会自动创建它
 
@@ -116,7 +117,7 @@ baidusitemap:
 
 # Baidu 主动推送
 baidu_url_submit:
-  count: 5 ## 提交最新的五个链接
+  count: 100 ## 提交最新的五个链接
   host: jokerbyrant.github.io ## 在百度站长平台中注册的域名
   token: 80BiyzUwcCsyqXf2 ## 百度站长平台中的秘钥
   path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
