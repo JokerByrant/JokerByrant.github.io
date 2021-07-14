@@ -117,7 +117,7 @@ baidusitemap:
 
 # Baidu 主动推送
 baidu_url_submit:
-  count: 100 ## 提交最新的五个链接
+  count: 10 ## 提交最新的十个链接
   host: jokerbyrant.github.io ## 在百度站长平台中注册的域名
   token: 80BiyzUwcCsyqXf2 ## 百度站长平台中的秘钥
   path: baidu_urls.txt ## 文本文档的地址， 新链接会保存在此文本文档里
