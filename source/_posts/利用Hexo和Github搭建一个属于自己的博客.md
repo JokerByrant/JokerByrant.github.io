@@ -104,6 +104,38 @@ Sitemap: https://jokerbyrant.github.io/baidusitemap.xml
 在具体的文章页面也能看到阅读次数
 ![](https://i.loli.net/2021/07/14/tJunadHUZprOLAE.png)
 
+--- 
+
+## 网站链接优化
+### 自定义文章链接
+在 `_config.yml` 中找到 `permalink` 配置，然后根据自己需要自定义即可，我的配置如下
+![](https://i.loli.net/2021/07/27/GReo6igVcPhXIju.png)
+
+### 简化文章链接
+利用 `hexo-abbrlink` 插件，最终效果如下：
+![](https://i.loli.net/2021/07/27/W7jchnAleIDs4Ei.png)
+
+安装 `henxo-abbrlink`
+```batch
+npm install hexo-abbrlink --save
+```
+
+修改 `source\_data\next.yml` 文件，添加如下配置：
+```yml
+# 持久化链接
+permalink: archives/:abbrlink.html
+abbrlink:
+  alg: crc32  # 算法：crc16(default) and crc32
+  rep: hex    # 进制：dec(default) and hex
+```
+
+添加完毕之后，之后使用 `hexo new` 命令创建新的文章时，就会在文件中自动添加 `abbrlink` 标识，这就是生成的持久化链接标识
+![](https://i.loli.net/2021/07/27/bGgUPRDom2nHE5h.png)
+
+然后修改 `_comfig.yml` 文件，更改文章后缀
+```yml
+permalink: :year-:month-:day/:abbrlink/
+```
 ---
 
 
