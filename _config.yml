@@ -109,7 +109,7 @@ deploy:
 
 # Google SEO
 sitemap:
-  path: sitemap.xml
+  path: sitemap.XML
 
 # Baidu SEO
 baidusitemap:
