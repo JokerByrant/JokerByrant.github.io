@@ -15,6 +15,11 @@ TODO---笔记整理
 
 这一块儿推荐看看 [可能是把 ZooKeeper 概念讲的最清楚的一篇文章](https://juejin.im/post/6844903677367418893)。
 
+## Zookeeper Java Api Demo
+[Zookeeper客户端的使用（Zookeeper原生API的调用、ZKClient、Curator）和Zookeeper会话](https://www.cnblogs.com/leesmall/p/9576437.html)
+[java springboot整合zookeeper增删改查入门教程](https://www.cnblogs.com/zwcry/p/10407806.html)
+
+
 ## 开源项目
 [轻量级分布式 RPC 框架](https://my.oschina.net/huangyong/blog/361751)
 
