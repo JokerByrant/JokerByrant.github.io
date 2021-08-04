@@ -239,3 +239,14 @@ function getPromiseFun(url) {
 ```
 
 其他的一些情况，参考：[CSS垂直居中的12种实现方式](https://juejin.cn/post/6844903550909153287)
+
+## jQuery.data() 方法
+有一个 `input` 表单，注意 `data-value`
+```html
+<input type="text" class="form-control" id="publishRegion" name="publishRegion" data-value="" placeholder="选择地区" readonly/>
+```
+`jQuery.data()` 就是操作这种 `data-xxx` 的方法，下面给出示例：
+```js
+let dataValue = $('#publishRegion').data("value"); // 获取data-value的值
+$('#publishRegion').data("value", "测试"); // 给data-value赋值
+```
