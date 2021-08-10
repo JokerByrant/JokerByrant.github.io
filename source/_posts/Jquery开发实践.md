@@ -250,3 +250,17 @@ function getPromiseFun(url) {
 let dataValue = $('#publishRegion').data("value"); // 获取data-value的值
 $('#publishRegion').data("value", "测试"); // 给data-value赋值
 ```
+
+## 文本溢出显示省略号，鼠标浮动查看全部内容
+```css
+.ellipse {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /*控制显示几行*/
+    -webkit-box-orient: vertical;
+}
+```
+```html
+<p class="ellipse" title="这里填写字符串内容">{{this.message}}</p>
+```
