@@ -264,3 +264,22 @@ $('#publishRegion').data("value", "测试"); // 给data-value赋值
 ```html
 <p class="ellipse" title="这里填写字符串内容">{{this.message}}</p>
 ```
+
+## JS下载文件
+第一种，弹出一个新页面进行下载
+```js
+window.open(url, "_blank");
+```
+
+第二种，在当前页面下载
+```js
+function fileDownload(url) {
+	let $form = $('<form>');
+	$form.attr("target","");
+	$form.attr("method","get");
+	$form.attr("style","display:none");
+	$form.attr('action', url);
+	$('body').append($form);
+	$form.submit();
+}
+```
