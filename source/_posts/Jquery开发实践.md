@@ -174,6 +174,11 @@ function isStrEmpty(str) {
 </style>
 ```
 
+如果需要动态修改 `content` 值，在 `js` 中调用下面代码即可
+```js
+$(element).attr("data-tips", "修改后的内容");
+```
+
 ## 利用Promise管理多个异步请求
 浏览器端的渲染效果想要达到体验最佳，那就需要对请求进行异步处理，如果想等到所有的异步请求全部执行完毕再进行下一步操作的话，可以引入 `Promise`，Demo如下：
 ```js
