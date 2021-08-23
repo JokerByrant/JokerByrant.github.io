@@ -288,3 +288,59 @@ function fileDownload(url) {
 	$form.submit();
 }
 ```
+
+## 在页面引入代码编辑器
+经过调研，发现了两款插件：[Ace](https://ace.c9.io/) 和 [Monaco Editor](https://microsoft.github.io/monaco-editor/)。
+
+我使用的是Ace，下面是相关代码：
+``` html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<div th:replace="common/layout :: headerCss"></div>
+</head>
+<body>
+		 <div class="form-group">
+			 <label class="col-sm-3 control-label">代码编辑</label>
+			 <div class="col-sm-10">
+				 <pre class="ace_editor" id="ace_editor" style="min-height:400px"></pre>
+			 </div>
+		 </div>
+	 </form>
+   <div th:replace="common/layout :: footerJs"></div>
+	 <script th:src="@{/webjars/hplus/js/plugins/ace/ace.js}"></script>
+	 <script th:src="@{/webjars/hplus/js/plugins/ace/ext-language_tools.js}"></script>
+	 <script th:src="@{/webjars/hplus/js/plugins/ace/mode-html.js}"></script>
+	 <script th:src="@{/webjars/hplus/js/plugins/ace/worker-html.js}"></script>
+	 <script th:src="@{/webjars/hplus/js/plugins/ace/html.js}"></script>
+	 <script th:src="@{/webjars/hplus/js/plugins/ace/theme-sqlserver.js}"></script>
+	 <script th:inline="javascript">
+		 let editor;
+		 initAceCode();
+
+		 // 初始化ace代码编辑器
+		 function initAceCode() {
+			 editor = ace.edit("ace_editor");
+			 editor.setTheme("ace/theme/sqlserver"); // 风格
+			 editor.session.setMode("ace/mode/html"); // 语言
+			 editor.setFontSize(14);
+			 editor.setReadOnly(false); // true表示只读
+			 editor.setOption("wrap", "free"); //自动换行,设置为off关闭
+			 ace.require("ace/ext/language_tools"); //启用提示菜单
+			 editor.setOptions({
+				 enableBasicAutocompletion: true,
+				 enableSnippets: true,
+				 enableLiveAutocompletion: true
+			 });
+		 }
+	 </script>
+</body>
+</html>
+```
+
+`Demo`并不完善，只是方便理解，引入方式大致就是如此。相关的js文件去 [Ace插件包下载地址](https://pagecdn.com/lib/ace) 下载即可。其中可以设置语言和代码样式，这些也可以自定义，关于代码样式的可以参考 [Ace主题](https://www.jianshu.com/p/b21d8562d2e3)。其他相关的操作参考 [Ace Editor中文文档](https://segmentfault.com/a/1190000021386202)。
+
+实现效果如下：![1629702939259.png](https://i.loli.net/2021/08/23/XO8shQogrNaCY9L.png)
