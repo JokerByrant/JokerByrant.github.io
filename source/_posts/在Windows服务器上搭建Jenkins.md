@@ -250,11 +250,24 @@ set startLogs=%4
 ::由于bat中无法将=作为参数传入，因此传入@，这里替换为=
 set "options=%options:@==%"
 java %Xmx% -jar %jarFile% %options% > %startLogs%
+exit
 ```
 
 --- 
 
 ## 遇到的一些坑
+
+### 服务器CPU占用率达到100%
+这个情况是在运行了1个多月后发现的，服务器出现了大量`cmd.exe`和`conhost.exe`进程(大约有300多个)，占用了大量`CPU`资源。
+![](https://i.loli.net/2021/08/27/L2NhYbXyf8CkMxl.png)
+
+开始以为是服务器中病毒了，但是排查之后并没有发现相关迹象。之后猜测是不是`Jenkins`的原因，因为这段时间服务器也就加了`Jenkins`和`Nginx`两个服务。于是便对`Jenkins`进行了调查。
+在进行Jenkins构建过程中，服务器会出现一些`cmd.exe`进程：
+1. 进行`Maven`打包时会开启一个`cmd.exe`进程，打包结束该进程自动关闭。
+2. 在打印日志时，开启一个`cmd.exe`进程，打印结束`cmd.exe`关闭。
+3. 整个`Job`构建结束，会有一个`cmd.exe`进程仍然残留。在进行n次构建后，会残留n个该进程，这就是为什么`CPU`占用率会达到100%的原因。
+
+出现进程残留，于是猜测是不是脚本执行完毕没有关闭？于是对脚本进行了排查，最后发现是 `startJar.bat` 脚本中未添加 `exit`，添加了 `exit` 退出命令后再次测试，没有发现残留的`cmd.exe`进程。
 
 
 
