@@ -220,17 +220,17 @@ start %startBat% %Xmx% %jarFile% %profile% %startLog%
 echo =========================================== 开始打印启动日志 ===========================================
 set line=0
 :while
-set content=0
+set content=
 @for /f "tokens=1* delims=:" %%i in ('findstr/n .* %startLog%') do (
     @if %%i GTR %line% (
         set line=%%i
-        set content=%%j
+        set content=!content!%%j
         echo %%j
     )
 )
 ::检查项目是否输出启动成功标志
 set exists_flag=false
-echo %content%|find %successFlag%>nul&&set exists_flag=true
+echo !content!|find %successFlag%>nul&&set exists_flag=true
 if "%exists_flag%"=="true" (
    echo =========================================== 项目启动成功！ ===========================================
    exit
@@ -269,8 +269,60 @@ exit
 
 出现进程残留，于是猜测是不是脚本执行完毕没有关闭？于是对脚本进行了排查，最后发现是 `startJar.bat` 脚本中未添加 `exit`，添加了 `exit` 退出命令后再次测试，没有发现残留的`cmd.exe`进程。
 
+### 启动日志未检测到退出点，一直打印(21-09-01)
+这个问题在一开始就发现了， `windows` 没有 `linux` 那样多样的命令，因此打印启动日志是通过 `while` 循环实现的，检测到启动成功标志时，退出打印。这个成功标志是手动指定的。
+先看一下之前的命令(上面完整的命令已修复为最新的，这里展示之前有问题的版本)：
+```bat
+::5.打印启动日志
+echo =========================================== 开始打印启动日志 ===========================================
+set line=0
+:while
+set content=0
+@for /f "tokens=1* delims=:" %%i in ('findstr/n .* %startLog%') do (
+    @if %%i GTR %line% (
+        set line=%%i
+        set content=%%j
+        echo %%j
+    )
+)
+::检查项目是否输出启动成功标志
+set exists_flag=false
+::这里拿到的content是最后一行的数据
+echo %content%|find %successFlag%>nul&&set exists_flag=true
+if "%exists_flag%"=="true" (
+   echo =========================================== 项目启动成功！ ===========================================
+   exit
+)
+goto while
+```
+注意几个 `content`，上面的 `echo %content%|find %successFlag%>nul&&set exists_flag=true`，这行命令是检测是否打印退出标志的关键。 `content` 的值是当前循环打印出的最后一行日志的信息，**如果退出标志没有在当前循环的最后一行日志出现，那么就会出现无法退出日志打印的情况**。
 
+我之前的解决办法是利用`Jenkins`中的超时设置，为构建增加一个最长响应时间，分析了历次的构建时间，确定了该时间为10分钟，如果整个构建时间超过10分钟，那么将自动退出构建。设置如下(需要对每个Job单独设置)：
+![](https://i.loli.net/2021/09/01/jwiHQGVUvyN4qgu.png)
 
+但是该项设置只是缓兵之计，之后的构建中出现了很多次日志无法退出的情况，让人抓狂。今天突然想起之前看过的 **延迟变量** 概念，之前也对这个做了记录，链接：{% post_link bat拼接字符变量，将文件内容赋值给变量保留换行 %}。
 
-
-
+于是对打印日志的命令做了修改，之前检测启动成功标志只能根据当前循环的最后一行日志，修改后可以根据循环内的所有日志，这样就不会产生遗漏了。优化后的效果有点类似`Java`中的字符串拼接，之前也尝试过该办法，但是由于不了解**延迟变量**这个概念，因此没有达到理想的效果。修改后的命令如下：
+```bat
+::5.打印启动日志
+echo =========================================== 开始打印启动日志 ===========================================
+set line=0
+:while
+set content=
+@for /f "tokens=1* delims=:" %%i in ('findstr/n .* %startLog%') do (
+    @if %%i GTR %line% (
+        set line=%%i
+        set content=!content!%%j
+        echo %%j
+    )
+)
+::检查项目是否输出启动成功标志
+set exists_flag=false
+::这里拿到的content是最后一行的数据
+echo !content!|find %successFlag%>nul&&set exists_flag=true
+if "%exists_flag%"=="true" (
+   echo =========================================== 项目启动成功！ ===========================================
+   exit
+)
+goto while
+```
