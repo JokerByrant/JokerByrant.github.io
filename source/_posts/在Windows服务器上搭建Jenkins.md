@@ -223,6 +223,7 @@ set content=
     @if %%i GTR %line% (
         set line=%%i
         set content=!content!%%j
+        set content=!content:~-2000!
         echo %%j
     )
 )
@@ -294,7 +295,8 @@ exit
 1. 将 `set BUILD_ID=dontKillMe` 放在 `start %startBat% %Xmx% %jarFile% %profile% %startLog%` 这行命令之前，意思就是告诉`Jenkins`不要杀死`start`启动的`cmd.exe`进程。每次服务启动前杀死之前`Jar`包进程的不会对之前的`cmd.exe`产生影响，因此残留的`cmd.exe`进程会越积越多，最后拖垮服务器。
 2. 而将 `set BUILD_ID=dontKillMe` 放在 `startJar.bat` 中后，意思则是告诉`Jenkins`不要杀死`java -jar` 启动的`Jar`包进程。由于每次启动服务前都会将之前的`Jar`包进程杀死，因此上一次构建残留的`cmd.exe`进程也会被一并杀死，因此残留的`cmd.exe`进程只会有寥寥几个。
 
-### 启动日志未检测到退出点，一直打印(21-09-01)
+
+### 启动日志未检测到退出点，导致Job无法终止
 这个问题在一开始就发现了， `windows` 没有 `linux` 那样多样的命令，因此打印启动日志是通过 `while` 循环实现的，检测到启动成功标志时，退出打印。这个成功标志是手动指定的。
 先看一下之前的命令(上面完整的命令已修复为最新的，这里展示之前有问题的版本)：
 ```bat
@@ -338,6 +340,42 @@ set content=
     @if %%i GTR %line% (
         set line=%%i
         set content=!content!%%j
+        echo %%j
+    )
+)
+::检查项目是否输出启动成功标志
+set exists_flag=false
+::这里拿到的content是最后一行的数据
+echo !content!|find %successFlag%>nul&&set exists_flag=true
+if "%exists_flag%"=="true" (
+   echo =========================================== 项目启动成功！ ===========================================
+   exit
+)
+goto while
+```
+
+上面已经基本能满足一般的项目打印日志的需求了，但是在实际使用期间仍然出现了问题：**日志输出了退出标志，但是Job仍在运行**。会出现两种情况：1.输出 **命令行过长** 的提示信息。2.无任何提示。
+
+Google了一下发现Windows确实有最大字符限制：
+![](https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/1630559062972-1630559062971.png)
+
+上面出现的两种情况都是这个限制导致的。由于上面利用了 **延迟变量** 实现了 **字符串拼接** 的拼接，导致 `content` 变量字符长度过长，超出了8191个，因此出现了命令行过长的提示。
+而无任何提示则是因为，不知道出于什么原因，`content` 有时会将超出8191个字符长度的字符剔除，而启动成功标志也在其中，因此到结尾无法检测到。
+![](https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/1630559624664-1630559624652.png)
+
+针对这一情况，我的解决办法如下：每次对 `content` 进行字符串拼接后，只取其中最后2000个字符，这样就不会出现上面的两种情况了，而启动成功标志基本也都会出现在这最后2000个字符中。最终代码如下：
+```bat
+::5.打印启动日志
+echo =========================================== 开始打印启动日志 ===========================================
+set line=0
+:while
+set content=
+@for /f "tokens=1* delims=:" %%i in ('findstr/n .* %startLog%') do (
+    @if %%i GTR %line% (
+        set line=%%i
+        set content=!content!%%j
+        ::只取最后2000个字符，启动成功标志一般都会在其中
+        set content=!content:~-2000!
         echo %%j
     )
 )
