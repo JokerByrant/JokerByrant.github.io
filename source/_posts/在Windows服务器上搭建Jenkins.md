@@ -164,7 +164,7 @@ TODO 介绍本地部署和远程部署
 
 下面放上几个脚本
 `backup.bat`---`Jar`包备份脚本
-```cmd
+```bat
 @echo off
 ::备份jar包
 set prefix=%1
@@ -175,7 +175,7 @@ echo =========================================== 成功备份至 %jarFile% =====
 ```
 
 `deploy.bat`---部署脚本
-```cmd
+```bat
 @echo off
 
 ::1.jar包、启动日志、启动脚本、占用端口、启动成功标志
@@ -210,10 +210,8 @@ if exist %startLog% (
   goto delFile
 )
 
-
 ::4.重启项目
 echo =========================================== 重启项目 ===========================================
-set BUILD_ID=dontKillMe
 start %startBat% %Xmx% %jarFile% %profile% %startLog%
 
 ::5.打印启动日志
@@ -241,7 +239,7 @@ exit
 ```
 
 `startJar.bat`---`Jar`包启动脚本
-```cmd
+```bat
 @echo off
 set Xmx=%1
 set jarFile=%2
@@ -249,6 +247,7 @@ set options=%3
 set startLogs=%4
 ::由于bat中无法将=作为参数传入，因此传入@，这里替换为=
 set "options=%options:@==%"
+set BUILD_ID=dontKillMe
 java %Xmx% -jar %jarFile% %options% > %startLogs%
 exit
 ```
@@ -267,7 +266,33 @@ exit
 2. 在打印日志时，开启一个`cmd.exe`进程，打印结束`cmd.exe`关闭。
 3. 整个`Job`构建结束，会有一个`cmd.exe`进程仍然残留。在进行n次构建后，会残留n个该进程，这就是为什么`CPU`占用率会达到100%的原因。
 
-出现进程残留，于是猜测是不是脚本执行完毕没有关闭？于是对脚本进行了排查，最后发现是 `startJar.bat` 脚本中未添加 `exit`，添加了 `exit` 退出命令后再次测试，没有发现残留的`cmd.exe`进程。
+出现进程残留，于是猜测是不是脚本执行完毕没有关闭？于是对脚本进行了排查，先分别单独测试只有其中一个步骤的情况，最后发现残留的进程是在 **启动Jar包** 的那一块出现的。接着再对这一块儿进行逐行测试，测出可能是 **`set BUILD_ID=dontKillMe`** 这一行命令导致的问题。如下(上面的完整命令已修复为正确版本，下面展示的是之前有问题的版本)：
+```bat
+::4.重启项目
+echo =========================================== 重启项目 ===========================================
+set BUILD_ID=dontKillMe
+start %startBat% %Xmx% %jarFile% %profile% %startLog%
+```
+> 解释一下这行命令，这是为了防止`Jenkins`将启动`Jar包`的进程杀死，如果不加这一行，在`Job`执行完毕后，`Jar包`对应的进程也会一并被杀死。
+
+这行命令还不能删，删除会导致`Jar包`无法启动，因此尝试将其换了个位置，将其放在了 `startJar.bat` 中，如下：
+```bat
+@echo off
+set Xmx=%1
+set jarFile=%2
+set options=%3
+set startLogs=%4
+::由于bat中无法将=作为参数传入，因此传入@，这里替换为=
+set "options=%options:@==%"
+set BUILD_ID=dontKillMe
+java %Xmx% -jar %jarFile% %options% > %startLogs%
+exit
+```
+再次运行，发现仍然会有 `cmd.exe` 进程残留。运行n次，仍然只有一个 `cmd.exe` 进程残留，对服务器的影响已经很小了。并且，尝试将已经启动的`Jar`包程序杀死后，对应的`cmd.exe`进程也会停止。也就是说不会再出现上面的残留300多个进程的情况，**最多只会出现与启动服务数量相同的`cmd.exe`进程**，而这完全是可以接受的。
+
+最后分析一下上面问题产生的原因：
+1. 将 `set BUILD_ID=dontKillMe` 放在 `start %startBat% %Xmx% %jarFile% %profile% %startLog%` 这行命令之前，意思就是告诉`Jenkins`不要杀死`start`启动的`cmd.exe`进程。每次服务启动前杀死之前`Jar`包进程的不会对之前的`cmd.exe`产生影响，因此残留的`cmd.exe`进程会越积越多，最后拖垮服务器。
+2. 而将 `set BUILD_ID=dontKillMe` 放在 `startJar.bat` 中后，意思则是告诉`Jenkins`不要杀死`java -jar` 启动的`Jar`包进程。由于每次启动服务前都会将之前的`Jar`包进程杀死，因此上一次构建残留的`cmd.exe`进程也会被一并杀死，因此残留的`cmd.exe`进程只会有寥寥几个。
 
 ### 启动日志未检测到退出点，一直打印(21-09-01)
 这个问题在一开始就发现了， `windows` 没有 `linux` 那样多样的命令，因此打印启动日志是通过 `while` 循环实现的，检测到启动成功标志时，退出打印。这个成功标志是手动指定的。
