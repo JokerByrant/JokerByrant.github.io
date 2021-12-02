@@ -972,10 +972,11 @@ public class MySimpleSmartLifeCycle implements SmartLifecycle {
 }
 ```
 
-OK，到这儿 Spring 容器的 `refresh` 流程就介绍完了，对各个步骤的介绍并没有深入进去，例如在 `finishBeanFactoryInitialization()` 步骤关于 `bean` 的实例化过程就没有具体的分析，这一块还是挺重要的，后续会看情况进行分析。
+OK，到这儿 `Spring` 容器的 `refresh` 流程就介绍完了，对各个步骤的介绍并没有深入进去，例如在 `finishBeanFactoryInitialization()` 步骤关于 `bean` 的实例化过程就没有具体的分析，这一块还是挺重要的，后续会看情况进行分析。
 
-
-
+## 后记
+补充于 `2021-12-2`：这篇文章中分析的 `Spring` 容器的 `refresh` 操作其实就是 `Spring IOC` 容器的初始化过程，上面只是对整个流程进行了粗略的分析，其中一些关键的细节并没有深入进去，包括 [](##2.`obtainFreshBeanFactory()`) --- 创建 `Bean` 容器，加载并注册 `Bean`、[](##11.`finishBeanFactoryInitialization(beanFactory)`) --- 初始化所有的 `singleton beans`，这两处代码还是有必要具体看一下的，具体可以看一下这篇博客：[Spring IOC 容器源码分析
+](https://javadoop.com/post/spring-ioc#toc_7)，大佬讲的很详细。
 
 
 
