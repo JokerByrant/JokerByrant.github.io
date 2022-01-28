@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言关于 Java 并发，之前曾经也学习过一段时间，但是只理解了其中一些简单的概念，学习的很片面，现在就来系统的学习一下这方面的知识。 计算机技术经历了从 单进程 到 多进程 再到现在的 多线程 的发展历程，Java 并发的出现就是为了支持现代计算机在 多线程 环境下运行程序的特点。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发---学习笔记">
+<meta property="og:url" content="https://jokerbyrant.github.io/2020-08-25/40693/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="前言关于 Java 并发，之前曾经也学习过一段时间，但是只理解了其中一些简单的概念，学习的很片面，现在就来系统的学习一下这方面的知识。 计算机技术经历了从 单进程 到 多进程 再到现在的 多线程 的发展历程，Java 并发的出现就是为了支持现代计算机在 多线程 环境下运行程序的特点。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/U011338060bb94fe6a0ad232a7e07a9d0h.jpg">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ueaae6349d6ca4721ac036161ce3a83bcs.jpg">
+<meta property="article:published_time" content="2020-08-25T03:51:57.000Z">
+<meta property="article:modified_time" content="2021-11-12T06:40:30.593Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="Java并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ae01.alicdn.com/kf/U011338060bb94fe6a0ad232a7e07a9d0h.jpg">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2020-08-25/40693/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java并发---学习笔记 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2020-08-25/40693/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java并发---学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-25 11:51:57" itemprop="dateCreated datePublished" datetime="2020-08-25T11:51:57+08:00">2020-08-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>关于 <code>Java</code> 并发，之前曾经也学习过一段时间，但是只理解了其中一些简单的概念，学习的很片面，现在就来系统的学习一下这方面的知识。</p>
+<p>计算机技术经历了从 <strong>单进程</strong> 到 <strong>多进程</strong> 再到现在的 <strong>多线程</strong> 的发展历程，<code>Java</code> 并发的出现就是为了支持现代计算机在 <strong>多线程</strong> 环境下运行程序的特点。</p>
+<span id="more"></span>
+
+<h3 id="多线程的优点和缺点"><a href="#多线程的优点和缺点" class="headerlink" title="多线程的优点和缺点"></a>多线程的优点和缺点</h3><p>关于多线程优点和缺点的介绍可以看看这两篇文章：<a target="_blank" rel="noopener" href="http://ifeve.com/benefits/">多线程的优点</a>，<a target="_blank" rel="noopener" href="http://ifeve.com/costs-of-multithreading/">多线程的代价</a>。</p>
+<p>其中在 <a target="_blank" rel="noopener" href="http://ifeve.com/costs-of-multithreading/">多线程的代价</a> 这篇中提到：</p>
+<blockquote>
+<p>当CPU从执行一个线程切换到执行另外一个线程的时候，它需要先存储当前线程的本地的数据，程序指针等，然后载入另一个线程的本地数据，程序指针等，最后才开始执行。这种切换称为 <strong>上下文切换</strong> (<code>context switch</code>)。<code>CPU</code>会在一个上下文中执行一个线程，然后切换到另外一个上下文中执行另外一个线程。上下文切换并不廉价，如果没有必要，应该减少上下文切换的发生。</p>
+</blockquote>
+<p>关于 <strong>上下文切换</strong> 的介绍可以参考这篇文章：<a target="_blank" rel="noopener" href="http://ifeve.com/context-switch-definition/"><strong>上下文切换详解</strong></a>。这里我把对它的介绍贴出来：</p>
+<blockquote>
+<p>上下文是指某一时间点 <strong><code>CPU</code> 寄存器</strong> 和 <strong>程序计数器</strong> 的内容。<strong>寄存器</strong>是 <code>CPU</code> 内部的数量较少但是速度很快的内存（与之对应的是 <code>CPU</code> 外部相对较慢的 <code>RAM</code> 主内存）。<strong>寄存器</strong> 通过对常用值（通常是运算的中间值）的快速访问来提高计算机程序运行的速度。<strong>程序计数器</strong> 是一个专用的寄存器，用于表明指令序列中 <code>CPU</code> 正在执行的位置，<strong>存的值为正在执行的指令的位置或者下一个将要被执行的指令的位置</strong>，具体依赖于特定的系统。</p>
+</blockquote>
+<h3 id="并发编程模型"><a href="#并发编程模型" class="headerlink" title="并发编程模型"></a>并发编程模型</h3><p>原文参考：<a target="_blank" rel="noopener" href="http://ifeve.com/%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e6%a8%a1%e5%9e%8b/">并发编程模型</a></p>
+<blockquote>
+<p>并发系统可以采用多种并发编程模型来实现。并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
+</blockquote>
+<h4 id="并行工作者模型"><a href="#并行工作者模型" class="headerlink" title="并行工作者模型"></a>并行工作者模型</h4><p><img src="https://ae01.alicdn.com/kf/U011338060bb94fe6a0ad232a7e07a9d0h.jpg" alt="并行工作者模型"><br>上图就是并行工作者模型，使用这种模型，只需添加更多的工作者就可以提高系统的并行度。</p>
+<p>这种模型有三个最明显的缺点：</p>
+<ol>
+<li>线程需要处理共享数据带来的 <strong>竞态</strong> 、 <strong>死锁</strong> 等并发性问题，以及在等待访问共享数据时线程的串行化问题。</li>
+<li>共享数据的在不同线程中的数据一致性问题</li>
+<li>线程的执行顺序是不确定的</li>
+</ol>
+<p>上面提到的第一点 <strong>共享数据带来的串行化问题</strong> 有两种办法可以解决：</p>
+<ul>
+<li>使用非阻塞并发算法</li>
+<li>使用可持久化的数据结构</li>
+</ul>
+<p>重点提一下 <strong>可持久化的数据结构</strong>，在 <code>Java</code> 中的 <code>CopyOnWriteArrayList</code> 就使用了这种结构，可以阅读一下这篇文章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tedzhao/archive/2008/11/12/1332112.html">可持久化的数据结构</a>，文章中拿<code>.NET Framework</code>中的<code>String</code>类作为例子解释了一下这个结构：</p>
+<blockquote>
+<p>一旦创建了一个 <code>String</code> 类型实例，它便不能被改变了，对于欲改变其值的任何操作都将被产生一个新的 <code>String</code> 对象，通过这样，每一个版本的 <code>String</code> 实例都将被驻留下来。这样的具有持久化特点的类型像 <code>String</code> 类型都内置了撤销（Undo）功能，当该对象的新一个版本产生的时候，旧版本将被压入栈中，如果需要执行撤销动作的时候，只需将旧版本从堆栈中取出。另外一个优点是由于可持久化数据类型不能更改其内部状态，很容易得知它是线程安全的。</p>
+</blockquote>
+<h4 id="流水线并发模型"><a href="#流水线并发模型" class="headerlink" title="流水线并发模型"></a>流水线并发模型</h4><p><img src="https://ae01.alicdn.com/kf/Ueaae6349d6ca4721ac036161ce3a83bcs.jpg"></p>
+<blockquote>
+<p>类似于工厂中生产线上的工人们那样组织工作者。每个工作者只负责作业中的部分工作。当完成了自己的这部分工作时工作者会将作业转发给下一个工作者。每个工作者在自己的线程中运行，并且不会和其他工作者共享状态。有时也被成为 <strong>无共享并行模型</strong> 。<br>通常使用非阻塞的 <code>IO</code> — <code>NIO</code> 来设计使用流水线并发模型的系统。非阻塞的 <code>IO</code> 意味着工作者在开始一个 <code>IO</code> 操作后，<code>CPU</code> 不必在工作者进行 <code>IO</code> 操作时进入阻塞状态，而是可以进行其他操作。当 <code>IO</code> 操作完成的时候，<code>IO</code> 操作的结果（比如读出的数据或者数据写完的状态）被传递给下一个工作者。</p>
+</blockquote>
+<p>解释一下为何要使用 <code>NIO</code>。</p>
+<ul>
+<li><code>BIO</code>会阻塞线程的运行，当一个连接在处理 <code>IO</code> 操作时，系统是阻塞的，如果是单线程的话必然就挂死在那里。但线程的阻塞不会影响到<code>CPU</code>，所以可以开启多线程，这样<code>CPU</code>就能处理更多的事情。但是这样就会创建大量的线程，在上文中提到过，线程的切换是有代价的。虽然说现在的多线程一般都使用线程池，可以让线程的创建和回收成本相对较低，但是这也只适用在活动连接数较少的情况，当面对十万甚至百万级连接的时候，传统的 <code>BIO</code> 模型是无能为力的。</li>
+<li>再来看一下 <code>NIO</code> ，<code>NIO</code> 的读写函数可以立刻返回，它不会因为<code>IO</code>操作而被阻塞，因此它不需要像<code>BIO</code>一样开启一个新的线程来处理<code>IO</code>操作。这很符合流水线并发模型的特点：如果一个连接不能读写（<code>socket.read()</code>返回0或者<code>socket.write()</code>返回0），我们可以把这件事记下来，记录的方式通常是在<code>Selector</code>上注册标记位，然后切换到其它就绪的连接（<code>channel</code>）继续进行读写。</li>
+</ul>
+<h2 id="Java是如何解决并发问题的"><a href="#Java是如何解决并发问题的" class="headerlink" title="Java是如何解决并发问题的"></a>Java是如何解决并发问题的</h2><h3 id="并发问题出现的根源"><a href="#并发问题出现的根源" class="headerlink" title="并发问题出现的根源"></a>并发问题出现的根源</h3><p><code>Java</code> 中出现的并发问题可以总结为三种：<strong>可见性</strong>、<strong>原子性</strong>、<strong>有序性</strong>。这些问题出现的根源是计算机体系结构、操作系统、编译程序，为了平衡 <code>CPU</code>、内存、<code>I/O</code> 设备之间的速度差异，做出了一些调整。</p>
+<h4 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h4><blockquote>
+<p>可见性：一个线程对共享变量的修改，另外一个线程能够立刻看到。</p>
+</blockquote>
+<p><code>CPU</code> 增加了缓存，以均衡与内存的速度差异，导致了<strong>可见性</strong>问题。</p>
+<h4 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h4><blockquote>
+<p>原子性：即一个操作或者多个操作 要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。</p>
+</blockquote>
+<p>操作系统增加了进程、线程，以分时复用 CPU，进而均衡 CPU 与 I/O 设备的速度差异，导致了<strong>原子性</strong>问题。</p>
+<h4 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h4><blockquote>
+<p>有序性：即程序执行的顺序按照代码的先后顺序执行。</p>
+</blockquote>
+<p>编译程序优化指令执行次序，使得缓存能够得到更加合理地利用，导致了<strong>有序性</strong>问题。<br>有序性问题主要是因为指令的重排序引起的，重排序分为三种：</p>
+<ul>
+<li>编译器优化的重排序。编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。 </li>
+<li>指令级并行的重排序。现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。 </li>
+<li>内存系统的重排序。由于处理器使用缓存和读 / 写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
+</ul>
+<h2 id="线程安全的实现方法-理论"><a href="#线程安全的实现方法-理论" class="headerlink" title="线程安全的实现方法(理论)"></a>线程安全的实现方法(理论)</h2><h3 id="互斥同步"><a href="#互斥同步" class="headerlink" title="互斥同步"></a>互斥同步</h3><h3 id="非阻塞同步"><a href="#非阻塞同步" class="headerlink" title="非阻塞同步"></a>非阻塞同步</h3><h3 id="无同步方案"><a href="#无同步方案" class="headerlink" title="无同步方案"></a>无同步方案</h3><h2 id="CAS、Unsafe和Atomicxxx"><a href="#CAS、Unsafe和Atomicxxx" class="headerlink" title="CAS、Unsafe和Atomicxxx"></a>CAS、Unsafe和Atomicxxx</h2><p>关于<code>CAS</code>和<code>Unsafe</code>相关的概念不多赘述，参考：<a target="_blank" rel="noopener" href="https://www.pdai.tech/md/java/thread/java-thread-x-juc-AtomicInteger.html#cas-%e9%97%ae%e9%a2%98">JUC原子类: CAS, Unsafe和原子类详解</a>、<a target="_blank" rel="noopener" href="https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html">美团-Java魔法类：Unsafe应用解析</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><code>CAS</code>全称<code>Compare And Swap</code>—比较并交换，是一条<code>CPU</code>的原子指令，其作用是让<code>CPU</code>进行如下操作：先比较两个值是否相等，然后再原子地将旧值替换为新值。</li>
+<li><code>Java</code>中在<code>Unsafe.class</code>中定义了三个<code>CAS</code>方法：<code>compareAndSwapObject</code>、<code>compareAndSwapInt</code>和<code>compareAndSwapLong</code>，三个都是<code>native</code>方法。<code>Unsafe.class</code>主要提供了一些<strong>用于执行低级别、不安全操作的方法，如直接访问系统内存资源、自主管理内存资源等</strong>，基本全部都是<code>native</code>方法。</li>
+<li><code>Java</code>中提供的原子类—<code>Atomicxxx</code>，主要的实现方法就是调用了<code>Unsafe.class</code>的<code>CAS</code>方法实现了修改操作的原子性，通过<code>volatile</code>实现了待更新参数的可见性。</li>
+</ul>
+<h2 id="AQS"><a href="#AQS" class="headerlink" title="AQS"></a>AQS</h2><p>这一块儿主要是同步器相关，是实现锁的关键，可以结合：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html">从ReentrantLock的实现看AQS的原理及应用-美团技术团队</a> 和 <a target="_blank" rel="noopener" href="https://www.pdai.tech/md/java/thread/java-thread-x-lock-ReentrantLock.html">JUC锁: ReentrantLock详解-Java全栈知识体系</a> 两篇文章一起服用。</p>
+<p>下面来看<code>JUC</code>包中基于<code>AQS</code>实现的一些类。</p>
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>关于这个的概念和源码参考<a target="_blank" rel="noopener" href="https://www.pdai.tech/md/java/thread/java-thread-x-juc-tool-countdownlatch.html">JUC工具类: CountDownLatch详解</a>。<br>这个类可以用来替代传统的<code>notify()</code>、<code>wait()</code>线程模型，上<code>Demo</code>(例子来源于上面的链接)：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 1. 利用notify()、wait()实现监控List大小</span></span><br><span class="line"><span class="comment">  * notify()唤醒别的线程-不会释放锁，wait()阻塞当前线程-会释放锁。</span></span><br><span class="line"><span class="comment">  * 使用这种方式切换线程会涉及线程的阻塞，当调用notify()-wait()后，线程会阻塞</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    LinkedList&lt;Integer&gt; list = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    Object lock = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;t2 start&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> (list.size() != <span class="number">5</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 阻塞当前t2</span></span><br><span class="line">                    lock.wait();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(<span class="string">&quot;t2 end&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 唤醒t1</span></span><br><span class="line">            lock.notify();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,<span class="string">&quot;t2&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(() -&gt;&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;t1 start&quot;</span>);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) &#123;</span><br><span class="line">                list.add(i);</span><br><span class="line">                System.out.println(<span class="string">&quot;add &quot;</span> + i);</span><br><span class="line">                <span class="keyword">if</span> (list.size() == <span class="number">5</span>) &#123;</span><br><span class="line">                    <span class="comment">// 唤醒t2</span></span><br><span class="line">                    lock.notify();</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">// 阻塞当前t1</span></span><br><span class="line">                        lock.wait();</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 2. 利用CountDown实现监控List大小</span></span><br><span class="line"><span class="comment">  * 这种方式不会阻塞线程，调用countDown()后，当前线程继续执行</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    LinkedList&lt;Integer&gt; list = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    CountDownLatch cdl = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;t2 start&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (list.size() != <span class="number">5</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 阻塞当前线程</span></span><br><span class="line">                cdl.await();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(<span class="string">&quot;t2 end&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,<span class="string">&quot;t2&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(() -&gt;&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;t1 start&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) &#123;</span><br><span class="line">            list.add(i);</span><br><span class="line">            System.out.println(<span class="string">&quot;add &quot;</span> + i);</span><br><span class="line">            <span class="keyword">if</span> (list.size() == <span class="number">5</span>) &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;execute countDown&quot;</span>);</span><br><span class="line">                <span class="comment">// 操作唤醒了t2</span></span><br><span class="line">                cdl.countDown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Thread.currentThread().join();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h2><p>结合这篇文章：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html">Java线程池实现原理及其在美团业务中的实践-美团技术团队</a>，主要关注以下几点：</p>
+<ul>
+<li>线程池的几个核心参数 以及 在不同业务场景下参数的配置方法</li>
+<li>线程池的内部结构设计</li>
+<li>线程池的生命周期和对其的管理</li>
+<li>任务执行机制 以及 对Worker线程的管理</li>
+<li>另外可以看一下这篇文章中关于线程池监控的实现方法</li>
+</ul>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://www.pdai.tech/md/java/thread/java-thread-x-overview.html">Java全栈知识体系</a><br><a target="_blank" rel="noopener" href="http://ifeve.com/java-concurrency-thread-directory/">并发编程网</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java%E5%B9%B6%E5%8F%91/" rel="tag"># Java并发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020-08-24/30562/" rel="prev" title="SpringBoot源码学习(三)---内置Servlet容器加载流程">
+      <i class="fa fa-chevron-left"></i> SpringBoot源码学习(三)---内置Servlet容器加载流程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020-10-12/48090/" rel="next" title="支付宝支付接口对接">
+      支付宝支付接口对接 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BC%98%E7%82%B9%E5%92%8C%E7%BC%BA%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">多线程的优点和缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">并发编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%B7%A5%E4%BD%9C%E8%80%85%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.2.1.</span> <span class="nav-text">并行工作者模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">流水线并发模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98%E7%9A%84"><span class="nav-number">2.</span> <span class="nav-text">Java是如何解决并发问题的</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98%E5%87%BA%E7%8E%B0%E7%9A%84%E6%A0%B9%E6%BA%90"><span class="nav-number">2.1.</span> <span class="nav-text">并发问题出现的根源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="nav-number">2.1.1.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="nav-number">2.1.2.</span> <span class="nav-text">原子性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="nav-number">2.1.3.</span> <span class="nav-text">有序性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95-%E7%90%86%E8%AE%BA"><span class="nav-number">3.</span> <span class="nav-text">线程安全的实现方法(理论)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E5%90%8C%E6%AD%A5"><span class="nav-number">3.1.</span> <span class="nav-text">互斥同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5"><span class="nav-number">3.2.</span> <span class="nav-text">非阻塞同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E5%90%8C%E6%AD%A5%E6%96%B9%E6%A1%88"><span class="nav-number">3.3.</span> <span class="nav-text">无同步方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAS%E3%80%81Unsafe%E5%92%8CAtomicxxx"><span class="nav-number">4.</span> <span class="nav-text">CAS、Unsafe和Atomicxxx</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.1.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AQS"><span class="nav-number">5.</span> <span class="nav-text">AQS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CountDownLatch"><span class="nav-number">5.1.</span> <span class="nav-text">CountDownLatch</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">6.</span> <span class="nav-text">线程池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">7.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

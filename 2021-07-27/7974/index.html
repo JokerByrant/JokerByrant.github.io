@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言前段时间在服务器搭建了 Jenkins, 过程见 在Windows服务器上搭建Jenkins。这个过程顺便也学习了 windwos 的批处理脚本的编写，但是仍然只是学了点皮毛。今天在群里碰到一个朋友询问关于 bat 脚本的问题，是 for 循环中字符拼接的问题。正好之前在解决 windows 服务器上实时打印 SpringBoot 项目启动日志时，也碰到类似的问题，就直接按照我的解决办法回答了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bat拼接字符变量，将文件内容赋值给变量保留换行">
+<meta property="og:url" content="https://jokerbyrant.github.io/2021-07-27/7974/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="前言前段时间在服务器搭建了 Jenkins, 过程见 在Windows服务器上搭建Jenkins。这个过程顺便也学习了 windwos 的批处理脚本的编写，但是仍然只是学了点皮毛。今天在群里碰到一个朋友询问关于 bat 脚本的问题，是 for 循环中字符拼接的问题。正好之前在解决 windows 服务器上实时打印 SpringBoot 项目启动日志时，也碰到类似的问题，就直接按照我的解决办法回答了">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img02.sogoucdn.com/app/a/100520146/19a9403aa1440db062b6d36e59bc931b">
+<meta property="article:published_time" content="2021-07-27T10:41:48.000Z">
+<meta property="article:modified_time" content="2021-11-12T06:40:30.595Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="bat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img02.sogoucdn.com/app/a/100520146/19a9403aa1440db062b6d36e59bc931b">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2021-07-27/7974/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>bat拼接字符变量，将文件内容赋值给变量保留换行 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021-07-27/7974/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          bat拼接字符变量，将文件内容赋值给变量保留换行
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-27 18:41:48" itemprop="dateCreated datePublished" datetime="2021-07-27T18:41:48+08:00">2021-07-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间在服务器搭建了 <code>Jenkins</code>, 过程见 <a href="/2021-07-05/40762/" title="在Windows服务器上搭建Jenkins">在Windows服务器上搭建Jenkins</a>。这个过程顺便也学习了 <code>windwos</code> 的批处理脚本的编写，但是仍然只是学了点皮毛。今天在群里碰到一个朋友询问关于 <code>bat</code> 脚本的问题，是 <code>for</code> 循环中字符拼接的问题。正好之前在解决 <code>windows</code> 服务器上实时打印 <code>SpringBoot</code> 项目启动日志时，也碰到类似的问题，就直接按照我的解决办法回答了他。但他的场景与我有所不同，我了解的也只是皮毛，但是想着帮人帮到底，正好借此也能学习深入一点。这个主要涉及的是 <code>bat</code>脚本中变量延迟加载的知识点。</p>
+<span id="more"></span>
+
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>碰到的问题如下：<br><img src="https://img02.sogoucdn.com/app/a/100520146/19a9403aa1440db062b6d36e59bc931b" alt="ed743ade48ff5b1cd3a4ada04ec6d93.png"></p>
+<p>最终的打印结果只有文件的最后一行内容，一开始我想到应该是字符没有进行拼接，便尝试了如下的代码：</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"><span class="built_in">set</span> param=</span><br><span class="line"><span class="keyword">for</span> /f <span class="variable">%%i</span> <span class="keyword">in</span> (d:\<span class="number">1</span>.txt) <span class="keyword">do</span> (</span><br><span class="line">    <span class="built_in">set</span> param=<span class="variable">%param%</span><span class="variable">%%i</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">%param%</span></span><br></pre></td></tr></table></figure>
+
+<p>但是输出的内容与先无二，查询博客，发现了一个概念：<strong>延迟变量</strong>。使用了延迟变量后，代码如下：</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line">@<span class="built_in">setlocal</span> enabledelayedexpansion</span><br><span class="line"><span class="built_in">set</span> param=</span><br><span class="line"><span class="keyword">for</span> /f <span class="variable">%%i</span> <span class="keyword">in</span> (d:\<span class="number">1</span>.txt) <span class="keyword">do</span> (</span><br><span class="line">    <span class="built_in">set</span> param=<span class="variable">!param!</span><span class="variable">%%i</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">!param!</span></span><br></pre></td></tr></table></figure>
+<p>输出内容正是我想要的。注意其中的 <code>!param!</code>, 之前写脚本时也用到过这个，注意这个与 <code>%param%</code> 作用有些差异。在开启变量延迟后，使用<code>!param!</code>，<code>param</code>后期被修改的值才能在<code>for</code>循环中被读取到。如果没开启，那么只能等到<code>for</code>循环结束，才能拿到<code>param</code>的值。不光是在<code>for</code>循环中，在各种复合语句皆是如此，比如<code>if</code>。如果还是没明白，可以看下这篇文章的解释：<a target="_blank" rel="noopener" href="http://bbs.bathome.net/thread-354-1-1.html"> 批处理延迟变量(通俗解释)</a>。</p>
+<p>上面的代码还需要改进一下，因为没有输出换行符，最终版本如下：</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line">@<span class="built_in">setlocal</span> enabledelayedexpansion</span><br><span class="line">::换行符，下面空出两行</span><br><span class="line"><span class="built_in">set</span> wrap=^</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> param=</span><br><span class="line"><span class="keyword">for</span> /f <span class="variable">%%i</span> <span class="keyword">in</span> (d:\<span class="number">1</span>.txt) <span class="keyword">do</span> (</span><br><span class="line">    <span class="built_in">set</span> param=<span class="variable">!param!</span><span class="variable">%%i</span><span class="variable">!wrap!</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">!param!</span></span><br></pre></td></tr></table></figure>
+<p>注意上面的换行符定义，下面必须空出两行，具体原因我也不清楚，参考的这篇文章：<a target="_blank" rel="noopener" href="http://bbs.bathome.net/thread-12347-1-1.html">扩展ASCII码字符集0x00~0xff 批处理获取函数</a></p>
+<h2 id="附：实时打印日志内容，并在指定位置退出"><a href="#附：实时打印日志内容，并在指定位置退出" class="headerlink" title="附：实时打印日志内容，并在指定位置退出"></a>附：实时打印日志内容，并在指定位置退出</h2><p>顺便贴一下上次实时打印日志的脚本</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"><span class="built_in">set</span> line=<span class="number">0</span></span><br><span class="line"><span class="built_in">set</span> content=<span class="number">0</span></span><br><span class="line">:while</span><br><span class="line">@<span class="keyword">for</span> /f &quot;tokens=<span class="number">1</span>* delims=:&quot; <span class="variable">%%i</span> <span class="keyword">in</span> (&#x27;<span class="built_in">findstr</span>/n .* <span class="number">1</span>.log&#x27;) <span class="keyword">do</span> (</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">%%i</span> <span class="keyword">GTR</span> <span class="variable">%line%</span> (</span><br><span class="line">        <span class="built_in">set</span> line=<span class="variable">%%i</span></span><br><span class="line">        <span class="built_in">set</span> content=<span class="variable">%%j</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">%%j</span></span><br><span class="line">    )</span><br><span class="line">)</span><br><span class="line"><span class="built_in">set</span> exists_flag=false</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">%content%</span>|<span class="built_in">find</span> &quot;JVMrunningfor&quot;&gt;<span class="built_in">nul</span>&amp;&amp;<span class="built_in">set</span> exists_flag=true</span><br><span class="line"><span class="keyword">if</span> &quot;<span class="variable">%exists_flag%</span>&quot;==&quot;true&quot; (</span><br><span class="line">     <span class="keyword">exit</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">goto</span> while</span><br></pre></td></tr></table></figure>
+
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>通过这次问题回答，发现帮人解决问题好处颇多。如果正好是自己不太熟悉的方面，也可以促使自己去学习。如果自己已经觉得掌握了，也可以帮自己巩固。</p>
+<p>顺便记录一下这次发现的批处理脚本的论坛：<a target="_blank" rel="noopener" href="http://bbs.bathome.net/index.php">批处理之家</a></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/brucezong/article/details/91386522">bat字符串拼接</a><br><a target="_blank" rel="noopener" href="http://www.bathome.net/thread-17366-1-1.html">批处理命令echo怎样输出换行符到文本？</a><br><a target="_blank" rel="noopener" href="http://bbs.bathome.net/thread-12347-1-1.html">扩展ASCII码字符集0x00~0xff 批处理获取函数</a><br><a target="_blank" rel="noopener" href="http://bbs.bathome.net/thread-354-1-1.html">批处理延迟变量(通俗解释)</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/habibah-chang/p/3532125.html">BAT 延迟变量</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/bat/" rel="tag"># bat</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021-07-14/60706/" rel="prev" title="利用Hexo和Github搭建一个属于自己的博客">
+      <i class="fa fa-chevron-left"></i> 利用Hexo和Github搭建一个属于自己的博客
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021-07-29/37259/" rel="next" title="健身中的分化训练">
+      健身中的分化训练 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text">问题解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%EF%BC%9A%E5%AE%9E%E6%97%B6%E6%89%93%E5%8D%B0%E6%97%A5%E5%BF%97%E5%86%85%E5%AE%B9%EF%BC%8C%E5%B9%B6%E5%9C%A8%E6%8C%87%E5%AE%9A%E4%BD%8D%E7%BD%AE%E9%80%80%E5%87%BA"><span class="nav-number">3.</span> <span class="nav-text">附：实时打印日志内容，并在指定位置退出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">5.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

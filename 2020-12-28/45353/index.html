@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言最近经常接到要变更很久之前的功能的需求，盯着自己码的代码，竟是那么的陌生，就像在看一堆Shit Mountain。之前看到一张图很形象优雅的代码应该做到低耦合高内聚，所以学习一下代码的优化技巧还是很有必要的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何优化项目中的SHIT MOUNTAIN">
+<meta property="og:url" content="https://jokerbyrant.github.io/2020-12-28/45353/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="前言最近经常接到要变更很久之前的功能的需求，盯着自己码的代码，竟是那么的陌生，就像在看一堆Shit Mountain。之前看到一张图很形象优雅的代码应该做到低耦合高内聚，所以学习一下代码的优化技巧还是很有必要的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img04.sogoucdn.com/app/a/100520146/3114d7a1916b7809d13e8719ab99bb97">
+<meta property="og:image" content="https://img02.sogoucdn.com/app/a/100520146/996608bf705e87cc5c2eb6721cd5ddc8">
+<meta property="og:image" content="https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746">
+<meta property="article:published_time" content="2020-12-28T08:45:22.000Z">
+<meta property="article:modified_time" content="2021-11-12T06:40:30.596Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="代码优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img04.sogoucdn.com/app/a/100520146/3114d7a1916b7809d13e8719ab99bb97">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2020-12-28/45353/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何优化项目中的SHIT MOUNTAIN | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2020-12-28/45353/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何优化项目中的SHIT MOUNTAIN
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-28 16:45:22" itemprop="dateCreated datePublished" datetime="2020-12-28T16:45:22+08:00">2020-12-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近经常接到要变更很久之前的功能的需求，盯着自己码的代码，竟是那么的陌生，就像在看一堆Shit Mountain。之前看到一张图很形象<br><img src="https://img04.sogoucdn.com/app/a/100520146/3114d7a1916b7809d13e8719ab99bb97"><br>优雅的代码应该做到低耦合高内聚，所以学习一下代码的优化技巧还是很有必要的。</p>
+<span id="more"></span>
+
+<h2 id="软件开发原则—SOLID"><a href="#软件开发原则—SOLID" class="headerlink" title="软件开发原则—SOLID"></a>软件开发原则—SOLID</h2><p><code>SOLID</code> 是五个软件开发原则的简称，它们分别是：<code>单一职责SRP(Single Responsibility Principle)</code>、<code>开放封闭原则OCP(Open Closed Principle)</code>、<code>里氏替换原则LSP(Liskov Substitution Principle)</code>、<code>接口隔离原则ISL(Interface Segregation Principle)</code>、<code>依赖倒置原则DIP(Dependency-Inversion Principle)</code>。</p>
+<h3 id="单一职责SRP"><a href="#单一职责SRP" class="headerlink" title="单一职责SRP"></a><code>单一职责SRP</code></h3><h3 id="开放封闭原则OCP"><a href="#开放封闭原则OCP" class="headerlink" title="开放封闭原则OCP"></a><code>开放封闭原则OCP</code></h3><h3 id="里氏替换原则LSP"><a href="#里氏替换原则LSP" class="headerlink" title="里氏替换原则LSP"></a><code>里氏替换原则LSP</code></h3><h3 id="接口隔离原则ISL"><a href="#接口隔离原则ISL" class="headerlink" title="接口隔离原则ISL"></a><code>接口隔离原则ISL</code></h3><h3 id="依赖倒置原则DIP"><a href="#依赖倒置原则DIP" class="headerlink" title="依赖倒置原则DIP"></a><code>依赖倒置原则DIP</code></h3><h2 id="代码重构"><a href="#代码重构" class="headerlink" title="代码重构"></a>代码重构</h2><p>推荐阅读：<a target="_blank" rel="noopener" href="http://gdut_yy.gitee.io/doc-refact2/">《重构 改善既有代码的设计》</a></p>
+<p>下面就说一说我从书中学到的一些技巧。</p>
+<h3 id="重构的原则"><a href="#重构的原则" class="headerlink" title="重构的原则"></a>重构的原则</h3><p><strong>在不改变软件可观察行为的前提下，对代码的结构进行调整</strong>。<br><strong>可观察行为</strong> 是指：经过重构之后的代码所做的事应该与重构之前大致一样，这里的一样是针对用户而言的。因为重构可能会对程序内部的代码结构进行调整，但对于用户而言，代码的功能仍与之前一样。<br>注意点：</p>
+<ol>
+<li>如果对代码的工作原理并不理解，那么就不要进行重构，因为这样很可能会破坏原有的逻辑。</li>
+<li>需求的变化使重构变得必要。如果一段代码能正常工作，并且不会再被修改，那么完全可以不去重构它。能改进之当然很好，但若没人需要去理解它，它就不会真正妨碍什么。</li>
+</ol>
+<h3 id="重构和性能优化"><a href="#重构和性能优化" class="headerlink" title="重构和性能优化"></a>重构和性能优化</h3><p>两者很相似，都需要修改代码，并且两者都不会改变程序的整体功能。他们的差别是在于最终目的：</p>
+<ul>
+<li>重构是为了让代码**”更容易理解，更易于修改”**，这可能使程序运行得更快，也可能使程序运行得更慢。</li>
+<li>在性能优化时，我只关心让程序运行得更快，最终得到的代码有可能更难理解和维护。</li>
+</ul>
+<p>以前我在优化代码时，总是会担心优化后会不会性能变差了，但其实大多数时候我们的优化对性能的影响可以忽略不计。在聪明的编译器、现代的缓存技术面前，我们很多直觉都是不准确的。如果系统对性能的要求不高，那就更不用担心了。但也有例外的时候，可能我们的优化对性能产生了很显著的影响，但正如上面说的：重构是为了让代码**”更容易理解，更易于修改”**。所以保证可读性和易拓展性才是重构首先要考虑的，性能的调优可以在重构之后再进行。</p>
+<h3 id="两顶帽子"><a href="#两顶帽子" class="headerlink" title="两顶帽子"></a>两顶帽子</h3><p>在进行软件开发时，应当让自己适应两种模式：<strong>添加新功能</strong> 和 <strong>重构</strong>。添加新功能时，不应该修改既有代码，只管添加新功能，这样任务的耗时才能被很好的掌握。重构时就不再添加功能，只管调整代码的结构。但当在添加新功能时，发现如果把代码再抽象一下，功能的添加会容易很多，那么这时候就可以换一顶帽子，切换到重构的工作中。但是如果这样的重构操作需要耗费几个小时，那么可以将手头的任务完成之后再进行。</p>
+<h3 id="重构的目的"><a href="#重构的目的" class="headerlink" title="重构的目的"></a>重构的目的</h3><p>总的来说，重构的终极目的就是：<strong>添加功能更快</strong>；<strong>修复Bug更快</strong>。</p>
+<h3 id="重构的手段"><a href="#重构的手段" class="headerlink" title="重构的手段"></a>重构的手段</h3><ul>
+<li>消除重复代码。</li>
+<li>优化函数命名—函数名最好能清晰的指出函数做了什么工作。</li>
+</ul>
+<h3 id="自动化重构"><a href="#自动化重构" class="headerlink" title="自动化重构"></a>自动化重构</h3><p><a target="_blank" rel="noopener" href="http://gdut_yy.gitee.io/doc-refact2/ch2.html#_2-10-%E8%87%AA%E5%8A%A8%E5%8C%96%E9%87%8D%E6%9E%84">自动化重构</a><br>IntelliJ IDEA就支持自动化重构，比如在修改一个文件名时，勾选了对应的选项后，就能发现不只文件名发生了变化，引用了该文件的代码也会相应的发生变化。这是因为IDEA在语法树上实现了代码导航、静态检查等功能，不仅处理了文本，同时也处理了语法树。</p>
+<h3 id="重构的时机"><a href="#重构的时机" class="headerlink" title="重构的时机"></a>重构的时机</h3><ol>
+<li>神秘命名（Mysterious Name）。函数、变量、模块的命名会让人感到疑惑。</li>
+<li>重复代码（Duplicated Code）。重复代码不光是指代码完全一致，相似的代码也可算作其中一部分。通过移动语句重组代码的顺序，将相似的部分提炼成单独的函数。</li>
+<li>过长函数（Long Function）。以多个小函数取代一个长函数，将函数以功能划分成多个部分，每个部分用一个命名清晰的小函数替代。</li>
+<li>过长参数列表（Long Parameter List）。如果一个函数所需参数过多，可以使用<strong>中转数据结构</strong>来替代，这样参数列表可以简洁一些。</li>
+<li>发散式变化（Divergent Change）。如果某个模块经常因为不同的原因在不同的方向上发生变化，发散式变化就出现了。当你看着一个类说：“呃，如果新加入一个数据库，我必须修改这 3 个函数；如果新出现一种金融工具，我必须修改这 4 个函数。”这就是发散式变化的征兆。</li>
+</ol>
+<h2 id="一些优化技巧"><a href="#一些优化技巧" class="headerlink" title="一些优化技巧"></a>一些优化技巧</h2><ul>
+<li>把复杂的代码块拆分成小的单元，也就是将一个很长的方法按照功能拆分成n个小的方法，这样的主要目的是便于理解。</li>
+<li>在对相似代码进行重构时，可以使用<strong>中转数据结构</strong>来将公共部分代码抽象出来，使得抽象出的代码可以适应不同的场景。</li>
+<li>抽象出的代码需要注意<strong>数据的可变状态</strong>，如果不希望数据在公共部分中发生变化，可以传入一个数据的副本进去。</li>
+</ul>
+<h3 id="剖解临时变量"><a href="#剖解临时变量" class="headerlink" title="剖解临时变量 #"></a>剖解临时变量 <a target="_blank" rel="noopener" href="http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_6">#</a></h3><p>不要对一个临时变量进行赋值，使用多个临时变量代替，并使用 <code>final</code> 修饰。如果一段冗长的代码中，一个临时变量承担了多件事情，那么可能会使代码阅读者疑惑，应该使用多个临时变量代替。<strong>集用临时变量</strong>(负责运算和收集结果) -&gt; <code>i = i + 1</code> 和 <strong>循环变量</strong> -&gt; <code>for(int i = 0; i &lt; 10; i++)</code> 除外。<br><em>例：(来自《重构》)</em></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 优化前</span></span><br><span class="line"><span class="keyword">double</span> temp = <span class="number">2</span> * (_height + _width);</span><br><span class="line">System.out.println (temp);</span><br><span class="line">temp = _height * _width;</span><br><span class="line">System.out.println (temp);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//优化后</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">double</span> perimeter = <span class="number">2</span> * (_height + _width);</span><br><span class="line">System.out.println (perimeter);</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">double</span> area = _height * _width;</span><br><span class="line">System.out.println (area);</span><br></pre></td></tr></table></figure>
+
+<h3 id="将查询函数和修改函数分离"><a href="#将查询函数和修改函数分离" class="headerlink" title="将查询函数和修改函数分离 #"></a>将查询函数和修改函数分离 <a target="_blank" rel="noopener" href="http://wangvsa.github.io/refactoring-cheat-sheet/making-method-calls-simpler/#_15">#</a></h3><p>将函数中查询操作和修改操作分离，提炼出两个函数，一个负责查询，一个负责修改。<br><img src="https://img02.sogoucdn.com/app/a/100520146/996608bf705e87cc5c2eb6721cd5ddc8"></p>
+<h3 id="以查询取代临时变量"><a href="#以查询取代临时变量" class="headerlink" title="以查询取代临时变量 #"></a>以查询取代临时变量 <a target="_blank" rel="noopener" href="http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_8">#</a></h3><p><em>优化前：</em></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> basePrice = _quantity * _itemPrice;</span><br><span class="line"><span class="keyword">if</span> (basePrice &gt; <span class="number">1000</span>)</span><br><span class="line">    <span class="keyword">return</span> basePrice * <span class="number">0.95</span>;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="keyword">return</span> basePrice * <span class="number">0.98</span>;</span><br></pre></td></tr></table></figure>
+<p><em>优化后：</em></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (basePrice() &gt; <span class="number">1000</span>)</span><br><span class="line">    <span class="keyword">return</span> basePrice() * <span class="number">0.95</span>;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="keyword">return</span> basePrice() * <span class="number">0.98</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">basePrice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> _quantity * _itemPrice;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>优化步骤如下：</p>
+<ol>
+<li>首先确保临时变量只进行了一次赋值，使用 <code>final</code> 修饰对应的临时变量，这样如果该临时变量发生了多次赋值，编译器会给出对应的提示。</li>
+<li>将重复赋值的临时变量使用 <strong>剖解临时变量</strong> 的方式将其分割为多个临时变量。</li>
+<li>将 <code>=</code> 右侧的部分代码提炼成单独的函数，确保函数不进行任何修改操作，如果有，就对其进行 <strong>将查询函数和修改函数分离</strong> 的操作。</li>
+<li>替换使用了临时变量部分的代码。</li>
+</ol>
+<h3 id="移除参数"><a href="#移除参数" class="headerlink" title="移除参数 #"></a>移除参数 <a target="_blank" rel="noopener" href="http://wangvsa.github.io/refactoring-cheat-sheet/making-method-calls-simpler/#_7">#</a></h3><p>函数的参数尽可能的减少，这样在后续在复用时就不用为了一个参数该传什么值而绞尽脑汁。如果是多态函数，在进行复用时可以新建一个函数，在函数中进行必要的参数赋值操作，新函数的参数就可以精简了。<br><img src="https://img01.sogoucdn.com/app/a/100520146/c12cda53a521e29460aa69706d712746"></p>
+<h3 id="移除对参数的赋值"><a href="#移除对参数的赋值" class="headerlink" title="移除对参数的赋值 #"></a>移除对参数的赋值 <a target="_blank" rel="noopener" href="http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/#_7">#</a></h3><p>传递进来的参数尽量不要改变其值，如果一定要改变，最好以 <code>return</code> 方式返回，这样代码的意图更清晰。如果要返回的值有多个，尝试将大堆数据组装成对象，或者为每一个返回值设计一个对应的独立函数。</p>
+<h3 id="提炼函数"><a href="#提炼函数" class="headerlink" title="提炼函数 #"></a>提炼函数 <a target="_blank" rel="noopener" href="http://wangvsa.github.io/refactoring-cheat-sheet/composing-methods/">#</a></h3><p>下面只记录一下 <strong>对局部变量再赋值</strong> 这个问题。<br>情况描述：在提炼出的函数中，修改了传入的局部变量的值。</p>
+<blockquote>
+<p>被赋值的临时变量也分两种情况。较简单的情况是：这个变量只在被提炼码区段中使用。果真如此，你可以将这个临时变量的声明式移到被提炼码中，然后一起提炼出去。另一种情况是：被提炼码之外的代码也使用了这个变量。这又分为两种情况： 如果这个变量在被提炼码之后未再被使用，你只需直接在目标函数中修改它就可以了；如果被提炼码之后的代码还使用了这个变量，你就需要让目标函数返回该变量改变后的值。我以下列代码说明这几种不同情况：<br>解决：如果传入的局部变量在提炼的函数中值被改变，那么这时应该将其 <code>return</code> 出去。如果要返回的变量不只一个，那么可以再次提炼，尽量让一个函数只返回一个值。</p>
+</blockquote>
+<h3 id="去除代码中多余的if-else"><a href="#去除代码中多余的if-else" class="headerlink" title="去除代码中多余的if else"></a>去除代码中多余的if else</h3><p>如果是<code>Spring</code>项目，可以利用<code>Spring</code>的依赖注入结合策略模式来对代码进行优化。参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/5ccf1706297d">Spring优雅的实现策略模式</a>。<br>在 <a target="_blank" rel="noopener" href="https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html">去除多余的if else</a> 这篇文章中也提到一些重构技巧。</p>
+<h2 id="编写单元测试"><a href="#编写单元测试" class="headerlink" title="编写单元测试"></a>编写单元测试</h2><h2 id="命名参考"><a href="#命名参考" class="headerlink" title="命名参考"></a>命名参考</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/96100037">Java命名规范参考</a></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>变量声名在循环体内还是循环体外，这个问题困扰了我很久，我倾向于怎么方便怎么来。可以看看这篇文章的讨论：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/31751468">变量声明在循环体内还是循环体外的争论，以及怎样才真正叫『避免在循环体中创建对象』</a></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/22166831">10个现代的软件过度设计错误</a><br><a target="_blank" rel="noopener" href="https://ronjeffries.com/xprog/articles/refactoring-not-on-the-backlog/">Refactoring – Not on the backlog!</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/5ccf1706297d">Spring优雅的实现策略模式</a><br><a target="_blank" rel="noopener" href="https://www.pdai.tech/md/develop/refactor/dev-refactor-if-else.html">去除多余的if else</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/" rel="tag"># 代码优化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020-10-20/44002/" rel="prev" title="Zookeeper学习">
+      <i class="fa fa-chevron-left"></i> Zookeeper学习
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021-01-13/31091/" rel="next" title="一个简单的抢红包功能设计">
+      一个简单的抢红包功能设计 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E5%8E%9F%E5%88%99%E2%80%94SOLID"><span class="nav-number">2.</span> <span class="nav-text">软件开发原则—SOLID</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E4%B8%80%E8%81%8C%E8%B4%A3SRP"><span class="nav-number">2.1.</span> <span class="nav-text">单一职责SRP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E6%94%BE%E5%B0%81%E9%97%AD%E5%8E%9F%E5%88%99OCP"><span class="nav-number">2.2.</span> <span class="nav-text">开放封闭原则OCP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8C%E6%B0%8F%E6%9B%BF%E6%8D%A2%E5%8E%9F%E5%88%99LSP"><span class="nav-number">2.3.</span> <span class="nav-text">里氏替换原则LSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3%E9%9A%94%E7%A6%BB%E5%8E%9F%E5%88%99ISL"><span class="nav-number">2.4.</span> <span class="nav-text">接口隔离原则ISL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E5%80%92%E7%BD%AE%E5%8E%9F%E5%88%99DIP"><span class="nav-number">2.5.</span> <span class="nav-text">依赖倒置原则DIP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E9%87%8D%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">代码重构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E7%9A%84%E5%8E%9F%E5%88%99"><span class="nav-number">3.1.</span> <span class="nav-text">重构的原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E5%92%8C%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">3.2.</span> <span class="nav-text">重构和性能优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E9%A1%B6%E5%B8%BD%E5%AD%90"><span class="nav-number">3.3.</span> <span class="nav-text">两顶帽子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="nav-number">3.4.</span> <span class="nav-text">重构的目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E7%9A%84%E6%89%8B%E6%AE%B5"><span class="nav-number">3.5.</span> <span class="nav-text">重构的手段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E9%87%8D%E6%9E%84"><span class="nav-number">3.6.</span> <span class="nav-text">自动化重构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E7%9A%84%E6%97%B6%E6%9C%BA"><span class="nav-number">3.7.</span> <span class="nav-text">重构的时机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E4%BC%98%E5%8C%96%E6%8A%80%E5%B7%A7"><span class="nav-number">4.</span> <span class="nav-text">一些优化技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%96%E8%A7%A3%E4%B8%B4%E6%97%B6%E5%8F%98%E9%87%8F"><span class="nav-number">4.1.</span> <span class="nav-text">剖解临时变量 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E6%9F%A5%E8%AF%A2%E5%87%BD%E6%95%B0%E5%92%8C%E4%BF%AE%E6%94%B9%E5%87%BD%E6%95%B0%E5%88%86%E7%A6%BB"><span class="nav-number">4.2.</span> <span class="nav-text">将查询函数和修改函数分离 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5%E6%9F%A5%E8%AF%A2%E5%8F%96%E4%BB%A3%E4%B8%B4%E6%97%B6%E5%8F%98%E9%87%8F"><span class="nav-number">4.3.</span> <span class="nav-text">以查询取代临时变量 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E9%99%A4%E5%8F%82%E6%95%B0"><span class="nav-number">4.4.</span> <span class="nav-text">移除参数 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E9%99%A4%E5%AF%B9%E5%8F%82%E6%95%B0%E7%9A%84%E8%B5%8B%E5%80%BC"><span class="nav-number">4.5.</span> <span class="nav-text">移除对参数的赋值 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E7%82%BC%E5%87%BD%E6%95%B0"><span class="nav-number">4.6.</span> <span class="nav-text">提炼函数 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%BB%E9%99%A4%E4%BB%A3%E7%A0%81%E4%B8%AD%E5%A4%9A%E4%BD%99%E7%9A%84if-else"><span class="nav-number">4.7.</span> <span class="nav-text">去除代码中多余的if else</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">编写单元测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">命名参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">7.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">8.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
