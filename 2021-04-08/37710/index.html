@@ -31,9 +31,9 @@
 <meta property="og:description" content="某天，测试环境突然崩了，所有服务都down了。和师傅定位问题，才发现是内存不足导致的，测试服务器内存就16g，一个MongoDb就占了3g，再加上启动起来的十几个服务，能撑这么久也不容易了。然后接着就是一通优化，清理MongoDb历史数据，从代码到JVM都需要进行优化。关于JVM调优，从来没有实践过，只看过几篇技术博客，知道几个调优参数，基本的调优技巧都很陌生，下面就记录下这次调优经历。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-08T08:41:49.000Z">
-<meta property="article:modified_time" content="2021-11-12T06:40:30.595Z">
+<meta property="article:modified_time" content="2022-02-28T01:26:56.469Z">
 <meta property="article:author" content="sxh">
-<meta property="article:tag" content="jokerbyrant">
+<meta property="article:tag" content="JVM">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://jokerbyrant.github.io/2021-04-08/37710/">
@@ -190,6 +190,15 @@
 
               <time title="创建时间：2021-04-08 16:41:49" itemprop="dateCreated datePublished" datetime="2021-04-08T16:41:49+08:00">2021-04-08</time>
             </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -223,6 +232,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
 
         
 
@@ -311,7 +323,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -324,7 +336,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

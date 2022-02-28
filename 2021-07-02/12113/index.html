@@ -23,16 +23,16 @@
     var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="写在前面，昨晚睡前突然意识到一件事儿，以前看的那些书已经在潜移默化间改变了我的思维和言行。比如现在我思考一件事儿，会在脑海中自动将从前书中的一些经验映射到现实，像是我曾经经历过一样。在与人谈话时它们的影响最明显，”腹有诗书气自华”大概就是这种感觉。  utf8和utf8mb4utf8编码最大字符长度为3字节，三个字节的UTF-8最大能编码的 Unicode字符是0xffff，也就是Unicode">
+  <meta name="description" content="写在前面，昨晚睡前突然意识到一件事儿，以前看的那些书已经在潜移默化间改变了我的思维和言行。比如现在我思考一件事儿，会在脑海中自动将从前书中的一些经验映射到现实，像是我曾经经历过一样。在与人谈话时它们的影响最明显，”腹有诗书气自华”大概就是这种感觉。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql中utf8和utf8mb4区别，并批量修改数据库中所有字段的编码">
 <meta property="og:url" content="https://jokerbyrant.github.io/2021-07-02/12113/index.html">
 <meta property="og:site_name" content="Sssxh BLOG">
-<meta property="og:description" content="写在前面，昨晚睡前突然意识到一件事儿，以前看的那些书已经在潜移默化间改变了我的思维和言行。比如现在我思考一件事儿，会在脑海中自动将从前书中的一些经验映射到现实，像是我曾经经历过一样。在与人谈话时它们的影响最明显，”腹有诗书气自华”大概就是这种感觉。  utf8和utf8mb4utf8编码最大字符长度为3字节，三个字节的UTF-8最大能编码的 Unicode字符是0xffff，也就是Unicode">
+<meta property="og:description" content="写在前面，昨晚睡前突然意识到一件事儿，以前看的那些书已经在潜移默化间改变了我的思维和言行。比如现在我思考一件事儿，会在脑海中自动将从前书中的一些经验映射到现实，像是我曾经经历过一样。在与人谈话时它们的影响最明显，”腹有诗书气自华”大概就是这种感觉。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://i.loli.net/2021/07/02/TkbMaYZnwGom9Ag.png">
 <meta property="article:published_time" content="2021-07-02T01:10:08.000Z">
-<meta property="article:modified_time" content="2021-11-12T06:40:30.595Z">
+<meta property="article:modified_time" content="2022-02-28T01:26:56.469Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
@@ -223,10 +223,10 @@
         <blockquote>
 <p>写在前面，昨晚睡前突然意识到一件事儿，以前看的那些书已经在潜移默化间改变了我的思维和言行。比如现在我思考一件事儿，会在脑海中自动将从前书中的一些经验映射到现实，像是我曾经经历过一样。在与人谈话时它们的影响最明显，”腹有诗书气自华”大概就是这种感觉。</p>
 </blockquote>
-<h2 id="utf8和utf8mb4"><a href="#utf8和utf8mb4" class="headerlink" title="utf8和utf8mb4"></a>utf8和utf8mb4</h2><p><code>utf8</code>编码最大字符长度为3字节，三个字节的<code>UTF-8</code>最大能编码的 <code>Unicode</code>字符是<code>0xffff</code>，也就是<code>Unicode</code>中的基本多文种平面（BMP）。也就是说：<strong>任何不在基本多文本平面的<code>Unicode</code>字符，都无法使用<code>Mysql</code>的<code>utf8</code>字符集存储。包括<code>Emoji</code>表情，和很多不常用的汉字，以及任何新增的 <code>Unicode</code>字符等等</strong>。</p>
-<p><code>mysql</code>最早只支持<code>utf8</code>，<code>utf8mb4</code>是在<code>Mysql-5.5.3</code>版本后引入的，<code>mb4</code>就是<code>most bytes 4</code>的意思，专门用来兼容四字节的<code>unicode</code>。<code>utf8mb4</code>是<code>utf8</code>的超集，因此将字符编码从<code>utf8</code>变更为<code>utf8mb4</code>对原先的数据没有任何影响。</p>
 <span id="more"></span>
 
+<h2 id="utf8和utf8mb4"><a href="#utf8和utf8mb4" class="headerlink" title="utf8和utf8mb4"></a>utf8和utf8mb4</h2><p><code>utf8</code>编码最大字符长度为3字节，三个字节的<code>UTF-8</code>最大能编码的 <code>Unicode</code>字符是<code>0xffff</code>，也就是<code>Unicode</code>中的基本多文种平面（BMP）。也就是说：<strong>任何不在基本多文本平面的<code>Unicode</code>字符，都无法使用<code>Mysql</code>的<code>utf8</code>字符集存储。包括<code>Emoji</code>表情，和很多不常用的汉字，以及任何新增的 <code>Unicode</code>字符等等</strong>。</p>
+<p><code>mysql</code>最早只支持<code>utf8</code>，<code>utf8mb4</code>是在<code>Mysql-5.5.3</code>版本后引入的，<code>mb4</code>就是<code>most bytes 4</code>的意思，专门用来兼容四字节的<code>unicode</code>。<code>utf8mb4</code>是<code>utf8</code>的超集，因此将字符编码从<code>utf8</code>变更为<code>utf8mb4</code>对原先的数据没有任何影响。</p>
 <p>另外关于<code>utf8</code>和<code>utf8mb4</code>的排序规则问题，参考<a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903733034221576">mysql中utf8和utf8mb4的区别-癫Point</a>的解释：</p>
 <blockquote>
 <p><code>utf8_unicode_ci</code> 比较准确，<code>utf8_general_ci</code> 速度比较快，通常情况下 <code>utf8_general_ci</code> 的准确性就够我们用的了。如果是<code>utf8mb4</code>那么对应的就是 <code>utf8mb4_general_ci</code>、<code>utf8mb4_unicode_ci</code>。</p>
@@ -335,7 +335,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -348,7 +348,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
