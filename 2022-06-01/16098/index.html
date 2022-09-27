@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="先看效果图：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bootstrap-Table实现增加、删除行功能">
+<meta property="og:url" content="https://jokerbyrant.github.io/2022-06-01/16098/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="先看效果图：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642421509398b531ab5c17d46424074d5ebf1bd9206.png">
+<meta property="article:published_time" content="2022-06-01T03:28:44.000Z">
+<meta property="article:modified_time" content="2022-09-27T05:12:52.153Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="Bootstrap-Table">
+<meta property="article:tag" content="Html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642421509398b531ab5c17d46424074d5ebf1bd9206.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2022-06-01/16098/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Bootstrap-Table实现增加、删除行功能 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-06-01/16098/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Bootstrap-Table实现增加、删除行功能
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-01 11:28:44" itemprop="dateCreated datePublished" datetime="2022-06-01T11:28:44+08:00">2022-06-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>先看效果图：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642421509398b531ab5c17d46424074d5ebf1bd9206.png"></p>
+<span id="more"></span>
+
+<p>上代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">xmlns:th</span>=<span class="string">&quot;http://www.thymeleaf.org&quot;</span> <span class="attr">xmlns:sec</span>=<span class="string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>云鱼管理后台<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span> <span class="attr">th:fragment</span>=<span class="string">&quot;chargeSetting&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">&quot;form-horizontal m-t&quot;</span> <span class="attr">id</span>=<span class="string">&quot;settingForm&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">&quot;settingUid&quot;</span> <span class="attr">name</span>=<span class="string">&quot;settingUid&quot;</span> <span class="attr">class</span>=<span class="string">&quot;form-control&quot;</span> <span class="attr">type</span>=<span class="string">&quot;hidden&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">&quot;version&quot;</span> <span class="attr">name</span>=<span class="string">&quot;version&quot;</span> <span class="attr">class</span>=<span class="string">&quot;form-control&quot;</span> <span class="attr">type</span>=<span class="string">&quot;hidden&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 云鱼合伙人等级收益配置 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;form-group&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">label</span> <span class="attr">class</span>=<span class="string">&quot;label-xs control-label&quot;</span>&gt;</span>合伙人等级收益配置<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-8 list-table&quot;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">id</span>=<span class="string">&quot;addCharge&quot;</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-xs btn-info&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">&quot;fa fa-plus&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span> 新增<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-xs btn-info&quot;</span> <span class="attr">onclick</span>=<span class="string">&quot;reOrder(&#x27;charge&#x27;, 0)&quot;</span> <span class="attr">style</span>=<span class="string">&quot;padding: 1px 5px&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">&quot;fa fa-arrow-up&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-xs btn-info&quot;</span> <span class="attr">onclick</span>=<span class="string">&quot;reOrder(&#x27;charge&#x27;, 1)&quot;</span> <span class="attr">style</span>=<span class="string">&quot;padding: 1px 5px&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">&quot;fa fa-arrow-down&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">table</span> <span class="attr">id</span>=<span class="string">&quot;table-charge&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;hr-line-dashed&quot;</span> <span class="attr">style</span>=<span class="string">&quot;clear: both&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;hr-line-dashed&quot;</span> <span class="attr">style</span>=<span class="string">&quot;clear: both&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;form-button form-group&quot;</span> <span class="attr">sec:authorize</span>=<span class="string">&quot;hasAnyAuthority(&#x27;setting:update&#x27;)&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-8 col-sm-offset-2&quot;</span> <span class="attr">style</span>=<span class="string">&quot;margin-top: 20px&quot;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-primary&quot;</span>&gt;</span>保存提交<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">th:inline</span>=<span class="string">&quot;javascript&quot;</span>&gt;</span><span class="javascript"></span></span><br><span class="line"><span class="javascript">        initSubmitForm();</span></span><br><span class="line"><span class="javascript">        initPartnerTable(<span class="number">12</span>);</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">        $().ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> model = [[$&#123;model&#125;]];</span></span><br><span class="line"><span class="javascript">            $(<span class="string">&quot;#version&quot;</span>).val(model.version);</span></span><br><span class="line"><span class="javascript">            $(<span class="string">&quot;#settingUid&quot;</span>).val(model.settingUid);</span></span><br><span class="line"><span class="javascript">        &#125;);</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">        <span class="comment">// 组装提交到后台的表单数据</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">getSubmitParam</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> param = &#123;&#125;;</span></span><br><span class="line"><span class="javascript">            param.version = $(<span class="string">&quot;#version&quot;</span>).val();</span></span><br><span class="line"><span class="javascript">            param.settingUid = $(<span class="string">&quot;#settingUid&quot;</span>).val();</span></span><br><span class="line"><span class="javascript">            param.moduleName = <span class="string">&quot;partnerSetting&quot;</span>;</span></span><br><span class="line"><span class="javascript">            <span class="comment">// 云豆收费数据</span></span></span><br><span class="line"><span class="javascript">            param.chargeSettings = getChargeSubmitParam();</span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> param;</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">        <span class="comment">//============================= 云豆收费表格相关 ================================</span></span></span><br><span class="line"><span class="javascript">        <span class="comment">// 初始化收费规则表格</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">initPartnerTable</span>(<span class="params">chargeType</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            $(<span class="string">&quot;#table-charge&quot;</span>).bootstrapTable(<span class="string">&quot;destroy&quot;</span>).bootstrapTable(&#123;</span></span><br><span class="line"><span class="javascript">                <span class="attr">url</span>: <span class="string">&quot;/chargeSetting/selectByChargeType?chargeType=&quot;</span>+chargeType,	<span class="comment">//请求后台的URL（*）</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">method</span>: <span class="string">&#x27;GET&#x27;</span>,                      <span class="comment">//请求方式（*）</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">toolbar</span>: <span class="string">&#x27;.searchArea&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                <span class="attr">clickEdit</span>: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">                <span class="attr">striped</span>: <span class="literal">true</span>,                      <span class="comment">//是否显示行间隔色</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">sortOrder</span>: <span class="string">&quot;asc&quot;</span>,                   <span class="comment">//排序方式</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">queryParamsType</span>:<span class="string">&quot;limit&quot;</span>,</span></span><br><span class="line"><span class="javascript">                <span class="attr">contentType</span>:<span class="string">&quot;application/x-www-form-urlencoded; charset=UTF-8&quot;</span>,</span></span><br><span class="line"><span class="javascript">                <span class="attr">minimumCountColumns</span>: <span class="number">2</span>,             <span class="comment">//最少允许的列数</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">clickToSelect</span>: <span class="literal">false</span>,                <span class="comment">//是否启用点击选中行</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">singleSelect</span>: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">                <span class="attr">uniqueId</span>: <span class="string">&quot;ID&quot;</span>,                     <span class="comment">//每一行的唯一标识，一般为主键列</span></span></span><br><span class="line"><span class="javascript">                <span class="attr">columns</span>: [&#123;</span></span><br><span class="line"><span class="javascript">                    <span class="attr">checkbox</span>: <span class="literal">true</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">width</span>:<span class="number">50</span></span></span><br><span class="line"><span class="javascript">                &#125;, &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="attr">field</span>: <span class="string">&#x27;chargeName&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">title</span>: <span class="string">&#x27;等级名称&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">halign</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">align</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">width</span>: <span class="string">&#x27;130px&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">formatter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value, row, index</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">return</span> <span class="string">&#x27;&lt;input maxlength=&quot;8&quot; style=&quot;width: 80%&quot; type=&quot;text&quot; required=&quot;true&quot; name=&quot;chargeName&#x27;</span>+index+<span class="string">&#x27;&quot; id=&quot;chargeName&#x27;</span>+index+<span class="string">&#x27;&quot; value=&quot;&#x27;</span>+value+<span class="string">&#x27;&quot; /&gt;&#x27;</span>;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;, &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="attr">field</span>: <span class="string">&#x27;chargeNum&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">title</span>: <span class="string">&#x27;推广码使用达标人数&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">halign</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">align</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">width</span>: <span class="string">&#x27;130px&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">formatter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value, row, index</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">return</span> <span class="string">&#x27;&lt;input maxlength=&quot;8&quot; style=&quot;width: 80%&quot; type=&quot;text&quot; required=&quot;true&quot; isZzs=&quot;true&quot; name=&quot;chargeNum&#x27;</span>+index+<span class="string">&#x27;&quot; id=&quot;chargeNum&#x27;</span>+index+<span class="string">&#x27;&quot; value=&quot;&#x27;</span>+value+<span class="string">&#x27;&quot; /&gt;&#x27;</span>;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;, &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="attr">field</span>: <span class="string">&#x27;chargeMoney&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">title</span>: <span class="string">&#x27;收益百分比&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">halign</span>: <span class="string">&#x27;center&#x27;</span>,<span class="comment">//表头居中</span></span></span><br><span class="line"><span class="javascript">                    <span class="attr">align</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">width</span>: <span class="string">&#x27;130px&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">formatter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value, row, index</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">return</span> <span class="string">&#x27;&lt;input maxlength=&quot;8&quot; style=&quot;width: 80%&quot; type=&quot;text&quot; required=&quot;true&quot; checkNumFormat=&quot;true&quot; name=&quot;chargeMoney&#x27;</span>+index+<span class="string">&#x27;&quot; id=&quot;chargeMoney&#x27;</span>+index+<span class="string">&#x27;&quot; value=&quot;&#x27;</span>+value+<span class="string">&#x27;&quot; /&gt;&#x27;</span>;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;, &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="attr">field</span>: <span class="string">&#x27;useStatus&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">title</span>: <span class="string">&#x27;开启状态&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">halign</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">formatter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value, row, index</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">let</span> isChecked = value==<span class="number">1</span>?<span class="string">&quot;checked&quot;</span>:<span class="string">&quot;unchecked&quot;</span>;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">return</span> <span class="string">&#x27;&lt;div class=&quot;switch&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;div class=&quot;onoffswitch&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;input type=&quot;checkbox&quot; &#x27;</span>+isChecked+<span class="string">&#x27; class=&quot;onoffswitch-checkbox&quot; id=&quot;useStatus&#x27;</span>+index+<span class="string">&#x27;&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;label id=&quot;useStatusCheckbox&#x27;</span>+index+<span class="string">&#x27;&quot; class=&quot;onoffswitch-label&quot; for=&quot;useStatus&#x27;</span>+index+<span class="string">&#x27;&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;span class=&quot;onoffswitch-inner&quot;&gt;&lt;/span&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;span class=&quot;onoffswitch-switch&quot;&gt;&lt;/span&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;/label&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;/div&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;/div&gt;&#x27;</span>;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;, &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="attr">field</span>: <span class="string">&#x27;chargeUid&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">title</span>: <span class="string">&#x27;操作&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">halign</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">align</span>: <span class="string">&#x27;center&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">width</span>: <span class="string">&#x27;50px&#x27;</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="attr">formatter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value, row, index</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">return</span> <span class="string">&#x27;&lt;input id=&quot;chargeUid&#x27;</span>+index+<span class="string">&#x27;&quot; value=&quot;&#x27;</span>+value+<span class="string">&#x27;&quot; type=&quot;hidden&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                            <span class="string">&#x27;&lt;button title=&quot;删除&quot; class=&quot;btn btn-warning btn-circle&quot; type=&quot;button&quot; onclick=&quot;deleteRow(\&#x27;charge\&#x27;,&#x27;</span>+index+<span class="string">&#x27;)&quot; &gt;&lt;i class=&quot;fa fa-times&quot;&gt;&lt;/i&gt;&lt;/button&gt;&#x27;</span>;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;],</span></span><br><span class="line"><span class="javascript">                <span class="attr">onLoadSuccess</span>: <span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                    initAddChargeEvent();</span></span><br><span class="line"><span class="javascript">                &#125;,</span></span><br><span class="line"><span class="javascript">                <span class="attr">formatLoadingMessage</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">return</span> <span class="string">&quot;请稍等，正在加载中。。。&quot;</span>;</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">            &#125;);</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 初始化新增收费规则事件</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">initAddChargeEvent</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            $(<span class="string">&quot;#addCharge&quot;</span>).off(<span class="string">&quot;click&quot;</span>).on(<span class="string">&quot;click&quot;</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">let</span> trLength = $(<span class="string">&#x27;#table-charge&gt;tbody&#x27;</span>).children(<span class="string">&quot;tr&quot;</span>).length;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">let</span> uid = SystemNameSpace.common.uuid();</span></span><br><span class="line"><span class="javascript">                <span class="keyword">if</span>(trLength == <span class="number">1</span>)&#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">if</span> ($(<span class="string">&#x27;#table-charge&gt;tbody&gt;tr&#x27;</span>)[<span class="number">0</span>].className == <span class="string">&#x27;no-records-found&#x27;</span>) &#123;</span></span><br><span class="line"><span class="javascript">                        $(<span class="string">&#x27;#table-charge&gt;tbody&gt;tr&#x27;</span>).remove();</span></span><br><span class="line"><span class="javascript">                        trLength = <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">let</span> appendHtml = <span class="string">&#x27;&lt;tr data-index=&quot;&#x27;</span>+trLength+<span class="string">&#x27;&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;td class=&quot;bs-checkbox &quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;input data-index=&quot;0&quot; name=&quot;btSelectItem&quot; type=&quot;checkbox&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/td&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;td style=&quot;text-align: center; width: 130px&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;input maxlength=&quot;8&quot; style=&quot;width: 80%&quot; type=&quot;text&quot; required=&quot;true&quot; name=&quot;chargeName&#x27;</span>+trLength+<span class="string">&#x27;&quot; id=&quot;chargeName&#x27;</span>+trLength+<span class="string">&#x27;&quot; value=&quot;&quot; /&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/td&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;td style=&quot;text-align: center; width: 130px&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;input maxlength=&quot;8&quot; style=&quot;width: 80%&quot; type=&quot;text&quot; isZzs=&quot;true&quot; required=&quot;true&quot; name=&quot;chargeNum&#x27;</span>+trLength+<span class="string">&#x27;&quot; id=&quot;chargeNum&#x27;</span>+trLength+<span class="string">&#x27;&quot; value=&quot;&quot; /&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/td&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;td style=&quot;text-align: center; width: 130px&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;input maxlength=&quot;8&quot; style=&quot;width: 80%&quot; type=&quot;text&quot; checkNumFormat=&quot;true&quot; required=&quot;true&quot; name=&quot;chargeMoney&#x27;</span>+trLength+<span class="string">&#x27;&quot; id=&quot;chargeMoney&#x27;</span>+trLength+<span class="string">&#x27;&quot; value=&quot;&quot; /&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/td&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;td&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;div class=&quot;switch&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;div class=&quot;onoffswitch&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;input type=&quot;checkbox&quot; class=&quot;onoffswitch-checkbox&quot; id=&quot;useStatus&#x27;</span>+trLength+<span class="string">&#x27;&quot; name=&quot;useStatus&#x27;</span>+trLength+<span class="string">&#x27;&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;label id=&quot;useStatusCheckbox&#x27;</span>+trLength+<span class="string">&#x27;&quot; class=&quot;onoffswitch-label&quot; for=&quot;useStatus&#x27;</span>+trLength+<span class="string">&#x27;&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;span class=&quot;onoffswitch-inner&quot;&gt;&lt;/span&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;span class=&quot;onoffswitch-switch&quot;&gt;&lt;/span&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/label&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/div&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/div&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/td&gt;&#x27;</span>+</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;td style=&quot;text-align: center; width: 50px &quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;input id=&quot;chargeUid&#x27;</span>+trLength+<span class="string">&#x27;&quot; value=&quot;&#x27;</span>+uid+<span class="string">&#x27;&quot; type=&quot;hidden&quot;&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;button title=&quot;删除&quot; class=&quot;btn btn-warning btn-circle&quot; type=&quot;button&quot; onclick=&quot;deleteRow(\&#x27;charge\&#x27;,&#x27;</span>+trLength+<span class="string">&#x27;)&quot; &gt;&lt;i class=&quot;fa fa-times&quot;&gt;&lt;/i&gt;&lt;/button&gt;&#x27;</span> +</span></span><br><span class="line"><span class="javascript">                    <span class="string">&#x27;&lt;/td&gt;&#x27;</span>;</span></span><br><span class="line"><span class="javascript">                $(<span class="string">&#x27;#table-charge&gt;tbody&#x27;</span>).append(appendHtml);</span></span><br><span class="line"><span class="javascript">                setCheckBoxSingleCheck(<span class="string">&#x27;charge&#x27;</span>);</span></span><br><span class="line"><span class="javascript">            &#125;);</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 获取收费规则表格参数</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">getChargeSubmitParam</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> list = [];</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> o = &#123;&#125;;</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">            <span class="comment">// 云鱼合伙人等级收益配置表格</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> arr = $(<span class="string">&#x27;#table-charge&#x27;</span>).children(<span class="string">&quot;tbody&quot;</span>).children(<span class="string">&quot;tr&quot;</span>);</span></span><br><span class="line"><span class="javascript">            <span class="keyword">for</span> (<span class="keyword">let</span> index = <span class="number">0</span>; index &lt; arr.length; index++) &#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">if</span> (arr[index].innerHTML &amp;&amp; !arr[index].classList.contains(<span class="string">&#x27;no-records-found&#x27;</span>)) &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">let</span> i = arr[index].dataset.index; <span class="comment">// i-&gt;数据索引，index-&gt;对应的那一行html element</span></span></span><br><span class="line"><span class="javascript">                    o = &#123;&#125;;</span></span><br><span class="line"><span class="javascript">                    o.chargeUid = $(<span class="string">&quot;#chargeUid&quot;</span>+i).val();</span></span><br><span class="line"><span class="javascript">                    o.chargeType = <span class="number">12</span>;</span></span><br><span class="line"><span class="javascript">                    o.chargeName = $(<span class="string">&quot;#chargeName&quot;</span>+i).val();</span></span><br><span class="line"><span class="javascript">                    o.chargeMoney = $(<span class="string">&quot;#chargeMoney&quot;</span>+i).val();</span></span><br><span class="line"><span class="javascript">                    o.chargeNum = $(<span class="string">&quot;#chargeNum&quot;</span>+i).val();</span></span><br><span class="line"><span class="javascript">                    o.useStatus = $(<span class="string">&quot;#useStatus&quot;</span>+i)[<span class="number">0</span>].checked ? <span class="number">1</span> : <span class="number">0</span>;</span></span><br><span class="line"><span class="javascript">                    o.chargeSort = index;</span></span><br><span class="line"><span class="javascript">                    list.push(o);</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">            &#125;</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> list;</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript">        <span class="comment">//--------------------------------------------------------------------------</span></span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">        <span class="comment">//============================= 表格相关 ==================================</span></span></span><br><span class="line"><span class="javascript">        <span class="comment">// 删除一行数据, id-&gt;表格id，index-&gt;数据索引</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">deleteRow</span>(<span class="params">id, index</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> arr = $(<span class="string">&#x27;#table-&#x27;</span>+id).children(<span class="string">&quot;tbody&quot;</span>).children(<span class="string">&quot;tr&quot;</span>);</span></span><br><span class="line"><span class="javascript">            <span class="keyword">for</span>(<span class="keyword">let</span> x = <span class="number">0</span>; x &lt; arr.length; x++) &#123;</span></span><br><span class="line"><span class="javascript">                <span class="comment">// 根据数据索引找到指定的那一行row</span></span></span><br><span class="line"><span class="javascript">                <span class="keyword">if</span> (arr[x].dataset.index == index) &#123;</span></span><br><span class="line"><span class="javascript">                    arr[x].innerText = <span class="string">&quot;&quot;</span>;</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">            &#125;</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 表格排序 direction 0-&gt;up 1-&gt;down</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">reOrder</span>(<span class="params">tableId, direction</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> selectedData = <span class="literal">null</span>;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> index;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> allData = $(<span class="string">&#x27;#table-&#x27;</span>+tableId+<span class="string">&#x27; .bs-checkbox input&#x27;</span>);</span></span><br><span class="line"><span class="javascript">            <span class="keyword">for</span>(<span class="keyword">let</span> x = <span class="number">0</span>; x &lt; allData.length; x++) &#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">if</span> (allData[x].checked) &#123;</span></span><br><span class="line"><span class="javascript">                    selectedData = $(allData[x]).parents(<span class="string">&quot;tr&quot;</span>)[<span class="number">0</span>];</span></span><br><span class="line"><span class="javascript">                    index = x;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">break</span>;</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">            &#125;</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">            <span class="keyword">if</span> (selectedData == <span class="literal">null</span>) &#123;</span></span><br><span class="line"><span class="javascript">                layer.msg(<span class="string">&quot;请选择需要移动的数据！&quot;</span>)</span></span><br><span class="line"><span class="javascript">            &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">let</span> tmp = selectedData;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">if</span> (direction == <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">if</span> (index == <span class="number">0</span>) &#123;</span></span><br><span class="line"><span class="javascript">                        <span class="comment">// layer.msg(&quot;首行数据不能上移！&quot;)</span></span></span><br><span class="line"><span class="javascript">                    &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">let</span> targetData = $(allData[index - <span class="number">1</span>]).parents(<span class="string">&quot;tr&quot;</span>)[<span class="number">0</span>];</span></span><br><span class="line"><span class="javascript">                        $(selectedData).insertBefore(targetData);</span></span><br><span class="line"><span class="javascript">                        $(targetData).insertAfter(tmp);</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">if</span> (index == allData.length-<span class="number">1</span>) &#123;</span></span><br><span class="line"><span class="javascript">                        <span class="comment">// layer.msg(&quot;尾行数据不能下移！&quot;)</span></span></span><br><span class="line"><span class="javascript">                    &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">let</span> targetData = $(allData[index + <span class="number">1</span>]).parents(<span class="string">&quot;tr&quot;</span>)[<span class="number">0</span>];</span></span><br><span class="line"><span class="javascript">                        $(selectedData).insertAfter(targetData);</span></span><br><span class="line"><span class="javascript">                        $(targetData).insertBefore(tmp);</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">            &#125;</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript">        <span class="comment">// 设置checkBox只能单选</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">setCheckBoxSingleCheck</span>(<span class="params">tableId</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">let</span> allCheckBox = $(<span class="string">&#x27;#table-&#x27;</span>+tableId+<span class="string">&#x27; .bs-checkbox input&#x27;</span>);</span></span><br><span class="line"><span class="javascript">            allCheckBox.on(<span class="string">&#x27;change&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">if</span> (<span class="built_in">this</span>.checked == <span class="literal">true</span>) &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">for</span>(<span class="keyword">let</span> x <span class="keyword">in</span> allCheckBox) &#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">if</span> (allCheckBox[x] != <span class="built_in">this</span> &amp;&amp; allCheckBox[x].checked) &#123;</span></span><br><span class="line"><span class="javascript">                            allCheckBox[x].click();</span></span><br><span class="line"><span class="javascript">                        &#125;</span></span><br><span class="line"><span class="javascript">                    &#125;</span></span><br><span class="line"><span class="javascript">                &#125;</span></span><br><span class="line"><span class="javascript">            &#125;)</span></span><br><span class="line"><span class="javascript">        &#125;</span></span><br><span class="line"><span class="javascript">        <span class="comment">//--------------------------------------------------------------------------</span></span></span><br><span class="line"><span class="javascript">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Bootstrap-Table/" rel="tag"># Bootstrap-Table</a>
+              <a href="/tags/Html/" rel="tag"># Html</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022-06-01/46421/" rel="prev" title="利用Bootstrap实现折叠面板">
+      <i class="fa fa-chevron-left"></i> 利用Bootstrap实现折叠面板
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022-06-27/21538/" rel="next" title="有关中医和西医的思考">
+      有关中医和西医的思考 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

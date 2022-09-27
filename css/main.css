@@ -271,7 +271,7 @@ kbd {
   border: 1px solid #ccc;
   border-radius: 0.2em;
   box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1);
-  color: #c72541;
+  color: #555;
   font-family: inherit;
   padding: 0.1em 0.3em;
   white-space: nowrap;
@@ -439,9 +439,9 @@ code {
   font-family: consolas, Menlo, monospace, 'Noto Serif SC', "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 code {
-  background: #f9f2f4;
+  background: #eee;
   border-radius: 3px;
-  color: #c72541;
+  color: #555;
   padding: 2px 4px;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -1213,7 +1213,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #d2ab16;
+  background: #09e7ff;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2566,10 +2566,10 @@ body {
 }
 .header-inner,
 .sidebar {
-  opacity: 0.8;
+  opacity: 0.9;
 }
 .content-wrap {
-  opacity: 0.9;
+  opacity: 1;
 }
 .content-wrap {
   background: initial;

@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文主要用来记录在阅读《Redis设计与实现》一书时的学习笔记，其中包括一些我总结的知识以及书中我认为比较重要的知识点。PDF 文件链接：《Redis设计与实现》, 建议使用 PDF XChange Editor 打开，可以看到其中我添加的一些注释，也可以自己完善。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Redis设计与实现》学习笔记">
+<meta property="og:url" content="https://jokerbyrant.github.io/2022-09-27/60142/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="本文主要用来记录在阅读《Redis设计与实现》一书时的学习笔记，其中包括一些我总结的知识以及书中我认为比较重要的知识点。PDF 文件链接：《Redis设计与实现》, 建议使用 PDF XChange Editor 打开，可以看到其中我添加的一些注释，也可以自己完善。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425566658111d486022448fb11304ae4608ad3cc48.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642556765811029d144e11020c71c32a7ec186f663f.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425568658133dd6dbcdd7447f42fbe4b75d35f27ad.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255694584d195b87dc0f5460944d2bea46aaab59f.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255703580e62f906b81cc3ab6a86804fd2e12ba58.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255711585738af8943c812319dcb3652b12c165d2.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255728582bdecbfb27a28071701f3a8ddf87865e5.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255738581f508768c2a9c9d96e1b8b11e70ed6bab.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642557535854caccde40fb77937322579c9a2772605.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255768585fa6cde813c68c99395f8384e00ca7c9e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255777581dbd9086d18d076851adfce7f6316d414.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255787581ed51a5c9f1a225f47e70b7c2a6d7b44b.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559215821664255920833.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559525831664255952430.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559635831cdd432489384733e4ca291b1be6d82e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255971583b4b2c4f3c4bef224aeeaba0030e08a96.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559805851346a7aa92160b478e6a4a05b44b04f7.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425600158617598e09511af7e20ec1dac809ef6f6c.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256013581d032b11e2f036435cf687c345234fd79.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256029581d9d02e97ad2bb3ad905d46eac4b9fd15.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425603858036d4697db2952dc41098274fb33b7e21.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642560465821daded4605a0a2ea6e48a88a509d4766.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256054581327f1167c965be5e08d3d4b8cfb9174e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642560665811e2a45b19f1bd28b67d723815e5ef124.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256077582b8a30a6f6f19a9ffef0bcc2904bcb50e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256090582467533938f386d5e4c949deb7f027c15.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256136582cf6bdba1b1c245b40e9f2916f791893f.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256144586ad8dfe8f40978e4b2b782ac29e8c8eab.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642561515820abe5c970179f15878e8254c10a0be5e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642561585848a7eabad6c2efdaa286f9aa9381d601a.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425617258237b9de4d0c1e76a39e525c151d4f06a6.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642570365810197a5c91f8dd37aaa3fc3d0e57db345.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256194583594dd610a65bda7d7a494dc70adf90e1.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256205605c5d2922f099194075ebaa4e6008520e4.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256212580675f6af575971a9bfb529ad9f868d7e4.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642562295865bf6cb4637da038e71212b20fd69826d.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256261581ae128d1fdcef6a0dca2af5a2d38847b2.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256267582387a6305143db2e7cf1f854d81a9289b.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256273584e12db8e061be54eb33b5e982d0f90d51.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642562805852111ae1ae417d560c92033e272470c6d.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256292581853be65284cbe78598c423eaaf960c3a.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425630058484b15e24aa58c9043b132dc0b20c85cc.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563105824d6f1027bf67d3b03fe789a1ae7eafdd.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256329587c15f4df6c5af8d4339a81121c5adfe99.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256340581c600f1d86a64e76b867754a206bcfb99.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563475823a6720e456367a94764c0fe96fc6168e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425635758288c271497a7af8ab0e3affb2ac2bbbf7.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563645847dc793e4aa3204f2c5863a8720dd74dc.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563795837d424efd8c79177efcf8171fcfd145b6.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425639258226ff860bcd2e4ecfdfe3c82a18cb41f8.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425640958186b630feb12fcd17190883dc16389f10.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642564185833b4fa148cc2754088d70c226392a2aa8.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642564975863b26b4557623dd53dff8efd163025b65.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256518581c30711a36b5cf81d132546c79bdf0627.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425654158157cd378b50274ca698e0330ec12c7703.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425654858594ee1bec25e53453a8e93a3212e654d7.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256556580cb4b86f0dbcb4043dc247b3ece0f9c1b.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256565584b633d873bc8e9626825116368533f71f.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642565745801941e32be9d7e1a04540bffe519074b6.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256580581ba613646ff5972a61f8fe6c51208fcb1.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425658858113c38a905eba47e2328c1eac45de46e4.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256602584eb082f630d254e1d3004464265c4fe2e.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425660958160a0ebf960bea1d73bf4a08fef8daa50.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256660581751ed360b5beade48655488033c66484.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642566705830ddfdbb0c40886bbb1e4dd008faa506d.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256680583596ad0ff8bc370c36a40c8fd0c57e891.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256691583117207f2fe11f6b5bb289586b3716241.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642567055824b3429be85b5f125b5e940ff6e5ad76d.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642567125842851de778e99530297669d0390bd47a5.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425672058275d815ab40412532e93615b446c8af89.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256729585f77c3855c15984260902bfff0035ad75.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256738583cdeb1fe6be23cbadf8865f7926d6e111.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425674658156180f9b1f49a1027e8932ebad526706.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425675358210408c2c8bf66fbd898277228c312ac9.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425676758626aba5c4ea4e423cc83ada2986826377.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642567775801be7b80f14508b23421f4429775a6a5a.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642568275830e04795529c70d7fdea39eb978bdca0a.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256837581930c4353669ff5de82a4707ef0273f7c.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256852581a9a8b5123be39e230e45c69537ea7580.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256861585add3b06c2f9aa7a1fcbd4d3a59e452fb.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642568725806f803b4cd1dba0d6497098c4b442e532.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425688258623a8ac539e61284571d7ede71854519a.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642568935861a9bce14118ed83a17f5726b321fed74.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642569305821664256929765.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642569515861664256951461.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425697558365ad06f3c9bd011982cc6d425833f8ef.png">
+<meta property="article:published_time" content="2022-09-27T02:26:41.000Z">
+<meta property="article:modified_time" content="2022-09-27T06:10:15.658Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="后端技术">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425566658111d486022448fb11304ae4608ad3cc48.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2022-09-27/60142/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Redis设计与实现》学习笔记 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-09-27/60142/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Redis设计与实现》学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-27 10:26:41" itemprop="dateCreated datePublished" datetime="2022-09-27T10:26:41+08:00">2022-09-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文主要用来记录在阅读《Redis设计与实现》一书时的学习笔记，其中包括一些我总结的知识以及书中我认为比较重要的知识点。<code>PDF</code> 文件链接：<a target="_blank" rel="noopener" href="https://github.com/JokerByrant/iBook/blob/main/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0.pdf">《Redis设计与实现》</a>, 建议使用 <code>PDF XChange Editor</code> 打开，可以看到其中我添加的一些注释，也可以自己完善。</p>
+<span id="more"></span>
+
+<h2 id="数据结构和对象"><a href="#数据结构和对象" class="headerlink" title="数据结构和对象"></a>数据结构和对象</h2><p>第一部分主要介绍 <code>Redis</code> 中的数据结构和对象，包含7个章节，分别对应7种数据类型：</p>
+<ol>
+<li>字符串</li>
+<li>链表</li>
+<li>字典</li>
+<li>跳跃表</li>
+<li>整数集合</li>
+<li>压缩列表</li>
+<li>对象<ul>
+<li>字符串对象 <code>String</code></li>
+<li>列表对象 <code>List</code></li>
+<li>集合对象 <code>Set</code></li>
+<li>哈希对象 <code>Hash</code></li>
+<li>有序集合对象 <code>Sorter Set</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p><code>Redis</code> 的数据库中，包含字符串值的键值对在底层都是用 <code>SDS</code> 实现的。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425566658111d486022448fb11304ae4608ad3cc48.png"></p>
+<p><code>SDS</code> 在 <code>Redis</code> 中的应用：</p>
+<ol>
+<li><code>Redis</code> 数据库中的字符串值的存储</li>
+<li>缓冲区的实现(AOF缓冲区、客户端状态的输入缓冲区)</li>
+</ol>
+<p><code>SDS</code> 相比于 <code>C</code> 字符串优势：</p>
+<ul>
+<li>效率：修改字符串的效率(SDS中的len保证了这个操作时间复杂度为O(1)、free实现的惰性删除避免了空间的重复分配)<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642556765811029d144e11020c71c32a7ec186f663f.png"></li>
+<li>安全性：缓冲区溢出的问题(SDS实现了自己的空间分配策略解决这个问题)</li>
+<li>功能：主要是二进制安全方面(C字符以”\0”作为判断字符结束的标志位，而SDS通过len来进行这个判断，因此可以存储更多类型的字符，比如图片)<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425568658133dd6dbcdd7447f42fbe4b75d35f27ad.png"></li>
+</ul>
+<p><code>SDS</code> 的 <code>API</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255694584d195b87dc0f5460944d2bea46aaab59f.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255703580e62f906b81cc3ab6a86804fd2e12ba58.png"></p>
+<p><code>Redis</code> 字符串相关知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255711585738af8943c812319dcb3652b12c165d2.png"></p>
+<h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255728582bdecbfb27a28071701f3a8ddf87865e5.png"></p>
+<p>链表在 <code>Redis</code> 中的应用：</p>
+<ol>
+<li>列表(List)的键底层实现之一：当一个列表键包含了数量比较多的元素，又或者列表中包含的元素都是比较长的字符串时，Rrdis就会使用链表作为列表键的底层实现。</li>
+<li>发布与订阅</li>
+<li>慢查询</li>
+<li>监视器</li>
+</ol>
+<p>链表相关的 <code>API</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255738581f508768c2a9c9d96e1b8b11e70ed6bab.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642557535854caccde40fb77937322579c9a2772605.png"></p>
+<p>总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255768585fa6cde813c68c99395f8384e00ca7c9e.png"></p>
+<h3 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h3><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255777581dbd9086d18d076851adfce7f6316d414.png"></p>
+<p>字典在 <code>Redis</code> 中的应用：</p>
+<ol>
+<li><code>Redis</code> 数据库底层实现</li>
+<li><code>Hash</code> 键的底层实现：当一个哈希键包含的键值对比较多，又或者键值对中的元素都是比较长的字符串时，Redis就会使用字典作为哈希键的底层实现。</li>
+</ol>
+<p><code>Redis</code> 的字典使用哈希表作为底层实现。散列表（Hash table，也叫哈希表），是根据关键码值(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做散列函数，存放记录的数组叫做散列表。</p>
+<p>Hash表节点中的next属性是为了解决Hash值冲突问题的，新添加的键如果Hash重复，那么将添加到链表首位。</p>
+<p>有关 <code>Reids</code> 对哈希表的实现有三个概念需要了解一下：</p>
+<ol>
+<li><strong><code>rehash</code> 操作。</strong> <code>rehash</code> 操作主要是用来解决键冲突的，当哈希表保存的键值对达到某个数量级时，会进行一次 <code>Hash</code> 表的扩容。这时 <code>ht(1)</code> 就排上用场了，给 <code>ht(1)</code> 按照规则分配了新空间后，重新计算 <code>ht(0)</code> 中数据的 <code>Hash</code> 值，之后将 <code>ht(0)</code> 中的数据移到 <code>ht(1)</code> 中。然后将 <code>ht(1)</code> 置为 <code>ht(0)</code>，再创建一个新的空 <code>ht(1)</code>，<code>rehash</code> 完成。</li>
+<li><code>Redis</code> 对哈希表的扩容和收缩的时机。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255787581ed51a5c9f1a225f47e70b7c2a6d7b44b.png"></li>
+<li>**渐进式 <code>rehash</code>**。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559215821664255920833.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559525831664255952430.png"></li>
+</ol>
+<p>字典相关的 <code>API</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559635831cdd432489384733e4ca291b1be6d82e.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664255971583b4b2c4f3c4bef224aeeaba0030e08a96.png"></p>
+<p>重点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642559805851346a7aa92160b478e6a4a05b44b04f7.png"></p>
+<h3 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h3><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425600158617598e09511af7e20ec1dac809ef6f6c.png"></p>
+<p>跳跃表在 <code>Redis</code> 中的应用：</p>
+<ol>
+<li>有序集合的键(Sorted List)</li>
+<li>集群节点的内部数据结构</li>
+</ol>
+<p><code>Redis</code> 中的跳跃表由 <code>zskiplist</code> 和 <code>zskiplistNode</code> 构成，<code>zskiplistNode</code> 是跳跃表的真正构成元素，单单使用 <code>zskiplistNode</code> 也能构建一个跳跃表，引入 <code>zskiplist</code> 则是为了更方便的管理跳跃表. </p>
+<ul>
+<li>跳跃表的遍历流程：与链表的遍历过程类似，只用到了前进指针 <code>*forward</code> 属性，跨度属性 <code>span</code> 没有被用到。</li>
+<li>跨度属性 <code>span</code> 在查找元素时会被使用到，它使得查找元素的操作时间复杂降到 O(n) 以下。</li>
+<li>跳跃表中元素的顺序由分值属性 <code>score</code> 来决定，根据 <code>score</code> 从小到大进行排序。<code>score</code> 可以相同，但是其中的成员对象属性 <code>obj</code> 必须唯一(Set的定义)。</li>
+</ul>
+<p>跳跃表 <code>API</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256013581d032b11e2f036435cf687c345234fd79.png"></p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256029581d9d02e97ad2bb3ad905d46eac4b9fd15.png"></p>
+<h3 id="整数集合"><a href="#整数集合" class="headerlink" title="整数集合"></a>整数集合</h3><p><code>Redis</code> 中整数集合的应用：</p>
+<ol>
+<li>集合(List)，在元素数量不多并且元素全部是整数时使用这种结构。</li>
+</ol>
+<p>整数集合的升级过程：</p>
+<ul>
+<li>升级机制的产生与C语言的语言特性有关，因为C语言是静态类型语言，为了避免类型错误，通常不会将两种不同类型的值放在同一个数据结构里面。</li>
+<li>所以如果一开始定义的数据类型为 <code>int16_t</code>，之后添加的元素大小超过了这个的限制，那么就需要进行升级操作。</li>
+<li>而为什么不一开始就定义为 <code>int64_t</code> 呢，这是为了节约内存而考虑的。</li>
+<li>整数集合不支持降级操作</li>
+</ul>
+<p>整数集合<code>API</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425603858036d4697db2952dc41098274fb33b7e21.png"></p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642560465821daded4605a0a2ea6e48a88a509d4766.png"></p>
+<h3 id="压缩列表"><a href="#压缩列表" class="headerlink" title="压缩列表"></a>压缩列表</h3><p><code>Redis</code> 中压缩列表的应用：</p>
+<ol>
+<li>列表(List) 键的实现。当一个列表键只包含少量列表项，并且每个列表项要么就是小整数值，要么就是长度比较短的字符串，那么 <code>Redis</code> 就会使用压缩列表来做列表键的底层实现。</li>
+<li>哈希(Hash) 键的实现。当一个哈希键只包含少量键值对，并且每个键值对的键和值要么是小整数值，要么就是长度比较短的字符串时，那么Redis就会使用压缩列表来做哈希键的底层实现。</li>
+</ol>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256054581327f1167c965be5e08d3d4b8cfb9174e.png"></p>
+<p>一个压缩列表可以包含多个节点，存储在属性 <code>entryX</code> 中；节点数量保存在属性 <code>zllen</code> 中，<code>zllen</code> 的类型是 <code>uint16_t</code>，可存储的最大数值是65535，也就是说当节点数量超过这个数值时，这个值会固定为65535，而节点真实数量需要遍历整个压缩列表才能拿到。</p>
+<p>压缩列表从后往前的遍历过程：压缩列表中每个节点都有一个 <code>previous_entry_length</code> 属性，这个属性记录了前一个节点的长度，通过当前节点起始地址的指针c，减去 <code>previous_entry_length</code> 属性的值，就可以得到指向前一个节点起始地址的指针p。</p>
+<p>压缩列表 <code>API</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642560665811e2a45b19f1bd28b67d723815e5ef124.png"></p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256077582b8a30a6f6f19a9ffef0bcc2904bcb50e.png"></p>
+<h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256090582467533938f386d5e4c949deb7f027c15.png"></p>
+<p><code>Redis</code> 对对象的设计有些类似 Java 中封装。<code>Redis</code> 中的5种对象是暴露给用户的外层Api，而对象底层的实现则根据情况使用不同的数据结构，可以优化对象在不同场景下的使用效率。</p>
+<p><code>Redis</code> 中对象 <code>redisObject</code> 的数据结构，包含三个属性：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256136582cf6bdba1b1c245b40e9f2916f791893f.png"></p>
+<ol>
+<li><code>type</code>：类型<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256144586ad8dfe8f40978e4b2b782ac29e8c8eab.png"></li>
+<li><code>encoding</code>：编码(决定了对象使用什么数据结构作为对象的底层实现)<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642561515820abe5c970179f15878e8254c10a0be5e.png"><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642561585848a7eabad6c2efdaa286f9aa9381d601a.png"></li>
+<li><code>*ptr</code>：指向底层实现数据结构的指针</li>
+</ol>
+<p><code>Redis</code> 根据不同的使用场景来为对象设置不同的编码(底层数据结构)，实现效率最优化。</p>
+<p>引出一个问题：<strong>对象在不同场景下使用的数据结构转变时机是如何确定的？</strong></p>
+<h4 id="字符串对象"><a href="#字符串对象" class="headerlink" title="字符串对象"></a>字符串对象</h4><p>字符串对象包含三种编码格式：</p>
+<ol>
+<li>长度大于32时：<code>raw</code></li>
+<li>长度小于32时： <code>embstr</code></li>
+<li>保存的是可以使用 <code>long</code> 表示的整数值时：<code>int</code></li>
+</ol>
+<p><code>raw</code> 和 <code>embstr</code> 都使用 <code>redisObject</code> 和 <code>sdshdr</code> 两个结构表示字符串对象，<code>embstr</code> 的优势是将这两个结构放在一块内存空间中，如左图所示；而 <code>raw</code> 则是为这两个结构分别创建内存空间。</p>
+<p>字符串对象编码的转换场景：</p>
+<ol>
+<li><code>int</code> 型编码的字符串数组中添加了字符串值，字符串对象将变为 <code>raw</code>；</li>
+<li><code>embstr</code> 类型的对象发生修改时，将自动转变为 <code>raw</code> 类型，原因是 <code>embstr</code> 类型没有修改的方法。#### 列表对象</li>
+</ol>
+<p>字符串相关的 <code>Redis</code> 命令：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425617258237b9de4d0c1e76a39e525c151d4f06a6.png"></p>
+<h4 id="列表对象"><a href="#列表对象" class="headerlink" title="列表对象"></a>列表对象</h4><p>列表对象包含两种编码格式：</p>
+<ol>
+<li><code>ziplist</code> (底层是压缩列表)。每一个压缩列表的节点保存一个列表元素。</li>
+<li><code>linkedlist</code> (底层是双端链表)。每一个双端链表的节点保存一个字符串对象，字符串对象中保存着列表元素。</li>
+</ol>
+<p>列表对象编码的转换时机：</p>
+<ol>
+<li>列表对象满足下面两个条件时，会使用 <code>ziplist</code> 进行编码：列表对象中所有的字符串元素长度都小于64字节；列表对象中的元素数量小于512个。</li>
+<li>如果不能满足上面的两个条件，那么列表对象需要使用 <code>linkedlist</code> 编码。</li>
+</ol>
+<p>列表对象相关的 <code>Redis</code> 命令：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642570365810197a5c91f8dd37aaa3fc3d0e57db345.png"></p>
+<h4 id="哈希对象"><a href="#哈希对象" class="headerlink" title="哈希对象"></a>哈希对象</h4><p>哈希对象包含的编码格式：</p>
+<ol>
+<li><code>ziplist</code>(压缩列表)。当有新的键值对要加入到哈希对象时，程序先将键对应的压缩列表节点推入到列表队尾，再将值对应的列表节点推入到列表队尾，所以键值对总是相邻的。</li>
+<li><code>hashtable</code>(字典)。字典保存键值对时，键和值都分别用一个字符串对象表示。</li>
+</ol>
+<p>哈希对象编码转换时机(与列表对象类似)：</p>
+<ol>
+<li>哈希对象满足下面两个条件时，会使用 <code>ziplist</code> 进行编码：哈希对象中所有的键值对的键和值对应的字符串长度都小于64字节；哈希对象保存的键值对数量小于512个。</li>
+<li>如果不能满足上面的两个条件，那么哈希对象需要使用 <code>hashtable</code> 编码。</li>
+</ol>
+<p>哈希对象相关的 <code>Redis</code> 命令：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256194583594dd610a65bda7d7a494dc70adf90e1.png"></p>
+<h4 id="集合对象"><a href="#集合对象" class="headerlink" title="集合对象"></a>集合对象</h4><p>集合对象包含的编码格式：</p>
+<ol>
+<li><code>intset</code>(整数集合)。</li>
+<li><code>hashtable</code>(字典)。字典的每个键都是一个字符串对象，每个字符串对象代表一个集合元素，而字典的值都被设置为 <code>null</code>。</li>
+</ol>
+<p>集合对象的转换时机：</p>
+<ol>
+<li>当集合对象可以同时满足以下两个条件时，对象使用 <code>intset</code> 编码：集合对象保存的所有元素都是整数值；集合对象保存的元素数量不过512个。</li>
+<li>不能满足这两个条件的集合对象需要使用 <code>hashtable</code> 编码。</li>
+</ol>
+<p>集合对象相关的 <code>Redis</code> 命令：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256205605c5d2922f099194075ebaa4e6008520e4.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256212580675f6af575971a9bfb529ad9f868d7e4.png"></p>
+<h4 id="有序集合对象"><a href="#有序集合对象" class="headerlink" title="有序集合对象"></a>有序集合对象</h4><p>有序集合对象包含的编码格式：</p>
+<ol>
+<li><code>ziplist</code>(压缩列表)。每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素成员(<code>member</code>)，第二个节点保存分值(<code>score</code>)。</li>
+<li><code>skiplist</code>(跳跃表)。这个编码的有序集合对象使用 <code>zset</code> 结构作为底层实现，<code>zset</code> 结构包含一个 <code>skiplist</code>属性(跳跃表) 和 <code>hashtable</code>属性(字典)。<ul>
+<li>其中跳跃表按照 <code>score</code>(分值) 大小保存集合元素，节点中的 <code>object</code> 属性保存了元素成员，<code>score</code> 属性保存了元素分值。跳跃表保证了有序集合使用 <code>ZRANK</code>、<code>ZRANGE</code> 等范围型命令的时间复杂度为 O(1)。</li>
+<li>而字典则为有序集合的每个元素创建了 <code>member</code>(成员) -&gt; <code>score</code>(分值) 的映射。字典保存了有序集合查找成员分值 <code>ZSCORE</code> 的操作时间复杂度为 O(1)。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>注：虽然有序集合同时使用两个结构来保存集合元素，但是它们通过指针共享了相同元素的成员和分值，也就是说它们指向的都是同一内存空间的元素，所以不会造成内存浪费。</p>
+</blockquote>
+<p>有序集合编码的转换时机：</p>
+<ol>
+<li>当有序集合对象可以同时满足以下两个条件时，对象使用 <code>ziplist</code> 编码：有序集合保存的元素数量小于128个；有序集合保存的所有元素成员的长度都小于64字节。</li>
+<li>不能满足以上两个条件的有序集合对象将使用 <code>skiplist</code> 编码。</li>
+</ol>
+<p>有序集合对象相关的 <code>Redis</code> 命令：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642562295865bf6cb4637da038e71212b20fd69826d.png"></p>
+<h4 id="内存回收"><a href="#内存回收" class="headerlink" title="内存回收"></a>内存回收</h4><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256261581ae128d1fdcef6a0dca2af5a2d38847b2.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256267582387a6305143db2e7cf1f854d81a9289b.png"></p>
+<h4 id="对象共享"><a href="#对象共享" class="headerlink" title="对象共享"></a>对象共享</h4><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256273584e12db8e061be54eb33b5e982d0f90d51.png"></p>
+<p>对象相关知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642562805852111ae1ae417d560c92033e272470c6d.png"></p>
+<h2 id="单机数据库"><a href="#单机数据库" class="headerlink" title="单机数据库"></a>单机数据库</h2><p><code>Redis</code> 数据库使用 <code>redisDb</code> 结构表示，每个 <code>redisDb</code> 中通过 <code>dict</code>(字典)属性保存数据库中的所有键值对，键是字符串对象，值是String、List、Hash、Set、SortedSet中的一种。</p>
+<p><code>redis</code> 通过一个 <code>dict</code>(字典) 结构的 <code>expires</code> 属性来保存数据库中所有键的过期时间，这个 <code>expires</code> 称为过期字典。它的键是一个指针，指向键空间中的某个键对象(某个数据库键)；值是一个 <code>long</code> 类型的整数，这个整数保存了对应键的过期时间 — 毫秒精度的 <code>UNIX</code> 时间戳。</p>
+<p><code>redis</code> 判断一个键是否过期的方法:</p>
+<ol>
+<li>检查给定键是否存在于过期字典：如果存在，那么取得键的过期时间。</li>
+<li>检查当前UNIX时间戳是否大于键的过期时间：如果是的话，那么键已经期；否则的话，键未过期。</li>
+</ol>
+<p>删除过期键的3种策略：</p>
+<ol>
+<li>定时删除，创建一个定时器任务，键过期后立刻执行删除。优点：能够保证过期键被尽快的删除，不占用内存资源；缺点：占用 <code>CPU</code> 资源。</li>
+<li>惰性删除，键过期时不立刻处理，之后获取键时判断是否过期，如果过期就执行删除。优点：不占用 <code>CPU</code> 资源。缺点：占用内存资源，如果处理不当可能会导致某些过期键一直存在，引发内存泄漏。</li>
+<li>定期删除，每隔一段时间检查数据库中过期键，执行删除。优点：中和了上面两种方法的优缺点。缺点：定情删除的频率策略必须合理设置，如果间隔过长会对内存资源不友好，间隔过低又会对 <code>CPU</code> 资源不友好。</li>
+</ol>
+<p><code>Redis</code> 使用惰性删除和定期删除结合的方式处理过期键：</p>
+<ul>
+<li>惰性删除。每次调用 <code>redis</code> 的读写命令前都会检查对应键是否过期，如果过期就移除对应键，如果未过期就不做处理(如果是读操作就返回 <code>null</code>)。</li>
+<li>定期删除。<code>reids</code> 中有一个周期性操作：<code>serverCron</code>，当它被调用时，在规定的时间内，会分多次遍历服务器中的各个数据库，从数据库的 <code>expires</code> 字典中随机检查一部分键的过期时间，并删除其中的过期键。</li>
+</ul>
+<p><code>RDB</code> 文件：<code>redis rdb</code> 文件是 <code>redis</code> 在内存中所存储全部数据的二进制表示，结构非常紧凑。</p>
+<p><code>AOF</code> 持久化功能：<code>AOF</code>持久化是通过保存 <code>Redis</code> 所执行的写命令来记录数据库状态的。</p>
+<p>惰性删除和定期删除对 <code>AOF</code> 持久化的影响：当键过期时，但是没有被移除，它不会被 <code>AOF</code> 文件记录；只有当触发惰性删除和定期删除，导致这个键被真正从内存移除了，才会将对应的操作写入 <code>AOF</code> 文件。</p>
+<p>主从复制下 <code>Redis</code> 的过期键删除流程如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256292581853be65284cbe78598c423eaaf960c3a.png"></p>
+<p><code>Redis</code> 中服务器通知的实现原理。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425630058484b15e24aa58c9043b132dc0b20c85cc.png"></p>
+<p><code>Redis</code> 数据库相关知识总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563105824d6f1027bf67d3b03fe789a1ae7eafdd.png"></p>
+<h2 id="RDB-持久化"><a href="#RDB-持久化" class="headerlink" title="RDB 持久化"></a><code>RDB</code> 持久化</h2><p><code>RDB</code> 持久化功能就是将 <code>Redis</code> 在内存中的所有数据保存到磁盘中去，对应的文件是 <code>rdb</code> 文件。</p>
+<p><code>redis rdb</code> 文件是 <code>redis</code> 在内存中所存储全部数据的二进制表示，通过该文件可以还原生成 RDB 文件时的数据库状态。</p>
+<p>如果 <code>Redis</code> 开启了 <code>AOF</code> 持久化功能，那么服务器会优先使用 <code>AOF</code> 文件还原数据库状态。</p>
+<p><code>AOF</code> 持久化功能：<code>AOF</code>持久化是通过保存 <code>Redis</code> 所执行的写命令来记录数据库状态的。</p>
+<p><code>SAVE</code> 和 <code>BGSAVE</code> 命令：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256329587c15f4df6c5af8d4339a81121c5adfe99.png"></p>
+<p>执行 <code>RDB</code> 持久化的时机：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256340581c600f1d86a64e76b867754a206bcfb99.png"></p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563475823a6720e456367a94764c0fe96fc6168e.png"></p>
+<h2 id="AOF-持久化"><a href="#AOF-持久化" class="headerlink" title="AOF 持久化"></a><code>AOF</code> 持久化</h2><ul>
+<li>RDB持久化保存的是键值对数据；</li>
+<li>AOF持久化保存的是操作键值对的命令。</li>
+</ul>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425635758288c271497a7af8ab0e3affb2ac2bbbf7.png"></p>
+<p>AOF文件的写入和同步策略由参数 <code>appendfsync</code> 来决定(见下表)</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563645847dc793e4aa3204f2c5863a8720dd74dc.png"></p>
+<p><code>Redis</code> 通过 <code>flushAppendOnlyFile()</code> 方法来将 <code>aof_buf</code> 缓冲区的数据写入到 <code>AOF</code> 文件中，在这个方法中根据 <code>appendfsync</code> 选项来决定 <code>AOF</code> 的持久化行为。 </p>
+<p><code>Redis</code> 可以通过读取并执行AOF文件中的写命令，来完成对Redis数据库的还原。</p>
+<p>通过 <code>AOF</code> 文件重写机制来解决 <code>AOF</code> 文件过大的问题：创建一个新的 <code>AOF</code> 文件，然后将 <code>Redis</code> 中已有的键值对转化为精简过的写入命令存储到新 <code>AOF</code> 文件中。所以相对于旧 <code>AOF</code> 文件来说，新文件不包含任何浪费空间的冗余命令，因此新文件的体积会小很多。</p>
+<p><code>AOF</code> 重写操作在后台运行(子进程)，这个过程进行时 <code>Redis</code> 接收到的所有写命令都会写入到新开辟的 <strong>AOF重写缓冲区</strong> 中，待 <code>AOF</code> 重写子进程执行结束，AOF 缓冲区中的所有命令都会被写入到新AOF文件中，然后新AOF文件改名，替换旧AOF文件。</p>
+<p><code>AOF</code> 持久化相关知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642563795837d424efd8c79177efcf8171fcfd145b6.png"></p>
+<h2 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h2><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425639258226ff860bcd2e4ecfdfe3c82a18cb41f8.png"></p>
+<h3 id="文件事件"><a href="#文件事件" class="headerlink" title="文件事件"></a>文件事件</h3><p><code>Redis</code> 的文件事件就是通过监听 <code>Socket</code>，并根据 <code>Socket</code> 目前执行的任务来为其关联不同的事件处理器。</p>
+<p>同一时间可以有多个 <code>Socket</code> 连接，<code>Redis</code> 通过 <code>I/O</code> 多路复用程序监听这些连接，将它们放到一个队列中，然后通过：有序、同步、每次一个的方式向文件事件分派器传送 <code>Socket</code>。文件事件分派器接收到套接字后，根据套接字对应的事件类型调用相应的时间处理器。 </p>
+<p><code>Redis</code>  的 <code>I/O</code> 多路复用程序有多个 <code>I/O</code> 多路复用库可选，程序在编译时会选择系统中性能最高的 <code>I/O</code> 多路复用函数库作为底层实现。</p>
+<p><code>Redis</code> 中的文件事件处理其汇总：</p>
+<ul>
+<li>连接应答处理器(对连接服务器的各个客户端进行应答)</li>
+<li>命令请求处理器(接收客户端传来的命令请求)</li>
+<li>命令回复处理器(向客户端返回命令的执行结果)</li>
+<li>复制处理器(主服务器和从服务器进行复制操作时)</li>
+</ul>
+<p><code>Redis</code> 的几个文件事件处理器工作流程如下：</p>
+<ul>
+<li>启动一个 <code>Redis</code> 服务，程序会将连接应答处理器和服务器监听套接字的 <code>AE_READABLE</code> 事件关联起来。</li>
+<li>当一个 <code>Redis</code> 客户端向服务器发起连接时，套接字会产生 <code>AE_READABLE</code> 事件，触发连接应答处理器的执行。服务器会对客户端的连接请求做出应答，并创建一个客户端套接字，然后将客户端套接字的 <code>AE_READABLE</code> 事件与命令请求处理器关联。</li>
+<li>之后客户端向服务器发送一个命令请求，客户端套接字产生 <code>AE_READABLE</code> 事件，触发命令请求处理器执行。</li>
+<li>如果执行命令时服务端给客户端做出了命令回复，那么服务器会将客户端套接字的 <code>AE_WRITABLE</code> 事件和命令回复处理器关联，当客户端尝试读取命令回复时，客户端套接字产生 <code>AE_WRITABLE</code> 事件，触发命令回复处理器执行。当命令回复处理器将命令回复全部写入套接字后，服务器会解除客户端套接字的 <code>AE_WRITABLE</code> 事件与命令回复处理器之间的关联。</li>
+</ul>
+<h3 id="时间事件"><a href="#时间事件" class="headerlink" title="时间事件"></a>时间事件</h3><p>时间事件的保存方式：使用无序链表，无序是指不按事件的执行时间来排序。当时间事件执行器运行时，需要遍历链表中所有的时间事件，查找所有已到达的时间事件，然后调用相应的事件处理器完成处理。</p>
+<p>时间事件应用实例：<code>ServerCron</code> 函数，每隔一段时间执行一次。</p>
+<p>上文提到的 <code>Redis</code> 中过期键值对的清理策略：定期删除 &amp; 惰性删除，其中定期删除就通过这个函数触发。</p>
+<p>此外 <code>RDB</code>持久化 和 <code>AOF</code>持久化 的操作也是通过这个触发：</p>
+<ul>
+<li><code>RDB</code> 持久化是由用户配置的策略，比如 <code>900s</code> 内进行了 <code>1次</code> 修改，或者 <code>300s</code> 内进行了 <code>10次</code> 修改就会触发 <code>RDB</code> 持久化操作，这个检查就是通过 <code>ServerCron</code> 进行的。</li>
+<li><code>AOF</code> 持久化则是每次执行修改操作后，命令会被写入 <code>aof_buf</code> 中，<code>ServerCron</code> 则会定期检查 <code>aof_buf</code>，考虑是否将 <code>aof_buf</code> 中的数据写入到 <code>AOF</code> 文件中去，具体是否执行要看 <code>AOF</code> 持久化的策略。</li>
+</ul>
+<p><code>Redis</code> 事件知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425640958186b630feb12fcd17190883dc16389f10.png"></p>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>问题：<code>Redis</code> 是如何使用单线程来处理多命令请求的？<br>答：使用 <code>I/O</code> 多路复用技术。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642564185833b4fa148cc2754088d70c226392a2aa8.png"></p>
+<p>当一个客户端发出一个命令请求时，这个命令会被服务器保存到对应的客户端状态的输入缓冲区(<code>querybuf</code>)中。之后服务器会对命令请求进行内容分析，然后将得到的 <strong>命令参数</strong> 保存到客户端状态的 <code>argv</code> 属性中，将 <strong>命令参数的个数</strong> 保存到客户端状态的 <code>argc</code> 属性中。<br>其中 <code>argv</code> 中是客户端要执行的命令(是一个数组)，<code>argv[0]</code> 表示要执行的操作(<code>set</code>、<code>delete</code>、<code>get</code>等)，<code>argv[1]</code> 记录了 <code>key</code> 值，<code>argv[2]</code> 记录了 <code>value</code> 值。服务器会根据 <code>argv[0]</code> 的值找到对应的 <code>redisCommand</code>，之后就会调用命令实现函数，完成一个命令的执行。</p>
+<p>客户端执行命令拿到的命令回复会被放到输出缓冲区中，有两种结构：</p>
+<ul>
+<li>固定大小缓冲区：使用一个 <code>buf</code> 数组保存数据，最大值为 16 * 1024.</li>
+<li>可变大小缓冲区：当回复超出上面的大小时，会使用可变大小缓冲区。这个结构使用链表连接多个字符串对象，可以保存一个非常长的命令回复。</li>
+</ul>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642564975863b26b4557623dd53dff8efd163025b65.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256518581c30711a36b5cf81d132546c79bdf0627.png"></p>
+<h2 id="服务器"><a href="#服务器" class="headerlink" title="服务器"></a>服务器</h2><h3 id="初始化服务器"><a href="#初始化服务器" class="headerlink" title="初始化服务器"></a>初始化服务器</h3><ol>
+<li>初始化服务器状态。创建 <code>struct redisServer</code> 类型的变量 <code>server</code> 作为服务器状态。通过 <code>initServerConfig</code> 函数完成初始化，主要工作有：<ul>
+<li>设置服务器的运行ID。</li>
+<li>设置服务器的默认运行频率。</li>
+<li>设置服务器的默认配置文件路径。</li>
+<li>设置服务器的运行架构。</li>
+<li>设置服务器的默认端口号。</li>
+<li>设置服务器的默认RDB持久化条件和AOF持久化条件。</li>
+<li>初始化服务器的LRU时钟。</li>
+<li><strong>创建命令表。</strong></li>
+</ul>
+</li>
+<li>载入配置选择。这个阶段主要是工作就是 <strong>载入用户给定的配置参数和配置文件</strong>，并根据用户设定的配置，对 <code>server</code> 变量中属性的值进行修改。如果用户没有指定配置，那么将沿用在初始化服务器状态时默认的配置。</li>
+<li>初始化服务器数据结构。<strong>命令表</strong> 在第1步 初始化数据库状态阶段就已经创建完成了，这一步是对下面几种属性进行创建：<ul>
+<li><code>server.clients</code> - 链表。记录了所有的客户端状态。</li>
+<li><code>server.db</code> - 数组。记录了服务器中所有的数据库。</li>
+<li><code>server.pubsub_channels</code> - 字典。保存频道订阅信息。</li>
+<li><code>server.pubsub_patterns</code> - 链表。保存模式订阅信息。</li>
+<li><code>server.lua</code>。执行 <code>Lua</code> 脚本的 <code>Lua</code> 环境。</li>
+<li><code>server.slowlog</code>。保存慢查询日志。</li>
+</ul>
+这一步通过 <code>initServer()</code> 函数完成初始化，当这个函数执行完毕，服务器在输出日志中打印出 <code>Redis</code> 的图标和版本号信息。</li>
+<li>还原数据库状态。通过载入 <code>RDB</code> / <code>AOF</code> 文件完成数据库状态的还原(优先使用 <code>AOF</code> 文件进行还原)。启动 <code>Redis</code> 服务时，可以看到这一步的日志输出：<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425654158157cd378b50274ca698e0330ec12c7703.png"></li>
+<li>执行事件循环。初始化的最后一步，服务器打印下面的内容，之后开始执行服务器的事件循环。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425654858594ee1bec25e53453a8e93a3212e654d7.png"></li>
+</ol>
+<h3 id="命令请求的过程"><a href="#命令请求的过程" class="headerlink" title="命令请求的过程"></a>命令请求的过程</h3><p>总结一下 <code>Redis</code> 执行命令请求的过程：</p>
+<ol>
+<li>用户输入命令请求，客户端将这个命令转换为协议格式发送给服务器</li>
+<li>服务器读取命令，将其保存到客户端状态的输入缓冲区，然后解析协议并将参数和参数个数保存到客户端状态的 <code>argv</code> 和 <code>argc</code> 属性中</li>
+<li>接着服务器调用命令执行器：<ul>
+<li>首先根据客户端状态中的 <code>argv[0]</code> 从命令表查找对应的命令，将找到的命令保存到客户端状态的 <code>cmd</code> 属性中；</li>
+<li>执行命令的必要条件都拿到了(客户端状态中的三个属性：<code>cmd</code>、<code>argv</code>、<code>argc</code>)，接着进行执行命令前的准备工作，进行一下参数的检查；</li>
+<li>然后执行命令，调用 <code>client.cmd.proc(client)</code>，调用完毕会产生对应的命令回复，命令回复保存在客户端状态的输出缓冲区中(<code>buf</code>、<code>reply</code>)；</li>
+<li>最终执行一些后续操作(慢查询日志、AOF持久化、命令同步)。</li>
+</ul>
+</li>
+<li>给客户端发送命令回复。</li>
+<li>客户端收到命令回复，将其转换为可读的格式，并打印给用户。</li>
+</ol>
+<h3 id="ServerCron-函数"><a href="#ServerCron-函数" class="headerlink" title="ServerCron 函数"></a><code>ServerCron</code> 函数</h3><p>每隔 <code>100ms</code> 执行一次。</p>
+<p>总结一下 <code>Redis</code> <code>ServerCron</code> 函数的功能：</p>
+<ol>
+<li>更新服务器时间缓存。每 <code>100ms</code> 对服务器状态中的两个时间属性进行更新： <code>unixtime</code>(秒级精度 <code>UNIX</code> 时间戳)、<code>mstime</code>(毫秒级精度 <code>UNIX</code> 时间戳)</li>
+<li>更新 <code>LRU</code> 时钟，每 <code>10s</code> 更新一次.</li>
+<li>更新服务器每秒执行命令次数。调用 <code>trackOperationsPerSecond()</code> 函数，这个函数采用抽样计算的方式估算并记录服务器最近一秒处理的命令请求数量。</li>
+<li>更新服务器内存峰值记录(<code>stat_peak_memory</code> 属性)。</li>
+<li>处理 <code>SIGTERM</code> 信号。服务器接收到这个信号后悔打开服务器状态的 <code>shutdown_asap</code> 标识，<code>ServerCron</code> 会对 <code>shutdown_asap</code> 属性进行检查，如果值为1则执行关闭服务器的操作(关闭前会执行 <code>RDB</code> 持久化的操作)。</li>
+<li>管理客户端资源。<code>ServerCron</code> 每次执行会调用 <code>clientsCron</code> 函数，对客户端做两个检查：<ul>
+<li>释放客户端资源(客户端与服务器之间长时间未互动)。</li>
+<li>释放并重置输入缓冲区(当输入缓冲区超过一定长度后)。</li>
+</ul>
+</li>
+<li>管理数据库资源。调用 <code>databasesCron</code> 函数，删除过期键，对字典进行收缩.</li>
+<li>执行被延迟的 <code>BGReWriteAOF</code> 命令 。这个命令会被延迟的原因是，服务器在执行 <code>BgSave</code> 命令的期间，如果客户端向服务器发来了 <code>BGReWriteAOF</code> 命令，那么服务器会将 <code>BGReWriteAOF</code> 命令延迟到 <code>BGSave</code> 命令后执行，并且 <code>aof_rewrite_scheduled</code> 会被标识为1。<code>ServerCron</code>运行时，如果 <code>BgSave</code> 和 <code>BgReWriteAOF</code> 命令都没在执行，并且 <code>aof_rewrite_scheduled</code> 属性为1，那么就执行 <code>BgReWriteAof</code> 命令。</li>
+<li>检查持久化操作的运行状态。服务器状态分别使用 <code>rdb_child_pid</code> 和 <code>aof_child_pid</code> 属性记录 <code>BgSave</code> 和 <code>BgReWriteAof</code> 命令的子进程 <code>ID</code>，<code>ServerCron</code> 做的操作就是检查这个属性的值，如果不为 <code>-1</code>，那么执行 <code>wait3()</code>，检查子进程是否有信号返回。如果有，表示 <code>RDB</code> 文件或 <code>AOF</code> 文件已重写完毕，那么就执行后续操作(新的 <code>RDB</code>/<code>AOF</code> 文件替换旧的)；如果没有，不作处理。</li>
+<li>将 <code>AOF</code> 缓冲区中的内容写入 <code>AOF</code> 文件。</li>
+<li>关闭异步客户端。(输出缓冲区超过大小限制的客户端)</li>
+<li>增加 <code>cronloops</code> 计数器的值。这个计数器的作用就是实现 “每执行 <code>ServerCron</code> N 次就执行一次指定代码” 的功能。</li>
+</ol>
+<p>服务器相关知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256556580cb4b86f0dbcb4043dc247b3ece0f9c1b.png"></p>
+<h2 id="Redis-独立功能的实现"><a href="#Redis-独立功能的实现" class="headerlink" title="Redis 独立功能的实现"></a><code>Redis</code> 独立功能的实现</h2><h3 id="发布和订阅功能"><a href="#发布和订阅功能" class="headerlink" title="发布和订阅功能"></a>发布和订阅功能</h3><p>客户端可以订阅 <strong>频道</strong> 和 <strong>频道对应的模式</strong>，当其他客户端向频道发送消息，<strong>频道的订阅者</strong> 和 <strong>频道匹配的模式的订阅者</strong> 都会收到这个消息。</p>
+<p>四个命令：</p>
+<ul>
+<li>订阅频道：<code>Subscribe</code></li>
+<li>退订频道：<code>UnSubscribe</code></li>
+<li>订阅模式：<code>PSubscribe</code></li>
+<li>退订模式：<code>PUnSubscribe</code></li>
+</ul>
+<p>服务器状态中 <code>pubsub_channels</code> 字典用来保存频道的订阅关系：</p>
+<ul>
+<li>键：被订阅的频道</li>
+<li>值：所有订阅这个频道的客户端(是一个链表)</li>
+</ul>
+<p>服务器状态中 <code>pubsub_patterns</code> 链表用来保存模式的订阅关系：</p>
+<ul>
+<li>链表中的每个节点都是一个 <code>pubsubPattern</code> 结构的属性，每个 <code>pubsubPattern</code> 中包含两个属性：<code>pattern</code> - 被订阅的模式，<code>client</code> - 订阅模式的客户端。</li>
+</ul>
+<p>服务端指定频道接收到消息后，会将消息发送给对应频道的订阅者(从 <code>pubsub_channels</code>字典中查找对应频道的客户端)，和频道绑定模式的订阅者(从 <code>pubsub_patterns</code> 链表中找到对应的客户端)。</p>
+<p>查看订阅信息的一些命令：</p>
+<ul>
+<li><code>pubsub channels [pattern]</code>：查看服务器当前被订阅的频道。</li>
+<li><code>pubsub numsub [channel-1 channel-2 ....]</code>：返回对应频道的订阅者数量</li>
+<li><code>pubsub numpat</code>：服务器当前被订阅模式的数量。</li>
+</ul>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256565584b633d873bc8e9626825116368533f71f.png"></p>
+<h3 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h3><p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642565745801941e32be9d7e1a04540bffe519074b6.png"></p>
+<p><code>Redis</code> 事务提供了一种将多个命令请求打包，然后一次性、按顺序地执行多个命令的机制，并且在事务执行期间，服务器不会中断事务而改去执行其他客户端的命令请求，它会将事务中的所有命令都执行完毕，然后才去处理其他客户端的命令请求。</p>
+<p>事务分下面3个阶段：</p>
+<ol>
+<li>事务开始。通过 <code>MULTI</code> 命令开启事务。</li>
+<li>命令入队。服务器拿到命令后，会判断是否将命令放入事务队列，也就是除了提交事务的其他命令都会被放入事务队列。</li>
+<li>事务执行。当服务器收到事务提交的命令时，会从事务队列取出事务并执行。</li>
+</ol>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256580581ba613646ff5972a61f8fe6c51208fcb1.png"></p>
+<p>每个 <code>Redis</code> 客户端都包含一个事务状态属性，使用 <code>multiState</code> 类型存储，<code>multiState</code> 中包含了两个属性：</p>
+<ul>
+<li>事务队列(<code>multiCmd *commands</code>)</li>
+<li>已入队命令计数(<code>int count</code>)</li>
+</ul>
+<p>事务的执行过程见下图：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425658858113c38a905eba47e2328c1eac45de46e4.png"></p>
+<h4 id="Watch-命令"><a href="#Watch-命令" class="headerlink" title="Watch 命令"></a><code>Watch</code> 命令</h4><p><code>WATCH</code> 命令是一个乐观锁（<code>optimistic locking</code>)，它可以在 <code>EXEC</code> 命令执行之前，监视<br>任意数量的数据库键，并在 <code>EXEC</code> 命令执行时，检查被监视的键是否至少有一个已经被修改过了，如果是的话，服务器将拒绝执行事务，并向客户端返回代表事务执行失败的空回复。</p>
+<p><code>Redis</code> 通过一个 <code>watched_keys</code> 字典来保存所有被监视的键。假设一个键A被加上了 <code>Watch</code> 事务，表示它正在被监视。如果这时对这个键执行了修改的操作，比如 <code>SET、LPUSH、SADD</code> 等命令，这些命令执行之后会调用 <code>multi.c/touchWatchKey</code> 对 <code>watched_keys</code> 字典进行检查，检查到字典中包含键A，<code>touchWatchKey</code> 会将被修改键的客户端的 <code>REDIS_DIRTY_CAS</code> 标识打开。<code>touchWatchKey</code> 伪代码如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256602584eb082f630d254e1d3004464265c4fe2e.png"></p>
+<p>当事务提交时，会判断客户端的 <code>REDIS_DIRTY_CAS</code> 是否打开，如果打开表示客户端提交的事务不安全，服务器会拒绝执行该事务。服务器判断是否执行事务的过程如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425660958160a0ebf960bea1d73bf4a08fef8daa50.png"></p>
+<h4 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h4><ol>
+<li><strong>原子性。</strong>事务中的命令要么都执行，要么都不执行(出现错误)。<code>Redis</code> 中都不执行的情况是只有在 <strong>命令入队</strong> 时出现错误才会触发，在 <strong>命令执行</strong> 阶段出现的错误不会影响别的命令执行。<strong><code>Redis</code> 中不支持事务的回滚操作。</strong>体现在命令执行阶段发生错误时的处理，当命令执行阶段有一条命令发生错误，事务不会回滚：<strong>事务的后续命令不会受影响，之前执行的命令也不会收影响。</strong></li>
+<li><strong>一致性。</strong>数据库中的数据没有包含错误的数据。<strong>命令入队</strong> 阶段发生错误，服务器会拒绝执行这个事务。<strong>命令执行</strong> 阶段发生错误，未执行的命令不会受影响，已执行的命令也不会受影响。<strong>服务器停机</strong> 导致的一致性问题 <code>Redis</code> 处理如下：<ul>
+<li>如果 <code>Redis</code> 运行在无持久化内存模式，重启后数据库空白，不会出现数据不一致情况；</li>
+<li>如果 <code>Redis</code> 运行在 <code>RDB/AOF</code> 模式下，那么重启后可以利用 <code>RDB/AOF</code> 文件恢复数据，保证数据的一致性。</li>
+</ul>
+</li>
+<li><strong>隔离性。</strong>多个事务并发执行时不会相互影响，并且在并发阶段执行的事务和串行阶段执行的事务结果完全相同。<code>Redis</code> 是单线程的方式执行事务(串行)，所以隔离性得到了保证。</li>
+<li><strong>持久性。</strong>事务执行完毕时，事务执行后得到的结果都被保存到了永久性介质中了。<code>Redis</code> 事务的持久性由 <code>Redis</code> 使用的持久化模式决定：<ul>
+<li>服务器在无持久化的内存模式下运行时，<strong>不具有持久性</strong>。</li>
+<li>服务器在 <code>RDB</code> 持久化模式下运行时，只有在特定情况下才具有持久性，这种情况也<strong>不能保证持久性</strong>。</li>
+<li>服务器在 <code>AOF</code> 持久化模式下运行时，当 <code>appendfsync</code> 选项值为 <code>always</code> 时，程序总会在执行命令后将命令数据保存到硬盘中(<code>AOF</code> 文件)，所以这种情况 <strong>可以保证持久性</strong>。</li>
+<li>服务器在 <code>AOF</code> 持久化模式下运行时，当 <code>appendfsync</code> 选项值为 <code>no</code> 时，命令数据写入硬盘的时机由操作系统决定，这种情况也 <strong>不能保证持久性</strong>。</li>
+<li>服务器在 <code>AOF</code> 持久化模式下运行时，当 <code>appendfsync</code> 选项值为 <code>everysec</code> 时，程序每隔一秒才会将命令同步到硬盘，这种情况 <strong>不能保证持久性</strong>。</li>
+<li>特殊情况，在 <code>AOF</code> 模式下，<code>appendfsync</code> 选项为 <code>always</code>，这时如果打开了 <code>no-appendfsync-on-rewrite</code> 配置，在执行 <code>BGSAVE</code> 或 <code>BGREWRITEAOF</code> 时，服务器会暂时停止 <code>AOF</code> 文件的同步，这时如果 <code>Redis</code> 停机，那么数据可能会没有写入硬盘，所以这种情况也 <strong>不能保证持久性</strong>。</li>
+<li>无论在什么持久化模式下运行时，只要在每个命令执行后加上一个 <code>SAVE</code> 命令，也能保证事务的持久性(<strong>效率很低，不实用</strong>)。</li>
+</ul>
+</li>
+</ol>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256660581751ed360b5beade48655488033c66484.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642566705830ddfdbb0c40886bbb1e4dd008faa506d.png"></p>
+<h3 id="Sort-命令"><a href="#Sort-命令" class="headerlink" title="Sort 命令"></a><code>Sort</code> 命令</h3><p>现在要对 <code>nums</code> 列表进行 <code>sort</code> 排序操作，具体执行过程：</p>
+<ul>
+<li>创建一个长度为 <code>nums.length</code> 的数组，数组项是 <code>redisSortObject</code> 结构，<code>redisSortObject</code> 包含两个关键属性：<ul>
+<li><code>obj</code> 指针：指向 <code>nums</code> 列表的各个项</li>
+<li><code>u.score</code>：存储列表项的值</li>
+</ul>
+</li>
+<li>之后根据 <code>u.score</code> 的值对数组项进行排序，之后遍历数组，依次返回数组中索引从小到大的项。</li>
+</ul>
+<p><code>redisSortObject</code> 的定义如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256680583596ad0ff8bc370c36a40c8fd0c57e891.png"></p>
+<blockquote>
+<p> 对字符串列表的排序原理类似，使用 <code>sort alpha xxx</code> 命令</p>
+</blockquote>
+<p><code>Redis</code> 的排序使用了 <strong>快速排序</strong> 算法。</p>
+<p><code>sort</code> 命令包含多个选项：<code>BY</code>、<code>LIMIT</code>、<code>GET</code>、<code>STORE</code> 等，如果同时传入了多个选项，那么它们的执行顺序是：<code>Sort Alpha/ASC/DESC/BY</code> -&gt; <code>LIMIT</code> -&gt; <code>GET</code> -&gt; <code>STORE</code>。选项摆放的位置不会影响 <code>SORT</code> 命令的排序结果(除 <code>GET</code> 外)。</p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256691583117207f2fe11f6b5bb289586b3716241.png"></p>
+<h3 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h3><p><code>Redis</code> 的慢查询日志中记录的是：<strong>执行时间超过给定时长的命令请求。</strong>用户可以通过这个功能产生的日志来监视和优化查询速度。包含两个与之相关的命令：</p>
+<ul>
+<li><code>slowlog-log-slower-than</code> 指定执行时间超过多少微秒的命令会被记录到日志上。</li>
+<li><code>slowlog-max-len</code> 指定服务器上最多保存多少条慢查询日志。</li>
+</ul>
+<p>通过 <code>slowlog get</code> 命令获取服务器上的慢查询日志。</p>
+<p>慢查询日志相关的属性：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642567055824b3429be85b5f125b5e940ff6e5ad76d.png"></p>
+<p>服务器记录慢查询日志的流程是：</p>
+<ul>
+<li>每次执行命令前后记录的微秒格式的UNIX时间戳，它们的差值就是执行命令耗费的时长。</li>
+<li>这个时长传递给 <code>slowlogPushEntryIfNeeded()</code>，这个函数会检查执行时长是否超过 <code>slowlog-log-slower-than</code> 设置的时间。超过了就创建新的日志，并将新日志添加到 <code>slowlog</code> 链表的表头。然后将 <code>slowlog_entry_id</code> 的值增加1。</li>
+<li>检查日志长度 (<code>slowlog</code> 链表长度) 是否超过 <code>slowlog-max-len</code> 的长度，如果超了，那么就将多出来的日志从 <code>slowlog</code> 链表中移除。</li>
+</ul>
+<p>执行流程的伪代码如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642567125842851de778e99530297669d0390bd47a5.png"></p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425672058275d815ab40412532e93615b446c8af89.png"></p>
+<h3 id="监视器"><a href="#监视器" class="headerlink" title="监视器"></a>监视器</h3><p>客户端可以通过 <code>MONITOR</code> 命令来将自己注册为一个监听器，服务端收到的命令都会被实时的打印出来。客户端调用 <code>monitor</code> 命令后执行的代码如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256729585f77c3855c15984260902bfff0035ad75.png"></p>
+<p>服务器端将所有的监视器都保存在 <code>monitors</code> 链表中，在处理接收到的命令前会调用 <code>replicationFeedMonitors()</code>，将被处理的命令发送给各个监视器。伪代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def replicationFeedMonitors(client, monitors, dbid, argv, argc):</span><br><span class="line">  # 创建要发送给各个监视器的信息</span><br><span class="line">  msg = create_message(client, dbid, argv, argc)</span><br><span class="line">  # 遍历所有监视器</span><br><span class="line">  for monitor in monitors:</span><br><span class="line">     # 将信息发送给监视器</span><br><span class="line">     send_message(monitor, msg)</span><br></pre></td></tr></table></figure>
+
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256738583cdeb1fe6be23cbadf8865f7926d6e111.png"></p>
+<h3 id="Lua脚本"><a href="#Lua脚本" class="headerlink" title="Lua脚本"></a>Lua脚本</h3><p><code>redis</code> 中可以通过如下方式执行 <code>Lua</code> 命令</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425674658156180f9b1f49a1027e8932ebad526706.png"></p>
+<h4 id="创建并修改-Lua-环境"><a href="#创建并修改-Lua-环境" class="headerlink" title="创建并修改 Lua 环境"></a>创建并修改 <code>Lua</code> 环境</h4><p><code>Reids</code> 中内嵌了一个 <code>Lua</code> 环境，并对这个环境进行了一系列修改，使其可以满足 <code>Redis</code> 服务器的需要。整个过程如下：</p>
+<ol>
+<li>创建一个基础的 <code>Lua</code> 环境，之后的所有修改都是针对这个环境进行的。</li>
+<li>载入多个函数库到 <code>Lua</code> 环境里面，让 <code>Lua</code> 脚本可以使用这些函数库来进行数据操作。包括下面几个库：<strong>基础库、表格库、字符串库、数学库、调试库、<code>Lua CJson</code> 库、<code>Struct</code> 库、<code>Lua cmsgpack</code> 库</strong>。</li>
+<li>创建全局表格 <code>redis</code>,这个表格包含了对 <code>Redis</code> 进行操作的函数，比如用于在 <code>Lua</code><br>脚本中执行 <code>Redis</code> 命令的 <code>redis.call</code> 函数。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425675358210408c2c8bf66fbd898277228c312ac9.png"></li>
+<li>使用 <code>Redis</code> 自制的随机函数 (<strong>纯函数</strong>) 来替换 <code>Lua</code> 原有的带有副作用的随机函数，从而避免在<br>脚本中引入副作用。<blockquote>
+<p>纯函数：函数与外界交换数据只有一个唯一渠道——参数和返回值。</p>
+<p>非纯函数：函数通过参数和返回值以外的渠道，和外界进行数据交换，比如在函数内部进行了读取/修改全局变量的操作，这个操作可能导致在不同条件(时间、环境)下，对函数传入相同的参数会得到不同的结果。</p>
+</blockquote>
+</li>
+<li>创建排序辅助函数 <code>__redis__compare__helper</code>，<code>Lua</code> 环境使用这个辅佐函数来对一部分 <code>Redis</code> 命令的结果进行排序，从而消除这些命令的不确定性。比如执行新增集合元素的命令 <code>SADD</code>，如果调整新增元素的位置，那么使用 <code>SMEMBERS</code> 查看元素后返回的结果可能都不一样。所以在调用完之后会使用 <code>__redis__compare__helper</code> 作为对比函数，然后调用 <code>table.sort()</code> 对命令的返回值做一次重排序，这样保证了相同数据集的返回结果一致。</li>
+<li>创建 <code>redis·Pca11</code> 函数的错误报告辅助函数 <code>__redis__err_handler</code>，这个函数可以提供更详细的出错信息。</li>
+<li>对 <code>Lua</code> 环境中的全局环境进行保护，防止用户在执行 <code>Lua</code> 脚本的过程中，将额外的<br>全局变量添加到 <code>Lua</code> 环境中。办法是在尝试进行下面操作时直接返回报错：<ul>
+<li>创建全局变量</li>
+<li>获取一个不存在的全局变量</li>
+</ul>
+<strong><code>Redis</code> 没有禁止用户修改已存在的全局变量。</strong></li>
+<li>将完成修改的 <code>Lua</code> 环境保存到服务器状态的 <code>Lua</code> 属性中，等待执行服务器传来的<br><code>Lua</code> 脚本。接下来的各个小节将分别介绍这些步骤。</li>
+</ol>
+<h4 id="Lua-命令的执行过程-伪客户端"><a href="#Lua-命令的执行过程-伪客户端" class="headerlink" title="Lua 命令的执行过程(伪客户端)"></a><code>Lua</code> 命令的执行过程(伪客户端)</h4><p><code>Redis</code> 执行命令必须要有相应的客户端状态，所以为了执行 <code>Lua</code> 脚本中的 <code>Redis</code> 命令，<code>Redis</code> 服务器为 <code>Lua</code> 环境创建了一个伪客户端 (<strong>在服务器初始化时创建，并且这个伪客户端会一直存在</strong>) 。当一个 <code>Lua</code> 脚本使用 <code>redis.call</code> 或 <code>redis.pcall</code> 函数执行一个 <code>Redis</code> 命令时，会完成以下几个步骤：</p>
+<ol>
+<li><code>Lua</code> 环境将 <code>redis.call</code> 函数或者 <code>redis.pcall</code> 函数想要执行的命令传给伪客户端。</li>
+<li>伪客户端将脚本想要执行的命令传给命令执行器。</li>
+<li>命令执行器执行伪客户端传给它的命令，并将命令的执行结果返回给伪客户端。</li>
+<li>伪客户端接收命令执行器返回的命令结果，并将这个命令结果返回给 <code>Lua</code> 环境。</li>
+<li><code>Lua</code>环境在接收到命令结果之后，将该结果返回给 <code>redis.call</code> 函数或者 <code>redis</code>,<br><code>pcall</code> 函数。</li>
+<li>接收到结果的 <code>redis.call</code> 函数或者 <code>redis.pcall</code> 函数会将命令结果作为函数<br>返回值返回给脚本中的调用者。</li>
+</ol>
+<h4 id="Lua-scripts-字典"><a href="#Lua-scripts-字典" class="headerlink" title="Lua_scripts 字典"></a><code>Lua_scripts</code> 字典</h4><p><code>Redis</code> 服务器中两种数据会保存到这个字典中:</p>
+<ul>
+<li>被 <code>EVAL</code> 命令执行过的 <code>Lua</code> 脚本。</li>
+<li>被 <code>SCRIPT LOAD</code> 命令载入过的 <code>Lua</code> 脚本。</li>
+</ul>
+<p>这个字典的键是 <code>Lua</code> 脚本的 <code>SHA1</code> 校验和，值是对应的 <code>Lua</code> 脚本，如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425676758626aba5c4ea4e423cc83ada2986826377.png"></p>
+<p>这个字典有两个作用：<strong>实现 <code>SCRIPT EXISTS</code> 命令</strong>，<strong>实现脚本复制功能</strong>。</p>
+<h4 id="EVAL-命令的实现"><a href="#EVAL-命令的实现" class="headerlink" title="EVAL 命令的实现"></a><code>EVAL</code> 命令的实现</h4><p>执行 <code>EVAl</code> 命令后，有三个步骤：</p>
+<ol>
+<li>根据客户端给定的 <code>Lua</code> 脚本，在 <code>Lua</code> 环境中定义一个 <code>Lua</code> 函数。函数定义的形式如下：<ul>
+<li>如果传入的脚本是 <code>return &#39;hello world&#39;</code>，脚本的 <code>SHA1</code> 校验和是 <code>xxx</code>，那么函数名是 <code>f_xxx</code>，函数体就是 <code>return &#39;hello world&#39;</code>，伪代码如下：<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">funtction f_xxx()</span><br><span class="line">   <span class="keyword">return</span> <span class="string">&#x27;hello world&#x27;</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>将客户端给定的脚本保存到 <code>lua_scripts</code> 字典，等待将来进一步使用。</li>
+<li>执行刚刚在 <code>Lua</code> 环境中定义的函数，以此来执行客户端给定的 <code>Lua</code> 脚本。</li>
+</ol>
+<p>具体的执行命令步骤如下：</p>
+<ol>
+<li>将 <code>EVAL</code> 命令中传人的键名 (<code>key name</code>) 参数和脚本参数分别保存到 <code>KEYS</code> 数组和<br><code>ARGV</code> 数组，然后将这两个数组作为全局变量传人到 <code>Lua</code> 环境里面。</li>
+<li>为 <code>Lua</code> 环境装载超时处理钩子 (<code>hook</code>),这个钩子可以在脚本出现超时运行情况时，<br>让客户端通过 <code>SCRIPT KILL</code> 命令停止脚本，或者通过 <code>SHUTDOWN</code> 命令直接关闭服务器。</li>
+<li>执行脚本函数。</li>
+<li>移除之前装载的超时钩子。</li>
+<li>将执行脚本函数所得的结果保存到客户端状态的输出缓冲区里面，等待服务器将结<br>果返回给客户端。</li>
+<li>对 <code>Lua</code> 环境执行垃圾回收操作。</li>
+</ol>
+<h4 id="EVALSHA-命令"><a href="#EVALSHA-命令" class="headerlink" title="EVALSHA 命令"></a><code>EVALSHA</code> 命令</h4><p>每个被 <code>EVAL</code> 命令执行过 <code>Lua</code> 脚本，在 <code>Lua</code> 环境中都有一个与脚本对应的 <code>Lua</code> 函数，函数名使用 <code>f_</code> + <code>Lua</code> 脚本对应的 <code>SHA1</code> 值定义。客户端可以通过 <code>SHA1</code> 值来调用脚本对应的函数，对应的命令是 <code>EVALSHA</code>，伪代码如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642567775801be7b80f14508b23421f4429775a6a5a.png"></p>
+<h4 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h4><ol>
+<li><code>SCRIPT FLUSH</code> - 清除服务器中所有和 <code>Lua</code> 脚本有关的信息，这个命令会释放并重建 <code>lua scripts</code> 字典，关闭现有的 <code>Lua</code> 环境并重新创建一个新的 <code>Lua</code> 环境。</li>
+<li><code>Script Exists</code> - 根据输入的 <code>SHA1</code> 校验和，检查校验和对应的脚本是否存在于服务器中。</li>
+<li><code>Script Load</code> - 首先在 <code>Lua</code> 环境中为脚本创建相对应的函数，然后再将脚本保存到 <code>lua scripts</code> 字典里面</li>
+<li><code>Script Kill</code> - 这个命令与服务器设置的超时钩子有关，如果服务器配置了 <code>lua-time-limit</code> 参数，那么每次执行 <code>Lua</code> 脚本之前，会在 <code>Lua</code> 环境中设置一个超时处理钩子。之后在脚本运行期间，这个钩子会定期检查脚本运行时间，如果超过了 <code>lua-time-limit</code> 设置的时长，钩子会在脚本运行的间隙定期查看是否有 <code>Script Kill</code> 命令或 <code>Shutdown</code> 命令到达服务器。所以这个命令是在 <code>lua</code> 脚本执行超时后由客户端发起的。如果超时运行的脚本没有执行任何写入操作，那么这个命令可以正常中断脚本的执行；如果执行了写入操作，那么只能通过 <code>Shutdown nosave</code> 命令停止服务器，防止出现不合法的数据。</li>
+</ol>
+<h4 id="脚本复制"><a href="#脚本复制" class="headerlink" title="脚本复制"></a>脚本复制</h4><p>这里会被复制的脚本是那些进行了写操作的脚本：<code>EVAL</code>、<code>EVALSHA</code>、<code>SCRIPT FlUSH</code>、<code>SCRIPT LOAD</code>。</p>
+<p>其中客户端在向服务器发送了 <code>EVAL</code>、<code>SCRIPT FLUSH</code> 或 <code>SCRIPT LOAD</code> 三个命令时，服务器会将命令转发所有从服务器，它们也会执行一遍这些命令。</p>
+<p><strong><code>EVALSHA</code> 命令的复制过程</strong></p>
+<p><code>EVALSHA</code> 命令比较特殊，因为一个在主服务器能被成功执行的 <code>EVALSHA</code> 命令，在从服务器执行时可能出现脚本未找到的错误。</p>
+<p><code>Redis</code> 对于上面问题的处理办法是要求主服务器在传播 <code>EVALSHA</code> 命令时，必须确保 <code>EVALSHA</code> 命要执行的脚本已经被所有从服务器载入过，如果不能确保这一点的话，主服务器会将 <code>EVALSHA</code> 命转换成一个等价的 <code>EVAL</code> 命令(从 <code>lua_scripts</code> 字典中找 <code>SHA1</code> 值对应的 <code>lua</code> 脚本)，然后通过传播 <code>EVAL</code> 命令来代替 <code>EVALSHA</code> 命令。</p>
+<ul>
+<li>主服务器维护了一个 <code>repl_scriptcache_dict</code> 字典，里面记录了主服务器已经将哪些脚本传播给了所有从服务器，记录的值为脚本对应的 <code>SHA1</code> 值。</li>
+<li>之后执行 <code>EVALSHA</code> 时，主服务器会从 <code>repl_scriptcache_dict</code> 中找对应的 <code>SHA1</code> 值是否存在，如果存在表示 <code>EVALSHA</code> 命令可以传播给从服务器执行；如果不存在，表示其中至少有一个从服务器会出现脚本未找到的错误。</li>
+</ul>
+<p>当主服务器添加一个新的从服务器时，<code>repl_scriptcache_dict</code> 会被清空，强制自己重新向所有从服务器传播脚本，这样可以确保从服务器不会出现脚本未找到的错误。</p>
+<p>如果上面的校验没有通过，那么就会将 <code>EVALSHA</code> 命令转换为 <code>EVAL</code> 命令传递给从服务器，转换过程如下：</p>
+<ol>
+<li>根据 <code>SHA1</code> 校验和 <code>sha1</code>,在 <code>lua_scripts</code> 字典中查找 <code>sha1</code> 对应的 <code>Lua</code> 脚本 <code>script</code></li>
+<li>将原来的 <code>EVALSHA</code> 命令请求改写成 <code>EVAL</code> 命令请求，并且将校验和 <code>sha1</code> 改成脚本<code>script</code>,至于 <code>numkeys</code>、<code>key</code>、<code>arg</code>等参数则保持不变。</li>
+</ol>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642568275830e04795529c70d7fdea39eb978bdca0a.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256837581930c4353669ff5de82a4707ef0273f7c.png"></p>
+<h2 id="多机数据库"><a href="#多机数据库" class="headerlink" title="多机数据库"></a>多机数据库</h2><h3 id="主从模式"><a href="#主从模式" class="headerlink" title="主从模式"></a>主从模式</h3><p>主从模式(复制)在新旧版本(基于2.8)上的实现有差异，分别来看。</p>
+<h4 id="旧版"><a href="#旧版" class="headerlink" title="旧版"></a>旧版</h4><p>复制操作分为同步 (<code>sync</code>) 和 命令传播 (<code>command propagate</code>) 两个操作。</p>
+<ul>
+<li><strong>同步</strong> 操作用于将从服务器的数据库状态更新至主服务器当前所处的数据库状态。</li>
+<li><strong>命令传播</strong> 操作则用于在主服务器的数据库状态被修改，导致主从服务器的数据库状<br>态出现不一致时，让主从服务器的数据库重新回到一致状态。</li>
+</ul>
+<p>描述一下从服务器复制主服务器的操作。客户端发送 <code>SLAVEOF</code> 命令，表示复制操作开始。从服务首先执行同步操作，将从服务器的数据库状态更新至主服务器当前所处的数据库状态。同步操作步骤如下：</p>
+<ol>
+<li>同步操作是通过从服务器向主服务器发送 <code>SYNC</code> 命令开始执行的。</li>
+<li>收到 <code>SYNC</code> 命令的主服务器执行 <code>BGSAVE</code> 命令，在后台异步的生成一个 <code>RDB</code> 文件，并使用一个缓冲区记录从先开始执行的所有写命令。</li>
+<li><code>BGSAVE</code> 执行完毕后，主服务器将生成的 <code>RDB</code> 文件发送给从服务器，从服务器接收并载入 <code>RDB</code> 文件，这时从服务器的数据库状态更新至了主服务器执行 <code>BGSAVE</code> 时的数据库状态。</li>
+<li>然后主服务器将记录在缓冲区中所有写命令发送给从服务器，从服务器执行这些写命令，这时从服务器的数据库状态已经更新至与主服务器相同的状态了，同步操作完成。</li>
+</ol>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256852581a9a8b5123be39e230e45c69537ea7580.png"></p>
+<blockquote>
+<p>同步操作 可以保证主从服务器的数据一致，但是需要客户端主动向服务器发送 <code>SLAVEOF</code> 命令才会触发。</p>
+</blockquote>
+<p>在每次服务器执行写命令时，会触发另一种主从服务器数据同步的操作：<strong>命令传播</strong>。主服务器执行了写命令后，会将这条命令发送给从服务器执行，从服务器执行了这条命令后，主从服务器的状态会重新回到一致的状态。</p>
+<blockquote>
+<p>旧版的复制功能主要缺陷是 <strong>同步功能</strong> 的处理。同步的触发条件有两种：</p>
+<ul>
+<li>主从服务器初次建立连接</li>
+<li>从服务器断开连接后的重连。</li>
+</ul>
+<p>同步操作所执行的 <code>SYNC</code> 命令会让主服务器生成并发送一个完整的 <code>RDB</code> 文件发送给从服务器，从服务器执行这个 <code>RDB</code> 文件完成同步操作。如果是断线重连时，并且断线的时间很短，那么可能 <code>RDB</code> 文件中的大部分数据从服务器中都已经存在，只有断线时产生的少量数据真正需要同步，但是旧版的同步操作会将整个 <code>RDB</code> 文件载入完成同步，所以效率很低。</p>
+</blockquote>
+<h4 id="新版"><a href="#新版" class="headerlink" title="新版"></a>新版</h4><p>新版复制功能主要是用来解决旧版复制的低效问题：通过使用 <code>PSYNC</code> 命令代替 <code>SYNC</code> 命令来实现。<code>PSYNC</code> 有两种同步模式：</p>
+<ul>
+<li>完整重同步。处理初次复制的情况，与旧版的 <code>SYNC</code> 命令执行步骤一样。</li>
+<li>部分重同步。处理断线后重复制的情况：如果条件允许，主服务器只会将服务器断连这段时间执行的写命令发送给从服务器。</li>
+</ul>
+<p>部分重同步的实现，包含几个关键结构：</p>
+<ul>
+<li>主服务器的复制偏移量，从服务器的复制偏移量。在执行部分重复制时，主服务器向从服务器传送N个字节数据后，会在自己的复制偏移量的值上加N；从服务器接收到主服务器传送的N个字节数据后，会在自己的复制偏移量的值上加N。</li>
+<li>主服务器的复制积压缓冲区（固定长度的先进先出队列）当主服务器进行命令传播时，它不仅会将写命令发送给所有从服务器，还会将写命令入队到复制积压缓冲区中。这个缓冲区的长度时固定的，也就是说如果缓冲区的数据超过了一定大小(默认1M)，那么最先入队的数据将被挤出队列。</li>
+<li>服务器的运行ID</li>
+</ul>
+<p>列举了这些关键概念后，下面就来回答一下几个问题：</p>
+<ol>
+<li>主服务器如何判断是执行部分重同步还是完整重同步？假设主从服务器的复制偏移量差值为A，复制积压缓冲区的大小为B，如果A&gt;B，表示复制积压缓冲区中已经有数据溢出了，这时需要执行完整重同步操作；如果A&lt;B，表示偏移量后的数据全部存在于复制积压缓冲区中，这时只需要执行部分重同步。从服务器对主服务器进行初次复制时，主服务器会将自己的运行ID传送给从服务器，从服务器会将这个运行ID保存起来。当从服务器断线重连时，会将之前保存的运行ID发送给主服务器，主服务器判断传送来的运行ID是否是自己的运行ID，如果是，则进行上一步复制偏移量和复制积压缓冲区的检查。如果不是，则进行完整重同步操作。</li>
+<li>部分重同步时从服务器在断线期间丢失的数据如何被补充回来？从服务器断线重连后，会给主服务器发送 <code>PSYNC</code> 命令，并报告自己的复制偏移量。主服务器收到命令后，检查从服务器的复制偏移量后的数据是否存在于复制积压缓冲区中，如果存在，那么执行部分重同步，主服务器将复制积压缓冲区的偏移量(从服务器的偏移量)后的数据发送给从服务器，从服务器收到数据并执行，完成同步。</li>
+</ol>
+<h4 id="复制操作"><a href="#复制操作" class="headerlink" title="复制操作"></a>复制操作</h4><p>复制操作就是客户端给从服务器发送 <code>SLAVEOF</code> 命令，让从服务器去复制对应的主服务器，具体的执行步骤如下：</p>
+<ol>
+<li><strong>设置主服务器的地址和端口。</strong>客户端发送 <code>SLAVEOF</code> 命令具体如下：<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SLAVEOF <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> <span class="number">6379</span></span><br></pre></td></tr></table></figure>
+
+从服务器会将这个 <code>ip</code> 和端口保存到服务器状态的 <code>masterhost</code> 和 <code>masterport</code> 属性中。设置完毕，从服务器给客户端返回 <code>OK</code>。</li>
+<li><strong>建立套接字连接。</strong>从服务器建立一个与主服务器的套接字连接。主服务器接受连接后，会为该套接字连接创建对应的客户端状态。之后主从服务器之间就可以进行命令的收发处理工作了。</li>
+<li><strong>发送 <code>PING</code> 命令。</strong>主服务器的客户端状态创建成功后，从服务器会向主服务器发送一个 <code>PING</code> 命令，检查套接字的读写状态和主服务器是否可以正常处理请求。如果一切正常，主服务器会返回一个 <code>PONG</code> 给从服务器。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664256861585add3b06c2f9aa7a1fcbd4d3a59e452fb.png"></li>
+<li>** 身份验证。**身份验证的操作是否进行与两个设置有关：<ul>
+<li>从服务器的 <code>masterauth</code> 选项</li>
+<li>主服务器的 <code>requirepass</code> 选项</li>
+</ul>
+如果两个选项都设置了，那么进行身份验证，从服务器通过 <code>AUTH</code> 命令发送密码，主服务器验证密码是否与 <code>requirepass</code> 设置的相同，如果相同可继续复制工作，如果不同则返回 <strong><code>invalid password</code> 错误</strong>。如果只设置了主服务器的 <code>requirepass</code> 选项，没有设置从服务器的 <code>masterauth</code> 选项，那么主服务器会会返回 <code>NOAUTH</code> 错误。相对的，如果只设置了从服务器的 <code>masterauth</code> 选项，而没有设置主服务器的，那么将返回 <code>no password is set</code> 错误。如果都没设置，那么复制工作继续执行。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642568725806f803b4cd1dba0d6497098c4b442e532.png"></li>
+<li><strong>发送端口信息。</strong>从服务器将自己绑定的端口信息发送个主服务器，主服务器收到的将其绑定到对应客户端状态的 <code>slave_listening_port</code> 属性中，这个属性的作用是在主服务器执行 <code>INFO replication</code> 命令时打印出从服务器的端口号。</li>
+<li><strong>同步。</strong>这一步进行的工作在上面已经介绍过了。这里需要额外注意的一点是，在这一步之后，主从服务器会互为对方的客户端(通过 <code>Socket</code> 连接)，这样可以完成数据的通信。</li>
+<li><strong>命令传播。</strong>同步操作后，主从服务器双方就建立了通信的通道，之后主服务器的写命令通过命令传播的方式同步给从服务器，就能保证主从服务器的数据一致。</li>
+</ol>
+<h4 id="心跳检测"><a href="#心跳检测" class="headerlink" title="心跳检测"></a>心跳检测</h4><p>主从服务器的正常通信状态下通过心跳来维持连接：<strong>从服务器每秒一次向主服务器发送命令。</strong>命令如下：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REPLCONF ACK &lt;replication_offset&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>replication_offset</code> 是从服务器当前的复制偏移量，发送这个命令有三个作用：</p>
+<ol>
+<li><strong>检测主从服务器的网络连接状态。</strong>如果主服务器超过 <code>1s</code> 没有收到从服务器发来的 <code>replconf ack</code> 命令，那么主服务器就知道主从服务器之间的连接出现问题了。</li>
+<li><strong>辅助实现 <code>min-slaves</code> 选项。</strong>这个选项的作用是防止主服务器在不安全的情况下执行写命令，有两个选项可用：<ul>
+<li><code>min-slaves-to-write </code> 3</li>
+<li><code>min-slaves-max-lag</code> 10</li>
+</ul>
+上面选项后的数字是给出的案例，意思是如果 <strong>从服务器的数量少于3个，或者3个服务器的延迟( <code>lag</code> )值都大于或等于 <code>10s</code> 时，主服务器将拒绝执行写命令</strong>。延迟值会通过心跳响应的时间反映出来。</li>
+<li><strong>检测命令丢失。</strong>当主从服务器的连接出现问题时，主服务器传播给从服务器的命令可能会丢失。当从服务器向主服务器发送 <code>REPLCONF ACK</code> 命令时，主服务器会发现从服务器的复制偏移量少于自己的复制偏移量，主服务器这时会将复制积压缓冲区中从服务器缺少的数据发送给从服务器。这一步的操作与部分重同步类似，但是部分重同步是发生在主从服务器断线重连后，这一步则是在主从服务器没有断线的情况下执行的。</li>
+</ol>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425688258623a8ac539e61284571d7ede71854519a.png"></p>
+<h3 id="Sentinel-哨兵模式"><a href="#Sentinel-哨兵模式" class="headerlink" title="Sentinel - 哨兵模式"></a><code>Sentinel</code> - 哨兵模式</h3><p><code>Sentinel</code> 就是使用一个或多个 <code>Sentinel</code> 实例组成的 <code>Sentinel</code> 系统来监视主服务器，以及主服务器对应的从服务器。当主服务器下线之后，自动将某个从服务器升级为新的主服务器。</p>
+<p>当哨兵模式下的主服务器下线时长超过了用户设定的下线时长上限时，主服务器的 <strong>故障转移操作</strong> 会被执行：</p>
+<ul>
+<li>选择一个从服务器，使其成为新的主服务器</li>
+<li>向其他的从服务器发送复制指令，让它们成为新的主服务器的从服务器。当所有的从服务器都开始复制新的主服务器时，故障转移操作执行完毕。</li>
+<li>已下线的旧主服务器会被继续监视，当其重新上线后，会被设置为新主服务器的从服务器。</li>
+</ul>
+<p><code>Sentinel</code> 本质上是一个运行在特殊模式下的 <code>Redis</code> 服务器，它的启动步骤如下：</p>
+<ol>
+<li>初始化一个普通的 <code>Redis</code> 服务器。<em><strong>初始化的服务器不会加载 <code>AOF</code> / <code>RDB</code> 文件。</strong></em></li>
+<li>将普通的 <code>Redis</code> 服务器使用的代码替换为 <code>Sentinel</code> 专用代码。替换的代码包括 <strong>服务器端口</strong> 对应的参数：<code>redis.h/REDIS_SERVERPORT = 6379</code> -&gt; <code>sentinel.c/REDIS_SENTINEL_PORT = 26379</code>，以及命令表，<code>Sentinel</code> 使用的命令表只包含 <code>PING</code>、<code>SENTINEL</code>、<code>INFO</code>、<code>SUBSCRIBE</code>、<code>UNSUBSCRIBE</code>、<code>PSUBSCRIBE</code>、<code>PUNSUBSCRIBE</code> 七个命令。</li>
+<li>初始化 <code>Sentinel</code> 状态。具体操作是初始化一个 <code>sentinel.c/sentinelState</code> 结构，这个结构中保存了服务器中所有和 <code>Sentinel</code> 功能有关的状态。<em><strong>服务器的一般状态仍然由 <code>redis.h/redisServer</code> 保存</strong></em>。</li>
+<li>根据给定的配置文件，初始化 <code>Sentinel</code> 的监视主服务器列表。在上一步初始化的 <code>Sentinel</code> 状态中，其中包含一个 <code>masters</code> 字典，它记录了所有被 <code>Sentinel</code> 监视的主服务器的相关信息：<ul>
+<li>字典的键是被监视的主服务器名。</li>
+<li>字典的值是被监视的主服务器对应的 <code>sentinel.c/sentinelRedisInstance</code> 结构。</li>
+</ul>
+</li>
+<li>创建连向主服务器的网络连接。这一步会将 <code>Sentinel</code> 设置为主服务器的客户端，它可以向主服务器发送命令，并从命令回复获取相应的信息。对于每个被 <code>Sentinel</code> 监视的主服务器来说，<code>Sentinel</code> 会创建两个连向主服务器的异步网络连接：<ul>
+<li>一个是命令连接，这个连接专门用于向主服务器发送命令，并接收命令回复。</li>
+<li>另一个是订阅连接，这个连接专门用于订阅主服务器的 <code>__sentinel__:hello</code>频道。</li>
+</ul>
+<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642568935861a9bce14118ed83a17f5726b321fed74.png"></li>
+</ol>
+<p><code>Sentinel</code> 启动后，默认会以 <code>10s</code> 一次的频率向被监视的主服务器发送 <code>INFO</code> 命令，通过分析 <code>INFO</code> 命令的回复来获取主服务器的当前信息，获取到的信息包含如下两种：</p>
+<ul>
+<li>主服务器本身的信息：<code>run_id</code> 域信息和 <code>role_id</code> 域信息。</li>
+<li>主服务器属下所有从服务器的信息。</li>
+</ul>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642569305821664256929765.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642569515861664256951461.png"></p>
+<h3 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h3><p>TODO</p>
+<p>知识点总结：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166425697558365ad06f3c9bd011982cc6d425833f8ef.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" rel="tag"># 后端技术</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022-09-02/58230/" rel="prev" title="Tomcat源码学习">
+      <i class="fa fa-chevron-left"></i> Tomcat源码学习
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.</span> <span class="nav-text">数据结构和对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.1.</span> <span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%93%BE%E8%A1%A8"><span class="nav-number">1.2.</span> <span class="nav-text">链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E5%85%B8"><span class="nav-number">1.3.</span> <span class="nav-text">字典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%B3%E8%B7%83%E8%A1%A8"><span class="nav-number">1.4.</span> <span class="nav-text">跳跃表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88"><span class="nav-number">1.5.</span> <span class="nav-text">整数集合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8"><span class="nav-number">1.6.</span> <span class="nav-text">压缩列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.7.</span> <span class="nav-text">对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.7.1.</span> <span class="nav-text">字符串对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%97%E8%A1%A8%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.7.2.</span> <span class="nav-text">列表对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.7.3.</span> <span class="nav-text">哈希对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.7.4.</span> <span class="nav-text">集合对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.7.5.</span> <span class="nav-text">有序集合对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6"><span class="nav-number">1.7.6.</span> <span class="nav-text">内存回收</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%85%B1%E4%BA%AB"><span class="nav-number">1.7.7.</span> <span class="nav-text">对象共享</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">单机数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB-%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">RDB 持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOF-%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">AOF 持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">事件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E4%BA%8B%E4%BB%B6"><span class="nav-number">5.1.</span> <span class="nav-text">文件事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E4%BA%8B%E4%BB%B6"><span class="nav-number">5.2.</span> <span class="nav-text">时间事件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">6.</span> <span class="nav-text">客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">7.</span> <span class="nav-text">服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">7.1.</span> <span class="nav-text">初始化服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%AF%B7%E6%B1%82%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">7.2.</span> <span class="nav-text">命令请求的过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ServerCron-%E5%87%BD%E6%95%B0"><span class="nav-number">7.3.</span> <span class="nav-text">ServerCron 函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-%E7%8B%AC%E7%AB%8B%E5%8A%9F%E8%83%BD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">8.</span> <span class="nav-text">Redis 独立功能的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E5%B8%83%E5%92%8C%E8%AE%A2%E9%98%85%E5%8A%9F%E8%83%BD"><span class="nav-number">8.1.</span> <span class="nav-text">发布和订阅功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1"><span class="nav-number">8.2.</span> <span class="nav-text">事务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Watch-%E5%91%BD%E4%BB%A4"><span class="nav-number">8.2.1.</span> <span class="nav-text">Watch 命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ACID"><span class="nav-number">8.2.2.</span> <span class="nav-text">ACID</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sort-%E5%91%BD%E4%BB%A4"><span class="nav-number">8.3.</span> <span class="nav-text">Sort 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%85%A2%E6%9F%A5%E8%AF%A2%E6%97%A5%E5%BF%97"><span class="nav-number">8.4.</span> <span class="nav-text">慢查询日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E8%A7%86%E5%99%A8"><span class="nav-number">8.5.</span> <span class="nav-text">监视器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lua%E8%84%9A%E6%9C%AC"><span class="nav-number">8.6.</span> <span class="nav-text">Lua脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%B9%B6%E4%BF%AE%E6%94%B9-Lua-%E7%8E%AF%E5%A2%83"><span class="nav-number">8.6.1.</span> <span class="nav-text">创建并修改 Lua 环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Lua-%E5%91%BD%E4%BB%A4%E7%9A%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B-%E4%BC%AA%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">8.6.2.</span> <span class="nav-text">Lua 命令的执行过程(伪客户端)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Lua-scripts-%E5%AD%97%E5%85%B8"><span class="nav-number">8.6.3.</span> <span class="nav-text">Lua_scripts 字典</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EVAL-%E5%91%BD%E4%BB%A4%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">8.6.4.</span> <span class="nav-text">EVAL 命令的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EVALSHA-%E5%91%BD%E4%BB%A4"><span class="nav-number">8.6.5.</span> <span class="nav-text">EVALSHA 命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%91%BD%E4%BB%A4"><span class="nav-number">8.6.6.</span> <span class="nav-text">其他命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%B6"><span class="nav-number">8.6.7.</span> <span class="nav-text">脚本复制</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">9.</span> <span class="nav-text">多机数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E6%A8%A1%E5%BC%8F"><span class="nav-number">9.1.</span> <span class="nav-text">主从模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A7%E7%89%88"><span class="nav-number">9.1.1.</span> <span class="nav-text">旧版</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E7%89%88"><span class="nav-number">9.1.2.</span> <span class="nav-text">新版</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%8D%E5%88%B6%E6%93%8D%E4%BD%9C"><span class="nav-number">9.1.3.</span> <span class="nav-text">复制操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%83%E8%B7%B3%E6%A3%80%E6%B5%8B"><span class="nav-number">9.1.4.</span> <span class="nav-text">心跳检测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sentinel-%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F"><span class="nav-number">9.2.</span> <span class="nav-text">Sentinel - 哨兵模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4"><span class="nav-number">9.3.</span> <span class="nav-text">集群</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
