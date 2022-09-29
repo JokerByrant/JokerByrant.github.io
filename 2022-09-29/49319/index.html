@@ -23,12 +23,12 @@
     var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="最近在整理博客，发现网站的侧边导航栏功能无法正常使用了，如下：">
+  <meta name="description" content="最近在整理博客，发现网站的侧边导航栏功能无法正常使用了。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hexo侧边导航栏功能异常，报错Cannot read properties of null (reading getBoundingClientRect)">
 <meta property="og:url" content="https://jokerbyrant.github.io/2022-09-29/49319/index.html">
 <meta property="og:site_name" content="Sssxh BLOG">
-<meta property="og:description" content="最近在整理博客，发现网站的侧边导航栏功能无法正常使用了，如下：">
+<meta property="og:description" content="最近在整理博客，发现网站的侧边导航栏功能无法正常使用了。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285146961664428513842.png">
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285926951664428592222.png">
@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644295876971664429586963.png">
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644299086971664429908000.png">
 <meta property="article:published_time" content="2022-09-29T05:13:46.000Z">
-<meta property="article:modified_time" content="2022-09-29T05:39:53.673Z">
+<meta property="article:modified_time" content="2022-09-29T08:59:45.857Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="前端技术">
 <meta name="twitter:card" content="summary">
@@ -225,9 +225,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>最近在整理博客，发现网站的侧边导航栏功能无法正常使用了，如下：<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285146961664428513842.png"></p>
+        <p>最近在整理博客，发现网站的侧边导航栏功能无法正常使用了。</p>
 <span id="more"></span>
 
+<p>侧边栏如下，点击某项之后正文没有正常跳转，并且侧边栏的高亮显示也有问题：<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285146961664428513842.png"></p>
 <p>点击某个子菜单正文没有跳转到对应位置，并且当前高亮的菜单也不对。打开开发者工具，发现报了一个错误：<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285926951664428592222.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644286076971664428606916.png"></p>
 <p>是 <code>utils.js</code> 文件中的 <code>registerSidebarTOC</code> 方法报错了，这个方法是用来实现点击侧边栏跳转正文指定位置的功能的。通过解析侧边栏中链接的 <code>href</code> 值，然后找到正文中对应的 <code>id</code>，以此定位到正文的指定位置。<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644295266951664429526165.png"><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644295876971664429586963.png"></p>
 <p>可以看到侧边栏的 <code>href</code> 存在乱码的情况，而正文中的 <code>id</code> 是正常的，这就是导致 <code>target</code> 为 <code>null</code> 的原因。</p>
