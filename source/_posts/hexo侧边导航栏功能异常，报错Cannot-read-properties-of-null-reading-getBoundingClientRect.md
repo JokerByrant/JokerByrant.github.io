@@ -6,10 +6,13 @@ tags: 前端技术
 categories: 前端技术
 ---
 
-最近在整理博客，发现网站的侧边导航栏功能无法正常使用了，如下：
-![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285146961664428513842.png)
+最近在整理博客，发现网站的侧边导航栏功能无法正常使用了。
 
 <!--more-->
+
+侧边栏如下，点击某项之后正文没有正常跳转，并且侧边栏的高亮显示也有问题：
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285146961664428513842.png)
+
 
 点击某个子菜单正文没有跳转到对应位置，并且当前高亮的菜单也不对。打开开发者工具，发现报了一个错误：
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16644285926951664428592222.png)
