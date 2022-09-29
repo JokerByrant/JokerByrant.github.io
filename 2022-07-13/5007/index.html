@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166424277294260d011f4d32d934c50ed0391c4daf9ee.png">
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166424278894110339103a71153f3551574e8f5ad1ca2.png">
 <meta property="article:published_time" content="2022-07-13T02:36:57.000Z">
-<meta property="article:modified_time" content="2022-09-27T05:12:52.167Z">
+<meta property="article:modified_time" content="2022-09-27T09:00:06.745Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="Flutter">
 <meta name="twitter:card" content="summary">
@@ -236,19 +236,19 @@
         <p> 之前尝试过在 <code>VMWare</code> 上安装黑苹果来运行 <code>Flutter</code> 的 <code>IOS</code> 端，但是卡在了安装 <code>XCode</code> 这一步。这次 <code>Flutter</code> 端在接入 <code>IOS</code> 的 <code>Notification Service Extension</code> 时遇到很多问题，于是就想自己配置一个 <code>MacOs</code> 环境来协助他解决这个问题。下面是全部的安装过程。</p>
 <span id="more"></span>
 
-<h3 id="系统安装"><a href="#系统安装" class="headerlink" title="系统安装"></a>系统安装</h3><p>之前安装的 <code>MacOS</code> 版本是 <code>11.6.6</code> 的，这次选择了 <code>10.15.5</code>，因为搜索出来的安装教程中大多使用的都是这个版本。</p>
+<h2 id="系统安装"><a href="#系统安装" class="headerlink" title="系统安装"></a>系统安装</h2><p>之前安装的 <code>MacOS</code> 版本是 <code>11.6.6</code> 的，这次选择了 <code>10.15.5</code>，因为搜索出来的安装教程中大多使用的都是这个版本。</p>
 <p>在 <a target="_blank" rel="noopener" href="https://www.lcgod.com/articles/139">Windows 安装 MacOS 10.15 虚拟机调试 Flutter iOS 应用</a> 这篇博客中有详细的安装步骤，包括各种需要的资源都有，我这里就不再赘述了。</p>
-<h3 id="分辨率调整-优化系统卡顿"><a href="#分辨率调整-优化系统卡顿" class="headerlink" title="分辨率调整(优化系统卡顿)"></a>分辨率调整(优化系统卡顿)</h3><p>在安装完 <code>VMWare Tools</code> 后，发现系统异常的卡顿，完全不能正常操作。于是尝试将 <code>VMWare Tools</code> 卸载，卡顿感大大降低，已经不影响正常使用了。但是 <code>VMWare Tools</code> 是必不可少的，所以这么做只能算拆东墙补西墙。</p>
+<h2 id="分辨率调整-优化系统卡顿"><a href="#分辨率调整-优化系统卡顿" class="headerlink" title="分辨率调整(优化系统卡顿)"></a>分辨率调整(优化系统卡顿)</h2><p>在安装完 <code>VMWare Tools</code> 后，发现系统异常的卡顿，完全不能正常操作。于是尝试将 <code>VMWare Tools</code> 卸载，卡顿感大大降低，已经不影响正常使用了。但是 <code>VMWare Tools</code> 是必不可少的，所以这么做只能算拆东墙补西墙。</p>
 <p>针对这个问题，我猜测是与我的电脑配置有关，我的电脑分辨率是 <code>2k</code> 的，查看安装了 <code>VMWare Tools</code> 后的 <code>MacOs</code>，发现分辨率也是 <code>2k</code>。但是 <code>MacOS</code> 的显存只有 <code>128M</code>，显然不足以带动这么高的分辨率。于是猜测，是否可以通过调整虚拟机的分辨率，来优化系统运行速度。</p>
 <p>在虚拟机的设置中找到了这个配置，如下：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242653944e8285b0a2d972b3c5b6d861476e196a2.png"></p>
 <p>将其调整后，重新运行虚拟机，卡顿感大大减轻！</p>
-<h3 id="安装-XCode"><a href="#安装-XCode" class="headerlink" title="安装 XCode"></a>安装 <code>XCode</code></h3><p>正常的安装 <code>XCode</code> 是直接在 <code>AppStore</code> 中安装就可以了，但是由于安装的 <code>MacOs</code> 版本比较老，<code>AppStore</code> 中无法直接下载，会报下面的提示：</p>
+<h2 id="安装-XCode"><a href="#安装-XCode" class="headerlink" title="安装 XCode"></a>安装 <code>XCode</code></h2><p>正常的安装 <code>XCode</code> 是直接在 <code>AppStore</code> 中安装就可以了，但是由于安装的 <code>MacOs</code> 版本比较老，<code>AppStore</code> 中无法直接下载，会报下面的提示：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166424266593951dbf4fefadb389fae12f07ea3c52fea.png"></p>
 <p>因此只能通过手动下载安装包的方式来安装，前往 <a target="_blank" rel="noopener" href="https://xcodereleases.com/">XCode 下载地址</a>，找支持当前系统版本的 <code>XCode</code>，我的 <code>MacOS</code> 版本是 <code>10.15.5</code>，下载的 <code>XCode</code> 版本是 <code>12.1</code> （<em><strong>注：如果之后需要安装 <code>Flutter</code>，需要首先确定对应的 <code>Flutter</code> 版本支持的最低版本 <code>XCode</code>，我在这里就踩了个坑，开始选择的 <code>XCode</code> 版本是 <code>11.7</code>，之后安装的 <code>Flutter</code> 版本是 <code>2.8.1</code>，在执行 <code>flutter doctor</code> 时被提示 <code>XCode</code> 版本过低，最低支持 <code>12.0.1</code> 版本的，导致我又重新安装了一遍</strong></em>）：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642426729391fc9edc32beb786d6065cf727f055f6a.png"></p>
 <p>安装完毕之后打开 <code>XCode</code>，检查一下下面的配置是否配置，如果不配置的话，之后执行 <code>flutter doctor</code> 将找不到已安装的 <code>XCode</code>。</p>
-<h3 id="pod-install-卡住"><a href="#pod-install-卡住" class="headerlink" title="pod install 卡住"></a><code>pod install</code> 卡住</h3><p>是在执行红框中的命令时卡住的，原因是这个项目太大了</p>
+<h2 id="pod-install-卡住"><a href="#pod-install-卡住" class="headerlink" title="pod install 卡住"></a><code>pod install</code> 卡住</h2><p>是在执行红框中的命令时卡住的，原因是这个项目太大了</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242683941a546431bca43dba0d3ef0de062aa2fab.png"></p>
 <p>可以通过下面的链接查看这个项目的大小：<a target="_blank" rel="noopener" href="https://api.github.com/repos/CocoaPods/Specs">链接</a>。这是github的api，打开之后显示一串json，是项目的相关信息，在里面找size，即是项目大小。换算下来是 <code>965.9M</code>，所以下载肯定是需要一定时间的。</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242693941b30f47997ca875acacc99ac26edeecfb.png"></p>
@@ -257,10 +257,10 @@
 <p><code>clone</code> 下来后安装步骤继续执行，之后报了一个错误，<code>MobileVlcKit</code> 依赖安装失败：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242709941b2d4e5810c4489f51e1751f100663b76.png"></p>
 <p>目前发现这个错误对项目的运行并没有影响，所以暂时没有处理。</p>
-<h3 id="Java-环境配置"><a href="#Java-环境配置" class="headerlink" title="Java 环境配置"></a><code>Java</code> 环境配置</h3><p>首先下载 <code>JDK</code>：<a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/downloads/#java8-mac">JDK8 - MacOS 下载地址</a></p>
+<h2 id="Java-环境配置"><a href="#Java-环境配置" class="headerlink" title="Java 环境配置"></a><code>Java</code> 环境配置</h2><p>首先下载 <code>JDK</code>：<a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/downloads/#java8-mac">JDK8 - MacOS 下载地址</a></p>
 <p>下载安装完毕后，需要配置 <code>Java</code> 环境，打开 </p>
 <p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1a7266619d36">Mac电脑Java环境安装</a></p>
-<h3 id="SVN-安装"><a href="#SVN-安装" class="headerlink" title="SVN 安装"></a><code>SVN</code> 安装</h3><p>首先需要安装 <code>HomeBrew</code> 工具，<code>Homebrew</code> 是一款 <code>MacOS</code> 平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索等很多实用的功能。安装命令如下：</p>
+<h2 id="SVN-安装"><a href="#SVN-安装" class="headerlink" title="SVN 安装"></a><code>SVN</code> 安装</h2><p>首先需要安装 <code>HomeBrew</code> 工具，<code>Homebrew</code> 是一款 <code>MacOS</code> 平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索等很多实用的功能。安装命令如下：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin/zsh -c <span class="string">&quot;<span class="subst">$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)</span>&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>接着使用下面的命令安装 <code>SVN</code></p>
@@ -270,10 +270,10 @@
 <p>使用 <code>SVN</code> 将代码拉取下来：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">svn checkout [仓库地址] </span><br></pre></td></tr></table></figure>
 
-<h3 id="Android-Studio-安装"><a href="#Android-Studio-安装" class="headerlink" title="Android Studio 安装"></a><code>Android Studio</code> 安装</h3><p>官网下载：<a target="_blank" rel="noopener" href="https://developer.android.com/studio">地址</a></p>
+<h2 id="Android-Studio-安装"><a href="#Android-Studio-安装" class="headerlink" title="Android Studio 安装"></a><code>Android Studio</code> 安装</h2><p>官网下载：<a target="_blank" rel="noopener" href="https://developer.android.com/studio">地址</a></p>
 <p>安装成功后，打开 <code>Android Studio</code>。安装 <code>Flutter</code>、<code>Dart</code> 插件，如下：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242717938568e77558f8eab50cd746103e39d4c27.png"></p>
-<h3 id="Android-Studio-上找不到真机设备"><a href="#Android-Studio-上找不到真机设备" class="headerlink" title="Android Studio 上找不到真机设备"></a><code>Android Studio</code> 上找不到真机设备</h3><p>如下，将设备连接到电脑上时，<code>Android Studio</code> 中没有显示对应的设备</p>
+<h2 id="Android-Studio-上找不到真机设备"><a href="#Android-Studio-上找不到真机设备" class="headerlink" title="Android Studio 上找不到真机设备"></a><code>Android Studio</code> 上找不到真机设备</h2><p>如下，将设备连接到电脑上时，<code>Android Studio</code> 中没有显示对应的设备</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166424273593906817b35428c29f63d04ba9d4fa50e85.png"></p>
 <p>在 <code>VMWare</code> 的虚拟机选项中可以找到设备的连接信息，如下：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242749938e8320e41ed835754ae7a36a04c0093ab.png"></p>
@@ -281,9 +281,9 @@
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242758938515215cbe332290b1163871ecd661779.png"></p>
 <p>之后重启虚拟机，连接设备，成功找到</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642427669405085e117a656dc994589b3faa96d3ecc.png"></p>
-<h3 id="扩展-MacOS-的磁盘空间"><a href="#扩展-MacOS-的磁盘空间" class="headerlink" title="扩展 MacOS 的磁盘空间"></a>扩展 <code>MacOS</code> 的磁盘空间</h3><p>在 <code>Android Stuio</code> 中 <code>Build</code> 项目时，发现磁盘空间已经不够了，需要对磁盘空间进行拓展。</p>
+<h2 id="扩展-MacOS-的磁盘空间"><a href="#扩展-MacOS-的磁盘空间" class="headerlink" title="扩展 MacOS 的磁盘空间"></a>扩展 <code>MacOS</code> 的磁盘空间</h2><p>在 <code>Android Stuio</code> 中 <code>Build</code> 项目时，发现磁盘空间已经不够了，需要对磁盘空间进行拓展。</p>
 <p>这篇博客中有完整的拓展磁盘空间的方法：<a target="_blank" rel="noopener" href="https://www.pcoic.com/tool/1372.html">MacOS 10.15 VMware 虚拟机扩展磁盘</a>。</p>
-<h3 id="使用-XCode-构建时报错找不到依赖"><a href="#使用-XCode-构建时报错找不到依赖" class="headerlink" title="使用 XCode 构建时报错找不到依赖"></a>使用 <code>XCode</code> 构建时报错找不到依赖</h3><p>错误信息如下，报错的位置是 <code>GeneratedPluginRegistrant.m</code> 文件：</p>
+<h2 id="使用-XCode-构建时报错找不到依赖"><a href="#使用-XCode-构建时报错找不到依赖" class="headerlink" title="使用 XCode 构建时报错找不到依赖"></a>使用 <code>XCode</code> 构建时报错找不到依赖</h2><p>错误信息如下，报错的位置是 <code>GeneratedPluginRegistrant.m</code> 文件：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166424277294260d011f4d32d934c50ed0391c4daf9ee.png"></p>
 <p>在 <a target="_blank" rel="noopener" href="https://github.com/flutter/flutter/issues/53573">GeneratedPluginRegistrant.m Module not found.</a> 这篇讨论中有好多种解决办法，尝试了其中的几种，最终我的处理办法如下：</p>
 <ol>
@@ -383,7 +383,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">系统安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E8%BE%A8%E7%8E%87%E8%B0%83%E6%95%B4-%E4%BC%98%E5%8C%96%E7%B3%BB%E7%BB%9F%E5%8D%A1%E9%A1%BF"><span class="nav-number">2.</span> <span class="nav-text">分辨率调整(优化系统卡顿)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-XCode"><span class="nav-number">3.</span> <span class="nav-text">安装 XCode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pod-install-%E5%8D%A1%E4%BD%8F"><span class="nav-number">4.</span> <span class="nav-text">pod install 卡住</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">5.</span> <span class="nav-text">Java 环境配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SVN-%E5%AE%89%E8%A3%85"><span class="nav-number">6.</span> <span class="nav-text">SVN 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-Studio-%E5%AE%89%E8%A3%85"><span class="nav-number">7.</span> <span class="nav-text">Android Studio 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-Studio-%E4%B8%8A%E6%89%BE%E4%B8%8D%E5%88%B0%E7%9C%9F%E6%9C%BA%E8%AE%BE%E5%A4%87"><span class="nav-number">8.</span> <span class="nav-text">Android Studio 上找不到真机设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A9%E5%B1%95-MacOS-%E7%9A%84%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4"><span class="nav-number">9.</span> <span class="nav-text">扩展 MacOS 的磁盘空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-XCode-%E6%9E%84%E5%BB%BA%E6%97%B6%E6%8A%A5%E9%94%99%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BE%9D%E8%B5%96"><span class="nav-number">10.</span> <span class="nav-text">使用 XCode 构建时报错找不到依赖</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">系统安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E8%BE%A8%E7%8E%87%E8%B0%83%E6%95%B4-%E4%BC%98%E5%8C%96%E7%B3%BB%E7%BB%9F%E5%8D%A1%E9%A1%BF"><span class="nav-number">2.</span> <span class="nav-text">分辨率调整(优化系统卡顿)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-XCode"><span class="nav-number">3.</span> <span class="nav-text">安装 XCode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pod-install-%E5%8D%A1%E4%BD%8F"><span class="nav-number">4.</span> <span class="nav-text">pod install 卡住</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">5.</span> <span class="nav-text">Java 环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SVN-%E5%AE%89%E8%A3%85"><span class="nav-number">6.</span> <span class="nav-text">SVN 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-Studio-%E5%AE%89%E8%A3%85"><span class="nav-number">7.</span> <span class="nav-text">Android Studio 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-Studio-%E4%B8%8A%E6%89%BE%E4%B8%8D%E5%88%B0%E7%9C%9F%E6%9C%BA%E8%AE%BE%E5%A4%87"><span class="nav-number">8.</span> <span class="nav-text">Android Studio 上找不到真机设备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95-MacOS-%E7%9A%84%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4"><span class="nav-number">9.</span> <span class="nav-text">扩展 MacOS 的磁盘空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-XCode-%E6%9E%84%E5%BB%BA%E6%97%B6%E6%8A%A5%E9%94%99%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BE%9D%E8%B5%96"><span class="nav-number">10.</span> <span class="nav-text">使用 XCode 构建时报错找不到依赖</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -399,7 +399,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -412,7 +412,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
