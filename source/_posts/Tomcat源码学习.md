@@ -13,13 +13,13 @@ date: 2022-09-02 10:20:11
 
 <!--more-->
 
-### Tomcat的类加载机制
+## Tomcat的类加载机制
 
 `Java` 默认的类加载机制是双亲委派机制，关于这个的解释可以看看这篇文章：[Java类加载机制-双亲委派机制说明](https://www.cnblogs.com/029zz010buct/p/10366808.html)。
 
 `Tomcat` 使用的类加载机制有别于上面的 `双亲委派机制` 。一个 `Tomcat` 容器允许同时运行多个 `Web` 程序，每个 `Web` 程序依赖的类又必须是相互隔离的。因此，如果 `Tomcat` 使用双亲委派模式来加载类的话，将导致 `Web` 程序依赖的类变为共享的。这时候 `Java` 的上下文类加载器(`contextClassLoader`)就派上用场了，它可以通过 `setContextClassLoader` 来传入自定义的类加载器，实现类的隔离。具体的分析见 [Tomcat 官网](https://tomcat.apache.org/tomcat-9.0-doc/class-loader-howto.html)、[Tomcat类加载机制](https://pdai.tech/md/framework/tomcat/tomcat-x-classloader.html#tomcat%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%E5%91%A2)
 
-### Tomcat中的组件
+## Tomcat中的组件
 
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664245236940fa1bbc667bd821d7224006710121b5b2.png)
 
@@ -55,7 +55,7 @@ date: 2022-09-02 10:20:11
 
 > **注：这一块儿现在看可能有些云里雾里，只需要知道大致的概念就行，等之后深入的阅读了各个组件的源码，理解了组件间关系的细节再回来看这个会很清晰。**
 
-### 加载和启动入口
+## 加载和启动入口
 
 `Tomcat` 的启动入口在 `Bootstrap.class` 的 `main()` 方法中，首先初始化 `Catalina` 类，配置自定义的类加载器。
 
@@ -141,7 +141,7 @@ public static void main(String args[]) {
 }
 ```
 
-### 组件生命周期管理
+## 组件生命周期管理
 
 `Tomcat` 中包含的组件见下图：
 
@@ -234,7 +234,7 @@ protected abstract void destroyInternal() throws LifecycleException;
 
 这些方法在 `StandardServer` 中都完成了相应的实现。
 
-### 组件的拓展管理
+## 组件的拓展管理
 
 继续以 `StandatdServer` 为例，看一下相关的继承关系：
 
@@ -254,7 +254,7 @@ protected abstract void destroyInternal() throws LifecycleException;
 
 有关这块儿的更多内容见：[Tomcat如何通过JMX实现组件管理](https://pdai.tech/md/framework/tomcat/tomcat-x-jmx.html#tomcat%E5%A6%82%E4%BD%95%E9%80%9A%E8%BF%87jmx%E5%AE%9E%E7%8E%B0%E7%BB%84%E4%BB%B6%E7%AE%A1%E7%90%86)
 
-### `Server` 的实现：`StandardServer` 代码分析
+## `Server` 的实现：`StandardServer` 代码分析
 
 首先回到 `Tomcat` 的启动入口，看一下这个类是在什么时候完成初始化的，直接截取对应的代码：
 
@@ -1295,7 +1295,7 @@ public final synchronized void destroy() throws LifecycleException {
 }
 ```
 
-### `Service` 的实现：`StandardService` 代码分析
+## `Service` 的实现：`StandardService` 代码分析
 
 看一下 `StandardService` 的继承关系：
 
@@ -1736,13 +1736,13 @@ protected void destroyInternal() throws LifecycleException {
 
 关于它们的具体分析见：[深入理解Tomcat（九）MapperListener和Mapper](https://www.jianshu.com/p/a0a421f3f8e5)。
 
-### `Excutor` 的实现 - `StandardThreadExecutor`
+## `Excutor` 的实现 - `StandardThreadExecutor`
 
 明白一个问题：**为什么 `Tomcat` 会自己构造一个 `StandardThreadExecutor` 而不是直接使用 `ThreadPoolExecutor`？**
 
 `StandardThreadExecutor` 中值使用了 `execute` 的两个主要方法，它希望能够屏蔽掉 `ThreadPoolExecutor` 中的其他方法，这样调用层就无需再处理了。
 
-### `Container` 的实现 - `ContainerBase`
+## `Container` 的实现 - `ContainerBase`
 
 在 `Tomcat` 中，`Container` 是 `Service` 中组件的总称，`Service` 中的组件基本都实现了这个接口。它们包括：`Engine`、`Host`、`Context`、`Wrapper`。如下图：
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642453649450826000d848d9f6c09531ac412263d6a.jpg)
@@ -1762,7 +1762,7 @@ protected void destroyInternal() throws LifecycleException {
 
 源码参考：[Tomcat - Request请求处理: Container设计](https://www.pdai.tech/md/framework/tomcat/tomcat-x-container.html)
 
-### `Connector` - 连接器
+## `Connector` - 连接器
 
 > `Connector` 用于接受请求并将请求封装成 `Request` 和 `Response`，然后交给 `Container` 进行处理，`Container` 处理完之后再交给 `Connector` 返回给客户端。
 
@@ -2134,7 +2134,7 @@ public void createExecutor() {
 
 `Connector` 是 `Tomcat` 中最复杂的一块儿功能，更详细的解读见：[深入理解Tomcat（十）Connector](https://www.jianshu.com/p/3059328cd661)
 
-### 参考文章 
+## 参考文章 
 
 [Java类加载机制-双亲委派机制说明](https://www.cnblogs.com/029zz010buct/p/10366808.html)
 

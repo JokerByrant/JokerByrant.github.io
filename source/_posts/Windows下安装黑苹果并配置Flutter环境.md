@@ -9,13 +9,13 @@ date: 2022-07-13 10:36:57
 
 <!--more-->
 
-### 系统安装
+## 系统安装
 
 之前安装的 `MacOS` 版本是 `11.6.6` 的，这次选择了 `10.15.5`，因为搜索出来的安装教程中大多使用的都是这个版本。
 
 在 [Windows 安装 MacOS 10.15 虚拟机调试 Flutter iOS 应用](https://www.lcgod.com/articles/139) 这篇博客中有详细的安装步骤，包括各种需要的资源都有，我这里就不再赘述了。
 
-### 分辨率调整(优化系统卡顿)
+## 分辨率调整(优化系统卡顿)
 
 在安装完 `VMWare Tools` 后，发现系统异常的卡顿，完全不能正常操作。于是尝试将 `VMWare Tools` 卸载，卡顿感大大降低，已经不影响正常使用了。但是 `VMWare Tools` 是必不可少的，所以这么做只能算拆东墙补西墙。
 
@@ -27,7 +27,7 @@ date: 2022-07-13 10:36:57
 
 将其调整后，重新运行虚拟机，卡顿感大大减轻！
 
-### 安装 `XCode`
+## 安装 `XCode`
 
 正常的安装 `XCode` 是直接在 `AppStore` 中安装就可以了，但是由于安装的 `MacOs` 版本比较老，`AppStore` 中无法直接下载，会报下面的提示：
 
@@ -39,7 +39,7 @@ date: 2022-07-13 10:36:57
 
 安装完毕之后打开 `XCode`，检查一下下面的配置是否配置，如果不配置的话，之后执行 `flutter doctor` 将找不到已安装的 `XCode`。
 
-### `pod install` 卡住
+## `pod install` 卡住
 
 是在执行红框中的命令时卡住的，原因是这个项目太大了
 
@@ -59,7 +59,7 @@ date: 2022-07-13 10:36:57
 
 目前发现这个错误对项目的运行并没有影响，所以暂时没有处理。
 
-### `Java` 环境配置
+## `Java` 环境配置
 
 首先下载 `JDK`：[JDK8 - MacOS 下载地址](https://www.oracle.com/java/technologies/downloads/#java8-mac)
 
@@ -67,7 +67,7 @@ date: 2022-07-13 10:36:57
 
 [Mac电脑Java环境安装](https://www.jianshu.com/p/1a7266619d36)
 
-### `SVN` 安装
+## `SVN` 安装
 
 首先需要安装 `HomeBrew` 工具，`Homebrew` 是一款 `MacOS` 平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索等很多实用的功能。安装命令如下：
 
@@ -89,7 +89,7 @@ brew install subversion
 svn checkout [仓库地址] 
 ```
 
-### `Android Studio` 安装
+## `Android Studio` 安装
 
 官网下载：[地址](https://developer.android.com/studio)
 
@@ -97,7 +97,7 @@ svn checkout [仓库地址]
 
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664242717938568e77558f8eab50cd746103e39d4c27.png)
 
-### `Android Studio` 上找不到真机设备
+## `Android Studio` 上找不到真机设备
 
 如下，将设备连接到电脑上时，`Android Studio` 中没有显示对应的设备
 
@@ -115,13 +115,13 @@ svn checkout [仓库地址]
 
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16642427669405085e117a656dc994589b3faa96d3ecc.png)
 
-### 扩展 `MacOS` 的磁盘空间
+## 扩展 `MacOS` 的磁盘空间
 
 在 `Android Stuio` 中 `Build` 项目时，发现磁盘空间已经不够了，需要对磁盘空间进行拓展。
 
 这篇博客中有完整的拓展磁盘空间的方法：[MacOS 10.15 VMware 虚拟机扩展磁盘](https://www.pcoic.com/tool/1372.html)。
 
-### 使用 `XCode` 构建时报错找不到依赖
+## 使用 `XCode` 构建时报错找不到依赖
 
 错误信息如下，报错的位置是 `GeneratedPluginRegistrant.m` 文件：
 
