@@ -15,6 +15,28 @@ date: 2022-07-13 10:36:57
 
 在 [Windows 安装 MacOS 10.15 虚拟机调试 Flutter iOS 应用](https://www.lcgod.com/articles/139) 这篇博客中有详细的安装步骤，包括各种需要的资源都有，我这里就不再赘述了。
 
+### dmg镜像转cdr
+
+在下载系统镜像时，下载的镜像后缀是 `dmg` 类型的，而 `vmware` 需要的镜像类型是 `cdr` 的，因此需要对下载下来的镜像进行处理。
+
+找到了一篇文章：[windows系统下，如何将dmg文件转化为cdr文件](https://blog.csdn.net/qq_45854074/article/details/111566055)。
+
+选择 `Tools` 菜单，点击 `create disk image`
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664526553662a96c759b64f00735fd51cefeaa6d5b29.png)
+
+选择转换后 `cdr` 文件存储位置，注意文件名要自己修改，后缀设置为 `cdr`
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664526564661c9ddd15eacd5f84991ab30593ebd7751.png)
+
+等待转换完成即可
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664526571663b49a38bb9aee503cb825d2c789a64d59.png)
+
+转换成功
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1664526577666d8d6bef074b8a5a9fcf51544c0d41e71.png)
+
 ## 分辨率调整(优化系统卡顿)
 
 在安装完 `VMWare Tools` 后，发现系统异常的卡顿，完全不能正常操作。于是尝试将 `VMWare Tools` 卸载，卡顿感大大降低，已经不影响正常使用了。但是 `VMWare Tools` 是必不可少的，所以这么做只能算拆东墙补西墙。
@@ -243,3 +265,19 @@ end
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166424278894110339103a71153f3551574e8f5ad1ca2.png)
 
 这里搜遍了各种博客都没找到解决办法，与 `App` 端同事的配置进行了对比也没有差异。执行了清除本地依赖然后重新拉取的操作也无济于事，目前只能猜测是我的 `XCode` 版本比较低：`12.1`。最后无奈之下只能将这两处报错的代码注释掉，项目才运行起来。
+
+## 构建App时报错
+
+报错信息如下
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16645265866647f322b8c9f3389bbe327fce8904d66a6.png)
+
+`App` 端同事提示可以直接在 `XCode` `Run` 也可以，尝试了一下，`Build Successed`，但是在安装时出现了下面的提示：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166452659766391ef4b6e3f3f1c6bdc2d24b6c829c297.png)
+
+在 `Google` 上搜索了一下，发现可能是 `XCode` 版本过低导致的，我的设备是 `Apple 11`，对应的系统是 `IOS 15.4`，`XCode` 版本只有 `12.1`，在 `StackOverflow` 上有人给了一个 `XCode` 和 `IOS` 版本的对应关系表：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16645266026637c6c9b73715a4f9779c26d6b0fe62ac4.png)
+
+这个问题目前只能通过升级 `XCode` 来解决，但是当前版本的系统不支持更高版本的 `XCode` 了，因此目前这个问题没法解决。真机调试也就没法继续了，目前只能将 `App` 运行在虚拟机上进行测试，之后尝试一下安装更高版本的 `MacOs`。
