@@ -281,3 +281,55 @@ end
 ![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16645266026637c6c9b73715a4f9779c26d6b0fe62ac4.png)
 
 这个问题目前只能通过升级 `XCode` 来解决，但是当前版本的系统不支持更高版本的 `XCode` 了，因此目前这个问题没法解决。真机调试也就没法继续了，目前只能将 `App` 运行在虚拟机上进行测试，之后尝试一下安装更高版本的 `MacOs`。
+
+## 解决构建时的报错(2022-10-12)
+
+无意间发现了一篇文章：[Could not locate device support files](https://ighibli.github.io/2017/03/28/Could-not-locate-device-support-files/)，可以解决 `Xcode` 版本过低但 `IOS` 版本过高，导致不能进行真机调试的问题。
+
+这个处理办法是添加一个适配指定 `IOS` 版本的包到 `XCode` 安装目录，之后就可以进行真机调试了。先从 [适配包下载地址](https://github.com/iGhibli/iOS-DeviceSupport) 下载指定版本的包，比如我的 `IOS` 设备版本是 `15.5`，就下载 `15.5` 版本的包，然后按照 [Could not locate device support files](https://ighibli.github.io/2017/03/28/Could-not-locate-device-support-files/) 这个里面的教程，将下载下来的包放入 `XCode` 的指定目录下：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1665560479120483ad2a020c895e8cc07b90c95bf0bec.png)
+
+之后重启 `XCode`，重新构建项目，报了下面的错误，与之前不一样：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1665560490114e5b814266c75f1cb92572f75c9cb8a0e.png)
+
+按照 [iPhone not connected. Xcode will continue when iPhone is connected](https://stackoverflow.com/questions/46014400/iphone-not-connected-xcode-will-continue-when-iphone-is-connected) 给的解决办法处理一下即可：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/166556050111402fd85d6d8d052cd72e82d2727a12e91.png)
+
+解决之后进入 `Xcode` 的 `window -> Devices and Simulators` 菜单，应该没有报错信息：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16655605111169e75f55e8b2bc4efb6b73c259951369c.png)
+
+之后重新构建，成功触发了安装进程，但是又报了错误：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1665560520117c6a41ff8db9a6c3a9c8f8f6652693d88.png)
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16655605251177a4c02d362fee07a07b8f5f2c6952c8a.png)
+
+在 [The code signature version is no longer supported](https://stackoverflow.com/questions/68467306/the-code-signature-version-is-no-longer-supported) 找到了解决办法：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16655605331156c6d54dacc796107b4dd3af000e6b800.png)
+
+在 `XCode` 中添加如下配置即可：
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1665560557119b2506559406fc6fc8b8cef6ad572940d.png)
+
+之后重新进行构建，可以在下面的 `Tag` 中查看构建进程
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1665560564114cd4e888b0315b13f09d772ad5fa64cf2.png)
+
+等待一段时间后，安装成功！
+
+### 通过 `Flutter` 安装 `release` 版
+
+上面通过 `Xcode` 安装的 `App` 必须插上数据线才能运行，数据线一旦断开 `App` 将无法运行。解决办法就是通过 `Flutter` 安装 `release` 版。
+
+> 注：虽然安装的是 `release` 版，但对应的 `Api` 服务地址还是线下的，如果使用线上的 `Api` 地址，推送将无法送达。
+
+直接在 `Android Studio` 的 `terminal` 中执行命令：`flutter run --release`。之前运行这个命令时是会报错的，无法安装成功。
+
+等待一段时间后，安装成功！
+
+![](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1665560576115af344bdda68f040dec6525b9da03daf5.png)
