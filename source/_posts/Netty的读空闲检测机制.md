@@ -2,8 +2,8 @@
 title: Netty的读空闲检测机制
 abbrlink: 6356
 date: 2023-07-24 13:41:15
-tags:
-categories:
+tags: Netty
+categories: 后端技术 
 ---
 > 这篇文章记录了一次因对 `Netty` 读空闲机制了解不够透彻导致的问题。
 
