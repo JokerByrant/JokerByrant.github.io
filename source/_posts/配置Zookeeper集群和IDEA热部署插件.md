@@ -3,7 +3,7 @@ title: 配置Zookeeper集群和IDEA热部署插件
 tags: 开发环境
 categories: 后端技术
 abbrlink: 17735
-date: 2023-07-24 13:53:45
+date: 2023-01-24 13:53:45
 ---
 > 记录一下工作开发环境的搭建。
 
