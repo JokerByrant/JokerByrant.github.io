@@ -30,13 +30,13 @@
 <meta property="og:site_name" content="Sssxh BLOG">
 <meta property="og:description" content="前言前段时间在服务器搭建了 Jenkins, 过程见 在Windows服务器上搭建Jenkins。这个过程顺便也学习了 windwos 的批处理脚本的编写，但是仍然只是学了点皮毛。今天在群里碰到一个朋友询问关于 bat 脚本的问题，是 for 循环中字符拼接的问题。正好之前在解决 windows 服务器上实时打印 SpringBoot 项目启动日志时，也碰到类似的问题，就直接按照我的解决办法回答了">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img02.sogoucdn.com/app/a/100520146/19a9403aa1440db062b6d36e59bc931b">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/168956539769619a9403aa1440db062b6d36e59bc931b_.png">
 <meta property="article:published_time" content="2021-07-27T10:41:48.000Z">
-<meta property="article:modified_time" content="2021-11-12T06:40:30.595Z">
+<meta property="article:modified_time" content="2023-07-17T03:43:25.692Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="bat">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img02.sogoucdn.com/app/a/100520146/19a9403aa1440db062b6d36e59bc931b">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/168956539769619a9403aa1440db062b6d36e59bc931b_.png">
 
 <link rel="canonical" href="https://jokerbyrant.github.io/2021-07-27/7974/">
 
@@ -223,7 +223,7 @@
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间在服务器搭建了 <code>Jenkins</code>, 过程见 <a href="/2021-07-05/40762/" title="在Windows服务器上搭建Jenkins">在Windows服务器上搭建Jenkins</a>。这个过程顺便也学习了 <code>windwos</code> 的批处理脚本的编写，但是仍然只是学了点皮毛。今天在群里碰到一个朋友询问关于 <code>bat</code> 脚本的问题，是 <code>for</code> 循环中字符拼接的问题。正好之前在解决 <code>windows</code> 服务器上实时打印 <code>SpringBoot</code> 项目启动日志时，也碰到类似的问题，就直接按照我的解决办法回答了他。但他的场景与我有所不同，我了解的也只是皮毛，但是想着帮人帮到底，正好借此也能学习深入一点。这个主要涉及的是 <code>bat</code>脚本中变量延迟加载的知识点。</p>
 <span id="more"></span>
 
-<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>碰到的问题如下：<br><img src="https://img02.sogoucdn.com/app/a/100520146/19a9403aa1440db062b6d36e59bc931b" alt="ed743ade48ff5b1cd3a4ada04ec6d93.png"></p>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>碰到的问题如下：<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/168956539769619a9403aa1440db062b6d36e59bc931b_.png" alt="168956539769619a9403aa1440db062b6d36e59bc931b_.png"></p>
 <p>最终的打印结果只有文件的最后一行内容，一开始我想到应该是字符没有进行拼接，便尝试了如下的代码：</p>
 <figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"><span class="built_in">set</span> param=</span><br><span class="line"><span class="keyword">for</span> /f <span class="variable">%%i</span> <span class="keyword">in</span> (d:\<span class="number">1</span>.txt) <span class="keyword">do</span> (</span><br><span class="line">    <span class="built_in">set</span> param=<span class="variable">%param%</span><span class="variable">%%i</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">%param%</span></span><br></pre></td></tr></table></figure>
 
@@ -338,7 +338,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -351,7 +351,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -378,7 +378,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
