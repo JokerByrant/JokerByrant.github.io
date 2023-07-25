@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="问题描述上一篇文章分析了 Logback 对过期日志清理的流程：：解决多服务下Logback日志丢失问题，找出了过期日志没有被清理的原因。其中提到了关于日志后缀顺序杂乱的问题，如下：  这里就仍按上一篇文章的思路来分析，先结合源码梳理一下日志文件后缀生成的流程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解决多服务下Logback日志文件后缀顺序错乱问题">
+<meta property="og:url" content="https://jokerbyrant.github.io/2021-12-16/10171/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="问题描述上一篇文章分析了 Logback 对过期日志清理的流程：：解决多服务下Logback日志丢失问题，找出了过期日志没有被清理的原因。其中提到了关于日志后缀顺序杂乱的问题，如下：  这里就仍按上一篇文章的思路来分析，先结合源码梳理一下日志文件后缀生成的流程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268520229f62b296b8c9f9073715fd5a34a535bbe.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026852822856ee3702fd2c22065a1ac8e1196cca6c.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026853522883b528bcc8cab1b0897db14675b1e2d2.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268541232437075874926feb7091e315c2ed821d7.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902685502312b504df3f1afc3ec367e0ee76d89b646.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268560228e60779e526f424702caae32ae4924ae8.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902685702281073f6106023616e43f4177c8255545b.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268580229b124bad154297d6e9a1a1fe0af9a5e4f.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268588252ef4bce5fe66cb646380a912216341d11.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268610229181bfaf8a84dbf7ffd35f4a572fa43e1.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902686372292ed3b4c0bbe8f23757ec0632bda32045.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268617228908653ae07e15abcd6443523dcf53f0d.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268644228139fdfc332a0bf5e06542a399e36f17f.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268666229882c5f5e0979cb8f7c7b9c884e6b8287.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268680235c539f1fb5e6890e428a38fd92578dde6.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902686852299b54b3664e9e1ca9652a8ac0f22476f5.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268692229b50667edb6dd3395bd7f2f02ca28012d.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026870023271dd16e9dff3e0ea2f7f6600439745c2.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026870823027317affebc977df28bb0aafb98b982e.png">
+<meta property="article:published_time" content="2021-12-16T02:07:15.000Z">
+<meta property="article:modified_time" content="2023-07-25T07:18:14.403Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="Logback">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268520229f62b296b8c9f9073715fd5a34a535bbe.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2021-12-16/10171/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>解决多服务下Logback日志文件后缀顺序错乱问题 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021-12-16/10171/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          解决多服务下Logback日志文件后缀顺序错乱问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-16 10:07:15" itemprop="dateCreated datePublished" datetime="2021-12-16T10:07:15+08:00">2021-12-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>上一篇文章分析了 <code>Logback</code> 对过期日志清理的流程：：<a href="/2021-12-10/11081/" title="解决多服务下Logback日志丢失问题">解决多服务下Logback日志丢失问题</a>，找出了过期日志没有被清理的原因。其中提到了关于日志后缀顺序杂乱的问题，如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268520229f62b296b8c9f9073715fd5a34a535bbe.png" alt="1690268520229f62b296b8c9f9073715fd5a34a535bbe.png"></p>
+<p>这里就仍按上一篇文章的思路来分析，先结合源码梳理一下日志文件后缀生成的流程。</p>
+<span id="more"></span>
+<h3 id="问题定位"><a href="#问题定位" class="headerlink" title="问题定位"></a>问题定位</h3><p>日志文件后缀生成的逻辑要与 [日志备份] 的逻辑结合起来看才行，这部分的代码与前一篇分析 [清除历史日志] 的代码稍有重合，这里仍然从最开始来分析。</p>
+<p>首先在项目启动时，会加载日志配置文件中的配置 — <code>TimeBasedRollingPolicy$start()</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026852822856ee3702fd2c22065a1ac8e1196cca6c.png" alt="169026852822856ee3702fd2c22065a1ac8e1196cca6c.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026853522883b528bcc8cab1b0897db14675b1e2d2.png" alt="169026853522883b528bcc8cab1b0897db14675b1e2d2.png"></p>
+<p>日志文件后缀的计算在 <code>SizeAndTimeBasedFNATP$start()</code> 中进行，日志文件后缀通过一个计数器 <code>currentPeriodsCounter</code> 保存，在后面进行日志文件备份会用到。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268541232437075874926feb7091e315c2ed821d7.png" alt="1690268541232437075874926feb7091e315c2ed821d7.png"></p>
+<p>上面提到了在 <code>logback.xml</code> 中，我们配置的滚动策略是 <code>TimeBasedRollingPolicy</code>，而我们配置的写日志的组件是 <code>RollingFileAppender</code>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- RollingFileAppender：滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;syslog&quot;</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>当有日志写入时，会执行 <code>RollingFileAppender</code> 的 <code>subAppend()</code> 方法：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902685502312b504df3f1afc3ec367e0ee76d89b646.png" alt="16902685502312b504df3f1afc3ec367e0ee76d89b646.png"></p>
+<p><code>isTriggerEvent</code> 方法执行的操作是 <strong>判断是否需要执行 [备份日志] 和 [清理历史日志] 的操作</strong></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268560228e60779e526f424702caae32ae4924ae8.png" alt="1690268560228e60779e526f424702caae32ae4924ae8.png"></p>
+<p>如果满足条件，那么执行 <strong>[备份日志]</strong> 和 <strong>[清理历史日志]</strong> 的操作：<code>roller()</code> 方法。这个方法比较重要，因为这是触发 <strong>[备份日志]</strong> 和 <strong>[清理历史日志]</strong> 的入口。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902685702281073f6106023616e43f4177c8255545b.png" alt="16902685702281073f6106023616e43f4177c8255545b.png"></p>
+<p>这里我们开始看 <code>renameUtil.rename()</code> 方法，这个方法执行的是 <strong>[日志备份]</strong> 的操作，备份的方法是：<strong>根据上面获取到的日志文件后缀，对原文件重命名，之后新的日志输出到新的文件中去。</strong></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268580229b124bad154297d6e9a1a1fe0af9a5e4f.png" alt="1690268580229b124bad154297d6e9a1a1fe0af9a5e4f.png"></p>
+<p>上面红框标注的地方就是日志文件后缀错乱的原因：<strong>当有日志写入文件时，会执行检查日志文件大小的判断。当日志文件大小达到设定值后，文件后缀计数+1，并执行备份操作。出于某种原因(可能与启动多个服务有关)，备份失败了。然后后续每次有日志写入时，都会重复的执行上面的步骤，后缀计数不断累加，最终在某次写入成功，但是此时后缀已经累加了n次。</strong></p>
+<p>在我们的业务中，接口服务 <code>rsdun-app-api</code> 在测试环境运行了3个服务，但它们共享一个日志文件前缀，因此它们的日志都会输出到同一文件中。<code>Windows</code> 环境下，文件流被打开后，就无法进行修改操作，会提示被占用，如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268588252ef4bce5fe66cb646380a912216341d11.png" alt="1690268588252ef4bce5fe66cb646380a912216341d11.png"></p>
+<p>上面开启了3个服务，如果其中一个服务发现日志文件大小超出限制了，开始执行文件备份操作，对这个日志进行重命名操作。但是这个文件仍然被另外两个服务占用着，因此就会出现重命名失败的情况，进而导致上面说的后缀不断累加。最终备份成功时，文件后缀就会发生错乱的请情况。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268610229181bfaf8a84dbf7ffd35f4a572fa43e1.png" alt="1690268610229181bfaf8a84dbf7ffd35f4a572fa43e1.png"></p>
+<h3 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h3><p>目前有两种思路：</p>
+<ol>
+<li>简单的办法，修改日志配置，按照端口号，为每个服务创建不同的日志文件：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_35549286/article/details/115915665">参考文章</a>。配置如下：<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902686372292ed3b4c0bbe8f23757ec0632bda32045.png" alt="16902686372292ed3b4c0bbe8f23757ec0632bda32045.png"><br>但是测试发现这种方法不可取，会导致日志被分割成多个，可读性会变得很差。<br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268617228908653ae07e15abcd6443523dcf53f0d.png" alt="1690268617228908653ae07e15abcd6443523dcf53f0d.png"></li>
+<li>想办法解决其他进程占用日志文件导致日志文件命名失败的问题。</li>
+</ol>
+<h3 id="文件重命名失败问题解决"><a href="#文件重命名失败问题解决" class="headerlink" title="文件重命名失败问题解决"></a>文件重命名失败问题解决</h3><p>上面提到出现这个问题的情况是运行了多个服务，在本地进行了测试，如果运行的是单服务，文件的重命名操作就没有问题，后缀也是正常的。</p>
+<p>查阅了 <code>renameTo()</code> 相关的文档，<strong>在每次调用该方法前都要保证文件流是关闭的</strong>。在日志相关的源码中，也有对应的操作：<strong>每次调用 <code>rollover()</code> 方法，都会开启一个同步锁，然后关闭文件流，因此单服务重命名文件不会失败。</strong>但是如果是多服务，该同步锁就失去作用了，因为同步锁只能作用于当前服务，别的服务可以正常通行。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268644228139fdfc332a0bf5e06542a399e36f17f.png" alt="1690268644228139fdfc332a0bf5e06542a399e36f17f.png"></p>
+<p>注解中也提到，<code>windows</code> 平台下无法重命名打开的文件！在 <a target="_blank" rel="noopener" href="https://blog.csdn.net/Abysscarry/article/details/102847754">多项目写入同一 <code>Logback</code> 日志文件导致的滚动混乱问题（修改 <code>Logback</code> 源码）</a> 文章中，进行了相应的测试</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268666229882c5f5e0979cb8f7c7b9c884e6b8287.png" alt="1690268666229882c5f5e0979cb8f7c7b9c884e6b8287.png"></p>
+<p>按照上面的说法，在 <code>linux</code> 平台下并不存在这个问题，这个需要后面进行测试。在 <code>windows</code> 平台上还是会有类似的问题，目前想到的办法是修改源码，利用<strong>分布式锁</strong>解决。下面进行尝试：</p>
+<h4 id="增加分布式锁-失败"><a href="#增加分布式锁-失败" class="headerlink" title="增加分布式锁(失败)"></a>增加分布式锁(失败)</h4><p>按照上面文档给出的修改源码方式，在已有项目中创建对应包，将要修改的文件从源码中复制过来，对应的文件是 <code>RollingFileAppender.java</code>：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268680235c539f1fb5e6890e428a38fd92578dde6.png" alt="1690268680235c539f1fb5e6890e428a38fd92578dde6.png"></p>
+<p>然后直接修改源码中的 <code>rollover()</code> 方法，将原先的同步锁修改为分布式锁：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16902686852299b54b3664e9e1ca9652a8ac0f22476f5.png" alt="16902686852299b54b3664e9e1ca9652a8ac0f22476f5.png"></p>
+<p>之后进行测试，发现添加分布式锁并没有用。分析了一下，要保证文件能够重命名成功，关键是要将所有服务中的文件流都关闭，而添加分布式锁并不能做到这一点。</p>
+<h4 id="文件重命名操作修改为先复制再清空"><a href="#文件重命名操作修改为先复制再清空" class="headerlink" title="文件重命名操作修改为先复制再清空"></a>文件重命名操作修改为先复制再清空</h4><p>换个思路，最终要实现的功能是将文件备份，那么可以先将文件进行复制，然后再将其删除。测试发现，删除操作也无法进行，但是清空文件的操作可以进行。</p>
+<p>因此，修改源码 <code>RenameUtil.class</code> 中的 <code>rename()</code> 方法，建立文件</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690268692229b50667edb6dd3395bd7f2f02ca28012d.png" alt="1690268692229b50667edb6dd3395bd7f2f02ca28012d.png"></p>
+<p>对重命名操作进行补充，如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026870023271dd16e9dff3e0ea2f7f6600439745c2.png" alt="169026870023271dd16e9dff3e0ea2f7f6600439745c2.png"></p>
+<p>修改后再进行测试，文件备份成功，并且后缀没有错乱！</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/169026870823027317affebc977df28bb0aafb98b982e.png" alt="169026870823027317affebc977df28bb0aafb98b982e.png"></p>
+<p>完整的 <code>RenameUtil.java</code> 文件如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Logback: the reliable, generic, fast and flexible logging framework.</span></span><br><span class="line"><span class="comment"> * Copyright (C) 1999-2015, QOS.ch. All rights reserved.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This program and the accompanying materials are dual-licensed under</span></span><br><span class="line"><span class="comment"> * either the terms of the Eclipse Public License v1.0 as published by</span></span><br><span class="line"><span class="comment"> * the Eclipse Foundation</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *   or (per the licensee&#x27;s choosing)</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * under the terms of the GNU Lesser General Public License version 2.1</span></span><br><span class="line"><span class="comment"> * as published by the Free Software Foundation.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">package</span> ch.qos.logback.core.rolling.helper;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> ch.qos.logback.core.CoreConstants;</span><br><span class="line"><span class="keyword">import</span> ch.qos.logback.core.rolling.RollingFileAppender;</span><br><span class="line"><span class="keyword">import</span> ch.qos.logback.core.rolling.RolloverFailure;</span><br><span class="line"><span class="keyword">import</span> ch.qos.logback.core.spi.ContextAwareBase;</span><br><span class="line"><span class="keyword">import</span> ch.qos.logback.core.util.EnvUtil;</span><br><span class="line"><span class="keyword">import</span> ch.qos.logback.core.util.FileUtil;</span><br><span class="line"><span class="keyword">import</span> org.springframework.util.FileCopyUtils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Utility class to help solving problems encountered while renaming files.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Ceki Gulcu</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RenameUtil</span> <span class="keyword">extends</span> <span class="title">ContextAwareBase</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> String RENAMING_ERROR_URL = CoreConstants.CODES_URL + <span class="string">&quot;#renamingError&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * A relatively robust file renaming method which in case of failure due to</span></span><br><span class="line"><span class="comment">     * src and target being on different volumes, falls back onto</span></span><br><span class="line"><span class="comment">     * renaming by copying.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> src</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> target</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> RolloverFailure</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rename</span><span class="params">(String src, String target)</span> <span class="keyword">throws</span> RolloverFailure </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (src.equals(target)) &#123;</span><br><span class="line">            addWarn(<span class="string">&quot;Source and target files are the same [&quot;</span> + src + <span class="string">&quot;]. Skipping.&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        File srcFile = <span class="keyword">new</span> File(src);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (srcFile.exists()) &#123;</span><br><span class="line">            File targetFile = <span class="keyword">new</span> File(target);</span><br><span class="line">            createMissingTargetDirsIfNecessary(targetFile);</span><br><span class="line"></span><br><span class="line">            addInfo(<span class="string">&quot;Renaming file [&quot;</span> + srcFile + <span class="string">&quot;] to [&quot;</span> + targetFile + <span class="string">&quot;]&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 首先，尝试直接重命名</span></span><br><span class="line">            <span class="keyword">boolean</span> result = srcFile.renameTo(targetFile);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">                <span class="comment">// 如果重命名失败，对文件执行复制清空操作</span></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    FileCopyUtils.copy(srcFile, targetFile);</span><br><span class="line">                    FileWriter fileWriter = <span class="keyword">new</span> FileWriter(srcFile);</span><br><span class="line">                    fileWriter.write(<span class="string">&quot;&quot;</span>);</span><br><span class="line">                    fileWriter.flush();</span><br><span class="line">                    fileWriter.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    <span class="comment">// 如果复制清空操作也执行失败，执行其原本的重试机制</span></span><br><span class="line">                    addWarn(<span class="string">&quot;Failed to rename file [&quot;</span> + srcFile + <span class="string">&quot;] as [&quot;</span> + targetFile + <span class="string">&quot;].&quot;</span>);</span><br><span class="line">                    Boolean areOnDifferentVolumes = areOnDifferentVolumes(srcFile, targetFile);</span><br><span class="line">                    <span class="keyword">if</span> (Boolean.TRUE.equals(areOnDifferentVolumes)) &#123;</span><br><span class="line">                        addWarn(<span class="string">&quot;Detected different file systems for source [&quot;</span> + src + <span class="string">&quot;] and target [&quot;</span> + target + <span class="string">&quot;]. Attempting rename by copying.&quot;</span>);</span><br><span class="line">                        renameByCopying(src, target);</span><br><span class="line">                        <span class="keyword">return</span>;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        addWarn(<span class="string">&quot;Please consider leaving the [file] option of &quot;</span> + RollingFileAppender.class.getSimpleName() + <span class="string">&quot; empty.&quot;</span>);</span><br><span class="line">                        addWarn(<span class="string">&quot;See also &quot;</span> + RENAMING_ERROR_URL);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RolloverFailure(<span class="string">&quot;File [&quot;</span> + src + <span class="string">&quot;] does not exist.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Attempts to determine whether both files are on different volumes. Returns true if we could determine that</span></span><br><span class="line"><span class="comment">     * the files are on different volumes. Returns false otherwise or if an error occurred while doing the check.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> srcFile</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> targetFile</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> true if on different volumes, false otherwise or if an error occurred</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Boolean <span class="title">areOnDifferentVolumes</span><span class="params">(File srcFile, File targetFile)</span> <span class="keyword">throws</span> RolloverFailure </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!EnvUtil.isJDK7OrHigher())</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// target file is not certain to exist but its parent has to exist given the call hierarchy of this method</span></span><br><span class="line">        File parentOfTarget = targetFile.getAbsoluteFile().getParentFile();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(parentOfTarget == <span class="keyword">null</span>) &#123;</span><br><span class="line">            addWarn(<span class="string">&quot;Parent of target file [&quot;</span>+targetFile+<span class="string">&quot;] is null&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!parentOfTarget.exists()) &#123;</span><br><span class="line">            addWarn(<span class="string">&quot;Parent of target file [&quot;</span>+targetFile+<span class="string">&quot;] does not exist&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">boolean</span> onSameFileStore = FileStoreUtil.areOnSameFileStore(srcFile, parentOfTarget);</span><br><span class="line">            <span class="keyword">return</span> !onSameFileStore;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RolloverFailure rf) &#123;</span><br><span class="line">            addWarn(<span class="string">&quot;Error while checking file store equality&quot;</span>, rf);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">renameByCopying</span><span class="params">(String src, String target)</span> <span class="keyword">throws</span> RolloverFailure </span>&#123;</span><br><span class="line"></span><br><span class="line">        FileUtil fileUtil = <span class="keyword">new</span> FileUtil(getContext());</span><br><span class="line">        fileUtil.copy(src, target);</span><br><span class="line"></span><br><span class="line">        File srcFile = <span class="keyword">new</span> File(src);</span><br><span class="line">        <span class="keyword">if</span> (!srcFile.delete()) &#123;</span><br><span class="line">            addWarn(<span class="string">&quot;Could not delete &quot;</span> + src);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">createMissingTargetDirsIfNecessary</span><span class="params">(File toFile)</span> <span class="keyword">throws</span> RolloverFailure </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> result = FileUtil.createMissingParentDirectories(toFile);</span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RolloverFailure(<span class="string">&quot;Failed to create parent directories for [&quot;</span> + toFile.getAbsolutePath() + <span class="string">&quot;]&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;c.q.l.co.rolling.helper.RenameUtil&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Logback/" rel="tag"># Logback</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021-12-10/11081/" rel="prev" title="解决多服务下Logback日志丢失问题">
+      <i class="fa fa-chevron-left"></i> 解决多服务下Logback日志丢失问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022-01-25/12637/" rel="next" title="将本地仓库上传到github">
+      将本地仓库上传到github <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">问题定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%80%9D%E8%B7%AF"><span class="nav-number">3.</span> <span class="nav-text">解决思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E9%87%8D%E5%91%BD%E5%90%8D%E5%A4%B1%E8%B4%A5%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-number">4.</span> <span class="nav-text">文件重命名失败问题解决</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81-%E5%A4%B1%E8%B4%A5"><span class="nav-number">4.1.</span> <span class="nav-text">增加分布式锁(失败)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E9%87%8D%E5%91%BD%E5%90%8D%E6%93%8D%E4%BD%9C%E4%BF%AE%E6%94%B9%E4%B8%BA%E5%85%88%E5%A4%8D%E5%88%B6%E5%86%8D%E6%B8%85%E7%A9%BA"><span class="nav-number">4.2.</span> <span class="nav-text">文件重命名操作修改为先复制再清空</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
