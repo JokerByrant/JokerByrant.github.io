@@ -533,7 +533,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/index.html</loc>
+    <loc>https://jokerbyrant.github.io/categories/index.html</loc>
     
     <lastmod>2021-11-12</lastmod>
     
@@ -542,7 +542,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/categories/index.html</loc>
+    <loc>https://jokerbyrant.github.io/tags/index.html</loc>
     
     <lastmod>2021-11-12</lastmod>
     
@@ -641,7 +641,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/2021-02-24/53737/</loc>
+    <loc>https://jokerbyrant.github.io/2020-08-25/40693/</loc>
     
     <lastmod>2021-11-12</lastmod>
     
@@ -650,7 +650,7 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/2020-08-25/40693/</loc>
+    <loc>https://jokerbyrant.github.io/2021-02-24/53737/</loc>
     
     <lastmod>2021-11-12</lastmod>
     
@@ -707,6 +707,13 @@
   </url>
   
   <url>
+    <loc>https://jokerbyrant.github.io/tags/Flutter/</loc>
+    <lastmod>2023-07-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://jokerbyrant.github.io/tags/JS/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -715,13 +722,6 @@
   
   <url>
     <loc>https://jokerbyrant.github.io/tags/JavaFX/</loc>
-    <lastmod>2023-07-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://jokerbyrant.github.io/tags/Flutter/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -742,14 +742,14 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Jquery/</loc>
+    <loc>https://jokerbyrant.github.io/tags/Java%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Java%E5%B9%B6%E5%8F%91/</loc>
+    <loc>https://jokerbyrant.github.io/tags/Jquery/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -784,14 +784,14 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/serverless/</loc>
+    <loc>https://jokerbyrant.github.io/tags/Netty/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Netty/</loc>
+    <loc>https://jokerbyrant.github.io/tags/serverless/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -819,13 +819,6 @@
   </url>
   
   <url>
-    <loc>https://jokerbyrant.github.io/tags/Tomcat/</loc>
-    <lastmod>2023-07-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://jokerbyrant.github.io/tags/bat/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -834,6 +827,13 @@
   
   <url>
     <loc>https://jokerbyrant.github.io/tags/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/</loc>
+    <lastmod>2023-07-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://jokerbyrant.github.io/tags/Tomcat/</loc>
     <lastmod>2023-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
