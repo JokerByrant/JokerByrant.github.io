@@ -3,7 +3,7 @@ title: Springboot启动时创建LOG_FILE_IS_UNDEFINED文件夹
 tags: Logback
 categories: 后端技术
 abbrlink: 30595
-date: 2023-07-25 13:50:56
+date: 2022-12-12 13:50:56
 ---
 如下，之前从未在意过这个文件夹
 
