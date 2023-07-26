@@ -31,7 +31,7 @@
 <meta property="og:description" content="这篇文章记录了一次因对 Netty 读空闲机制了解不够透彻导致的问题。  最近 App 的 Socket 连接出现了问题，客户端的 Socket 连接已经中断了，但是服务端还保留着与客户端的连接信息，导致转发消息时出现了消息没有送达并且丢失的问题。 定位到问题是 Netty 心跳机制导致的问题，服务端代码中设置的是如果 150s 没有收到来自客户端的数据时(服务端是通过 channelRead(">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-04-23T05:41:15.000Z">
-<meta property="article:modified_time" content="2023-07-24T08:22:06.080Z">
+<meta property="article:modified_time" content="2023-07-26T08:59:50.857Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="Netty">
 <meta name="twitter:card" content="summary">
@@ -345,7 +345,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">73</span>
+          <span class="site-state-item-count">74</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
