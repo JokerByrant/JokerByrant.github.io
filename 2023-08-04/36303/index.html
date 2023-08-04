@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="一套标准化的测试流程能够让软件的每次版本迭代都能保持稳定，每次的手动测试过程其实都是重复性劳动，这个过程很容易让人感到疲累。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="优化项目中的软件测试流程">
+<meta property="og:url" content="https://jokerbyrant.github.io/2023-08-04/36303/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="一套标准化的测试流程能够让软件的每次版本迭代都能保持稳定，每次的手动测试过程其实都是重复性劳动，这个过程很容易让人感到疲累。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-04T07:32:07.000Z">
+<meta property="article:modified_time" content="2023-08-04T07:36:34.663Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="软件测试">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2023-08-04/36303/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>优化项目中的软件测试流程 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-04/36303/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          优化项目中的软件测试流程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-04 15:32:07" itemprop="dateCreated datePublished" datetime="2023-08-04T15:32:07+08:00">2023-08-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>一套标准化的测试流程能够让软件的每次版本迭代都能保持稳定，每次的手动测试过程其实都是重复性劳动，这个过程很容易让人感到疲累。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在软件的开发过程中，如果有新需求或者旧的功能发生变更，都需要对变更后的功能进行测试。在我们的 <code>App</code> 以及几个 <code>Web</code> 项目中，目前的测试主要依靠的是下面几种方式：</p>
+<ul>
+<li><strong>开发工程师实现功能后的自测</strong>。</li>
+<li><strong>功能发布到生产环境后对新功能的简单测试</strong>。</li>
+<li><strong>用户正常使用软件发现问题</strong>。</li>
+</ul>
+<p>在我看来，上面的测试步骤有如下几个问题：</p>
+<ul>
+<li><strong>测试的覆盖面不够高。</strong>按照上面的步骤进行测试，可以暴露出一些常规的问题。但由于测试没有一份指南参考，因此每次可能都会遗漏一些特殊的情况没有测试到。</li>
+<li><strong>一些功能的改动可能会对之前既有的功能造成影响。</strong>比如在我们的 <code>App</code> 中，给每个用户增加了一个商友名，与真实姓名区分开，这个修改点看似很小，但是实际上是非常大的，因为涉及的功能很多，而在之后的测试中，所有这些受影响的功能都需要同步进行测试。</li>
+</ul>
+<p><strong>而对于上面的两个问题，在引入系统性的软件测试流程后，就能在一定程度上进行弥补。</strong></p>
+<h2 id="选择合适的测试方法"><a href="#选择合适的测试方法" class="headerlink" title="选择合适的测试方法"></a>选择合适的测试方法</h2><p>系统性的软件测试包含的内容比较多，按照设计方法可以分成 <strong>黑盒测试</strong> 和 <strong>白盒测试</strong>，按照测试类型可以分成 <strong>手动测试</strong> 和 <strong>自动测试</strong>，按照目的还能分成 <strong>功能测试</strong>、<strong>非功能测试</strong>、<strong>性能测试</strong> 等。</p>
+<p>由于缺少专业的测试工程师，如果引入完整的软件测试流程，那工作量是很大的。因此可以挑选几个适合现有 <code>App</code> 的测试方法，下面是我认为其中几个比较合适的方法：</p>
+<ul>
+<li><strong>编写测试用例</strong>：增加测试的覆盖度，可以按照 <strong>[模块] - [功能]</strong> 的粒度来编写测试用例。</li>
+<li><strong>回归测试</strong>：对于一个新版本的 <code>App</code>，每次都重新进行一遍以前的测试用例，可以及时发现新功能对既有功能是否有影响。</li>
+<li><strong>增加探索式测试</strong>。这个就是依靠测试人员的感觉来进行，随机性的对 <code>App</code> 的功能进行测试，有时测试用例编写的可能不是很完善，这个操作可以发现一些测试用例没有覆盖到的情况。</li>
+</ul>
+<p>目前的选择的测试方法优先以 <strong>手动测试</strong> 为主，后期待测试用例完善之后，可以考虑增加 <strong>自动化测试</strong>（<em>工作量比较大</em>）。</p>
+<blockquote>
+<p>另外补充一点，如果盲目的引入软件测试这套流程，可能会导致过程过于冗余繁琐，并且会增加开发和测试的负担。因此是否需要引入或者如何引入，还需要视具体情况而定。</p>
+</blockquote>
+<h2 id="软件测试学习"><a href="#软件测试学习" class="headerlink" title="软件测试学习"></a>软件测试学习</h2><p>关于 <strong>软件测试概念</strong> 的介绍可以参考这篇文章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/TankXiao/archive/2012/02/20/2347016.html">软件测试 (一) 软件测试方法大汇总</a>。</p>
+<p>关于 <strong>设计测试用例</strong> 的方法可以参考这篇文章：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/03/22/testcase-templete.html">使用模板快速编写测试用例 - 美团技术团队</a>。</p>
+<p>关于 <strong>自动化测试</strong> 的搭建方法可以参考这篇文章：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/56625870">如何从零开始搭建公司自动化测试框架？</a></p>
+<p>如果想 <strong>系统性的学习软件测试的知识</strong>，可以看看这篇专栏： <a target="_blank" rel="noopener" href="https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e8%bd%af%e4%bb%b6%e6%b5%8b%e8%af%9552%e8%ae%b2">软件测试52讲</a></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/03/22/testcase-templete.html">使用模板快速编写测试用例 - 美团技术团队</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/TankXiao/archive/2012/02/20/2347016.html">软件测试 (一) 软件测试方法大汇总</a></li>
+<li><a target="_blank" rel="noopener" href="https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/%e8%bd%af%e4%bb%b6%e6%b5%8b%e8%af%9552%e8%ae%b2">软件测试52讲</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/56625870">如何从零开始搭建公司自动化测试框架？</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95/" rel="tag"># 软件测试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-08-04/24556/" rel="prev" title="leetcode刷题记录 - 二叉树篇(四)">
+      <i class="fa fa-chevron-left"></i> leetcode刷题记录 - 二叉树篇(四)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">选择合适的测试方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">软件测试学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
