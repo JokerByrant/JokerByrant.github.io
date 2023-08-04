@@ -1,6 +1,8 @@
 ---
-title: leetcode刷题记录 - 二叉树的遍历
-tags: leetcode
+title: leetcode刷题记录 - 二叉树篇(一)
+tags: 
+  - leetcode
+  - 二叉树
 categories: 算法
 abbrlink: 9573
 date: 2023-07-26 16:56:58
@@ -34,7 +36,15 @@ date: 2023-07-26 16:56:58
 
 其中 **深度优先遍历** 的三种顺序：前中后序遍历。可以通过区分在遍历中 **中间节点(根节点)** 的位置来分辨，如下：
 
-![16904456772883ef9856caf2bf8747bc88b0fe4ca3a35.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16904456772883ef9856caf2bf8747bc88b0fe4ca3a35.png)
+![16908606842403ef9856caf2bf8747bc88b0fe4ca3a35.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16908606842403ef9856caf2bf8747bc88b0fe4ca3a35.png)
+
+下面的三张图更加的直观：[原文地址](https://blog.csdn.net/u013834525/article/details/80421684)
+
+![16908606912143eebceb13bbf6eb2c10bf54d98c158d0.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16908606912143eebceb13bbf6eb2c10bf54d98c158d0.png)
+
+再来看下文中提到的关于层序遍历的图：
+
+![1690860699193e349c621bb7a10cfa985c242711e22ec.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1690860699193e349c621bb7a10cfa985c242711e22ec.png)
 
 在实际的应用中，对二叉树进行遍历时，遍历方式如下：
 
