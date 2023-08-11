@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本篇是 回溯法 的第二篇，主要看一下 排列 类的题目。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="leetcode刷题记录 - 回溯算法(二)">
+<meta property="og:url" content="https://jokerbyrant.github.io/2023-08-11/6975/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="本篇是 回溯法 的第二篇，主要看一下 排列 类的题目。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-11T05:23:05.000Z">
+<meta property="article:modified_time" content="2023-08-11T05:24:36.018Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="leetcode">
+<meta property="article:tag" content="回溯">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2023-08-11/6975/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>leetcode刷题记录 - 回溯算法(二) | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-11/6975/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          leetcode刷题记录 - 回溯算法(二)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-11 13:23:05" itemprop="dateCreated datePublished" datetime="2023-08-11T13:23:05+08:00">2023-08-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>本篇是 <strong>回溯法</strong> 的第二篇，主要看一下 <strong>排列</strong> 类的题目。</p>
+</blockquote>
+<span id="more"></span>
+
+<p>在 <strong>组合</strong> 类的题目中，我们写的回溯法函数中都包含了 <code>startIndex</code>，用来剔除已经遍历过的节点（<em>注：从多个集合中找组合关系也不需要 <code>startIndex</code>，例如 [<strong>17.电话号码的字母组合</strong>] 这一题，因为多个集合中元素不会相互影响</em>）。</p>
+<p>而在 <strong>排列</strong> 类的题目中，回溯法函数中不需要使用 <code>startIndex</code>，因为 <strong>排列是有序的，也就是说 <code>&#123;1, 2&#125;</code> 和 <code>&#123;2, 1&#125;</code> 是两个集合，元素 <code>1</code> 在 <code>&#123;1, 2&#125;</code> 中已经使用过了，但是在 <code>&#123;2,1&#125;</code> 中还要在使用一次 <code>1</code>，所以处理排列问题就不用使用 <code>startIndex</code> 了</strong>。</p>
+<h2 id="排列问题"><a href="#排列问题" class="headerlink" title="排列问题"></a>排列问题</h2><p>相比于 <strong>组合问题</strong>，在处理 <strong>排列问题</strong> 时，我们需要关注下面几个问题：</p>
+<ul>
+<li>每层都是从 <code>0</code> 开始搜索而不是 <code>startIndex</code>，因为 <code>&#123;1, 2&#125;</code> 和 <code>&#123;2, 1&#125;</code> 是两个排列结果，而组合中这两个是一个组合。</li>
+<li>需要 <code>used</code> 数组记录 <code>path</code> 里都放了哪些元素了，这个 <code>used</code> 数组是为了在递归处理时剔除已经处理过的元素。</li>
+</ul>
+<h3 id="全排列"><a href="#全排列" class="headerlink" title="全排列"></a>全排列</h3><p>相关题目：</p>
+<ul>
+<li>46.全排列</li>
+</ul>
+<p>上面说过在处理 <strong>排列</strong> 问题时，回溯函数无需使用 <code>startIndex</code>，这就意味着我们每次进行递归时，都会遍历数组的所有元素，包括上面已经遍历过的父节点元素，这就会导致回溯函数陷入无限递归的死循环，因此我们需要对回溯函数进行一下遍历范围的限制：<strong>父节点处理过的节点无需在子节点中再处理一遍</strong>。</p>
+<p>可以使用一个 <strong>全局的哈希表</strong> 来记录在纵向递归树的某个枝干时处理过的节点，哈希表中放的元素是 <strong>数组的下标索引</strong>，<strong>这个哈希表也需要进行回溯操作</strong>。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">LinkedList&lt;Integer&gt; tmpList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">Set&lt;Integer&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permute(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">    <span class="keyword">if</span> (nums == <span class="keyword">null</span> || nums.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> resList;</span><br><span class="line">    &#125;</span><br><span class="line">    backtracking(nums);</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tmpList.size() == nums.length) &#123;</span><br><span class="line">        resList.add(<span class="keyword">new</span> ArrayList&lt;&gt;(tmpList));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 树的同层节点中重复节点不重复处理</span></span><br><span class="line">        <span class="keyword">if</span> (set.contains(i)) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        set.add(i);</span><br><span class="line">        tmpList.add(nums[i]);</span><br><span class="line">        backtracking(nums);</span><br><span class="line">        tmpList.removeLast();</span><br><span class="line">        set.remove(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对我而言，<strong>哈希表</strong> 更好理解，但是如果条件允许的话，最好还是将 <strong>哈希表</strong> 替换成 <strong>数组</strong>，这样效率更高。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">LinkedList&lt;Integer&gt; tmpList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"><span class="keyword">boolean</span>[] used;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permute(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">    <span class="keyword">if</span> (nums == <span class="keyword">null</span> || nums.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> resList;</span><br><span class="line">    &#125;</span><br><span class="line">    used = <span class="keyword">new</span> <span class="keyword">boolean</span>[nums.length];</span><br><span class="line">    Arrays.fill(used, <span class="keyword">false</span>);</span><br><span class="line">    backtracking(nums);</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tmpList.size() == nums.length) &#123;</span><br><span class="line">        resList.add(<span class="keyword">new</span> ArrayList&lt;&gt;(tmpList));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 树的同层节点中重复节点不重复处理</span></span><br><span class="line">        <span class="keyword">if</span> (used[i]) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        used[i] = <span class="keyword">true</span>;</span><br><span class="line">        tmpList.add(nums[i]);</span><br><span class="line">        backtracking(nums);</span><br><span class="line">        tmpList.removeLast();</span><br><span class="line">        used[i] = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的哈希表中进行的判重处理，针对的是数组的下标索引。因为本题中数组的元素是不可重复的，因此哈希表中放数组元素的值也是一样的。因此可以进行一下优化，要看当前节点的值是否在父节点中处理过，我们直接看 <strong>递归当前枝干拿到的路径(<code>tmpList</code>)</strong> 中是否包含当前节点的值即可，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">LinkedList&lt;Integer&gt; tmpList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permute(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">    <span class="keyword">if</span> (nums == <span class="keyword">null</span> || nums.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> resList;</span><br><span class="line">    &#125;</span><br><span class="line">    backtracking(nums);</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tmpList.size() == nums.length) &#123;</span><br><span class="line">        resList.add(<span class="keyword">new</span> ArrayList&lt;&gt;(tmpList));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 树的同层节点中重复节点不重复处理</span></span><br><span class="line">        <span class="keyword">if</span> (tmpList.contains(nums[i])) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        tmpList.add(nums[i]);</span><br><span class="line">        backtracking(nums);</span><br><span class="line">        tmpList.removeLast();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="全排列ii"><a href="#全排列ii" class="headerlink" title="全排列ii"></a>全排列ii</h3><p>相关题目：</p>
+<ul>
+<li>47.全排列ii</li>
+</ul>
+<p>题目中给出了条件：<strong>数组中包含重复的数字，但是结果集不能重复</strong>。因此我们需要在上一题 [<strong>46.全排列</strong>] 的基础上，对数组进行 <strong>对父节点下同层节点的去重</strong> 操作，因此只要先对数组进行 <strong>排序</strong>，然后在回溯函数中加上一个 <strong>哈希表去重</strong> 的处理即可，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">LinkedList&lt;Integer&gt; tmpList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"><span class="keyword">boolean</span>[] used;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permute(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">    <span class="keyword">if</span> (nums == <span class="keyword">null</span> || nums.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> resList;</span><br><span class="line">    &#125;</span><br><span class="line">    used = <span class="keyword">new</span> <span class="keyword">boolean</span>[nums.length];</span><br><span class="line">    Arrays.fill(used, <span class="keyword">false</span>);</span><br><span class="line">    backtracking(nums);</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tmpList.size() == nums.length) &#123;</span><br><span class="line">        resList.add(<span class="keyword">new</span> ArrayList&lt;&gt;(tmpList));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 树的同层节点中重复节点不重复处理</span></span><br><span class="line">        <span class="keyword">if</span> (used[i]) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        used[i] = <span class="keyword">true</span>;</span><br><span class="line">        tmpList.add(nums[i]);</span><br><span class="line">        backtracking(nums);</span><br><span class="line">        tmpList.removeLast();</span><br><span class="line">        used[i] = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还有另一种处理方式，在处理 <strong>[纵向递归树的枝干时，跳过已经处理过的指定下标的数组元素]</strong> 时，我们使用了一个存放数组下标索引的 **哈希表(数组)**。可以利用这个数组来进行 <strong>对父节点下同层子节点的去重</strong> 操作，如下，注意看其中的注释： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;Integer&gt;&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">LinkedList&lt;Integer&gt; tmpList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"><span class="keyword">boolean</span>[] used;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permuteUnique(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">    <span class="keyword">if</span> (nums == <span class="keyword">null</span> || nums.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> resList;</span><br><span class="line">    &#125;</span><br><span class="line">    used = <span class="keyword">new</span> <span class="keyword">boolean</span>[nums.length];</span><br><span class="line">    Arrays.fill(used, <span class="keyword">false</span>);</span><br><span class="line">    Arrays.sort(nums);</span><br><span class="line">    backtracking(nums);</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (nums.length == tmpList.size()) &#123;</span><br><span class="line">        resList.add(<span class="keyword">new</span> ArrayList&lt;&gt;(tmpList));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 在对某个节点的子树支进行遍历，如果当前节点被处理过了，那就直接跳过</span></span><br><span class="line">        <span class="keyword">if</span> (used[i]) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 当 nums[i] == nums[i - 1] 时，有下面两种情况：</span></span><br><span class="line">        <span class="comment">//   - 如果used[i - 1] == true，那么表示nums[i - 1]在同一树支(纵向)使用过</span></span><br><span class="line">        <span class="comment">//   - 如果used[i - 1] == false，那么表示 nums[i - 1] 在同一树层中使用过</span></span><br><span class="line">        <span class="comment">// 这里关于used[i - 1]两种状态的定义有些抽象，下面解释一下，可以结合下面的代码一起看，理解一下过程：</span></span><br><span class="line">        <span class="comment">//   - 在处理父节点(i-1)时，会将used[i-1]赋值为true，然后进入递归，所以如果对当前节点的处理是由父节点递归处理子节点触发的，那这时我们拿到的used[i-1]==true.</span></span><br><span class="line">        <span class="comment">//   - 在处理兄弟节点(i-1)时，used[i-1]同样会被赋值为true，但是处理完会进行回溯，used[i-1]重新被赋值为false，当处理到当前节点时(i)，拿到的used[i-1]==false</span></span><br><span class="line">        <span class="comment">// 这里我们要保证同一树层下，相同值的节点不重复处理，因此只要剔除 used[i - 1] == false 的情况即可</span></span><br><span class="line">        <span class="keyword">if</span> (i &gt; <span class="number">0</span> &amp;&amp; nums[i] == nums[i - <span class="number">1</span>] &amp;&amp; !used[i - <span class="number">1</span>]) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        tmpList.add(nums[i]);</span><br><span class="line">        used[i] = <span class="keyword">true</span>;</span><br><span class="line">        backtracking(nums);</span><br><span class="line">        tmpList.removeLast();</span><br><span class="line">        used[i] = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 [<strong>46.全排列</strong>] 中，我们最后贴了一个最优方案：<strong>直接通过递归当前枝干拿到的路径(<code>tmpList</code>)来判断当前节点是否在父节点中处理过了</strong>，在本题中并不适用。因为 [<strong>46.全排列</strong>] 中可以使用这种处理的前提是：<strong>数组中不包含重复的元素，因此哈希表对下标索引去重和对值去重效果是一样的</strong>。而本题中 <strong>数组中包含重复的数字</strong>，因此 <strong>无法通过某个值确定它的索引</strong>，因此只能使用 <strong>哈希表存数组元素下标</strong> 的方式来处理。</p>
+<h2 id="重新安排行程"><a href="#重新安排行程" class="headerlink" title="重新安排行程"></a>重新安排行程</h2><p>相关题目：</p>
+<ul>
+<li>322.重新安排行程</li>
+</ul>
+<p>本题是一道 <strong>hard</strong> 题，题目中给出的条件包含了一条航班行程，其中的元素是 **{出发机场, 到达机场}**，然后限定了 **最开始的出发机场是 “JFK”*<em>，让我门找一条行程组合，如果有多条那么返回那条按照机场名称的字典排序较小的那条（</em>比如机场1名称为 <code>A</code>，机场2名称为 <code>B</code>，那么 <code>A</code> 相对 <code>B</code> 在字典的排序更小*）。</p>
+<p>比较简单的处理是，我们先将给出的航班路径进行转换，创建一个哈希表来存储航班路径，里面的结构是 **{出发机场, {到达机场, 航班次数}}**。然后在递归函数中，我们的处理就是 <strong>找到从每个机场出发包含的路径，找到一条就将映射关系中的次数相应的减少</strong>。</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">LinkedList&lt;String&gt; resList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"><span class="comment">// 这里存放的映射关系是：&#123;出发机场, &#123;到达机场, 航班次数&#125;&#125;</span></span><br><span class="line">Map&lt;String, Map&lt;String, Integer&gt;&gt; pathMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">findItinerary</span><span class="params">(List&lt;List&lt;String&gt;&gt; tickets)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (List&lt;String&gt; list : tickets) &#123;</span><br><span class="line">        <span class="comment">// 题目中要求的按字典排序，是针对机场的名字，较小的在前面，因此我们这里使用TreeMap，默认是递增的</span></span><br><span class="line">        Map&lt;String, Integer&gt; map = pathMap.getOrDefault(list.get(<span class="number">0</span>), <span class="keyword">new</span> TreeMap&lt;&gt;());</span><br><span class="line">        map.put(list.get(<span class="number">1</span>), map.getOrDefault(list.get(<span class="number">1</span>), <span class="number">0</span>) + <span class="number">1</span>);</span><br><span class="line">        pathMap.put(list.get(<span class="number">0</span>), map);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 出发机场设置为JFK</span></span><br><span class="line">    resList.add(<span class="string">&quot;JFK&quot;</span>);</span><br><span class="line">    backtracking(tickets.size());</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span> ticketsNum)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (ticketsNum + <span class="number">1</span> == resList.size()) &#123;</span><br><span class="line">        <span class="comment">// 找到了一条路径，直接返回</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 结果集中的最后一条数据是上一次航班的到达机场，也就是这一次航班的出发机场</span></span><br><span class="line">    <span class="comment">// 这里拿到以 [上一次航班的到达机场] 为 [出发机场] 的航班路径</span></span><br><span class="line">    Map&lt;String, Integer&gt; map = pathMap.get(resList.getLast());</span><br><span class="line">    <span class="keyword">if</span> (map != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, Integer&gt; entry : map.entrySet()) &#123;</span><br><span class="line">            <span class="keyword">int</span> count = entry.getValue();</span><br><span class="line">            <span class="comment">// 只处理航班次数大于0的航班路径</span></span><br><span class="line">            <span class="keyword">if</span> (count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                resList.add(entry.getKey());</span><br><span class="line">                entry.setValue(count - <span class="number">1</span>);</span><br><span class="line">                <span class="comment">// 递归剩余路径</span></span><br><span class="line">                <span class="keyword">if</span> (backtracking(ticketsNum)) &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 回溯</span></span><br><span class="line">                resList.removeLast();</span><br><span class="line">                entry.setValue(count);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="棋盘问题"><a href="#棋盘问题" class="headerlink" title="棋盘问题"></a>棋盘问题</h2><p>棋盘问题要处理的都是 <strong>二维数组</strong>。</p>
+<h3 id="N皇后"><a href="#N皇后" class="headerlink" title="N皇后"></a>N皇后</h3><p>相关题目：</p>
+<ul>
+<li>51.N皇后</li>
+</ul>
+<blockquote>
+<p>这个题目应该是算法题中出现频率/名气比较大的题目吧，因为之前还没开始刷算法题，一想到算法题我就会自动联想到 <strong>N皇后</strong>…</p>
+</blockquote>
+<p>之前处理的都是一维数组，而这题要处理的是一个 <strong>二维数组</strong>，但是其实解法与一维数组是一样的，只不过在回溯函数的参数上我们需要做一下调整：<strong>如果递归中遍历的是行，那么就要传入列作为参数。</strong>下面的处理是：<strong>棋盘的宽度就是 <code>for</code> 循环的长度，递归的深度就是棋盘的高度。</strong></p>
+<p>个人认为本题比较难处理的点有两个：</p>
+<ul>
+<li>理解回溯函数是如何对二维数组进行回溯处理的。</li>
+<li>对皇后的位置是否满足条件的验证函数。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">List&lt;List&lt;String&gt;&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="comment">// 模拟棋盘</span></span><br><span class="line"><span class="keyword">char</span>[][] chessboard;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> List&lt;List&lt;String&gt;&gt; solveNQueens(<span class="keyword">int</span> n) &#123;</span><br><span class="line">    chessboard = <span class="keyword">new</span> <span class="keyword">char</span>[n][n];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">char</span>[] chars : chessboard) &#123;</span><br><span class="line">        Arrays.fill(chars, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    backtracking(n, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> resList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> row)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (row == n) &#123;</span><br><span class="line">        resList.add(Array2List(chessboard));</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 这里拿到的是棋盘中的列，遍历操作在棋盘中的表现是纵向的</span></span><br><span class="line">    <span class="comment">// 整体的处理流程是：纵向遍历棋盘的列，然后对每列再进行递归，递归的方向是横向的，处理的是棋盘的行</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> col = <span class="number">0</span>; col &lt; n; col++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (isValid(col, row, n)) &#123;</span><br><span class="line">            chessboard[row][col] = <span class="string">&#x27;Q&#x27;</span>;</span><br><span class="line">            backtracking(n, row + <span class="number">1</span>);</span><br><span class="line">            chessboard[row][col] = <span class="string">&#x27;.&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">Array2List</span><span class="params">(<span class="keyword">char</span>[][] chessboard)</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">char</span>[] chars : chessboard) &#123;</span><br><span class="line">        list.add(String.copyValueOf(chars));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查同一列、同一对角线是否包含皇后</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(<span class="keyword">int</span> col, <span class="keyword">int</span> row, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 下面的检查都进行了剪枝处理，因为我们尚未处理到的行和列肯定没有皇后存在</span></span><br><span class="line">    <span class="comment">// 检查同一列是否包含皇后</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; row; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (chessboard[i][col] == <span class="string">&#x27;Q&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 检查45度对角线</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = row - <span class="number">1</span>, j = col - <span class="number">1</span>; i &gt;= <span class="number">0</span> &amp;&amp; j &gt;= <span class="number">0</span>; i--, j--) &#123;</span><br><span class="line">        <span class="keyword">if</span> (chessboard[i][j] == <span class="string">&#x27;Q&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 检查135度对角线</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = row - <span class="number">1</span>, j = col + <span class="number">1</span>; i &gt;= <span class="number">0</span> &amp;&amp; j &lt; n; i--, j++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (chessboard[i][j] == <span class="string">&#x27;Q&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解数独"><a href="#解数独" class="headerlink" title="解数独"></a>解数独</h3><p>相关题目：</p>
+<ul>
+<li>37.解数独</li>
+</ul>
+<blockquote>
+<p>回溯算法 + 二维数组，就是 <code>hard</code> 题，但是如果掌握了套路，解起来也不是很难。</p>
+</blockquote>
+<p>本题的处理与 <strong>N皇后</strong> 类似，但是还是有一些区别，在上面 <strong>N皇后</strong> 的代码中，虽然题目中给出的条件也是 <strong>二维数组</strong>，但是因为 <strong>N皇后每一行每一列只放一个皇后</strong>，因此只需要通过 <code>for</code> 循环遍历行，递归遍历列，找到放置皇后的位置即可。而本题中，<strong>棋盘的每一个位置都要放一个数字，并需要检查数字是否满足条件，因此我们需要对行和列都进行 <code>for</code> 循环遍历</strong>。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">solveSudoku</span><span class="params">(<span class="keyword">char</span>[][] board)</span> </span>&#123;</span><br><span class="line">    backtracking(board);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">backtracking</span><span class="params">(<span class="keyword">char</span>[][] board)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// N皇后给出的条件也是二维数组，但是N皇后里每一行只需填充一个数字，因此我们只需一次遍历操作即可</span></span><br><span class="line">    <span class="comment">// 但是本题中我们需要将一行中的数字填满，因此我们需要分别对行和列进行遍历</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">9</span>; j++) &#123;</span><br><span class="line">            <span class="comment">// 当前位置有值了</span></span><br><span class="line">            <span class="keyword">if</span> (board[i][j] != <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 往当前位置填充数值，需要将 1~9 都填充进去试试</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">char</span> k = <span class="string">&#x27;1&#x27;</span>; k &lt;= <span class="string">&#x27;9&#x27;</span>; k++) &#123;</span><br><span class="line">                <span class="comment">// 如果满足条件，则继续进行递归</span></span><br><span class="line">                <span class="keyword">if</span> (isValid(i, j, k, board)) &#123;</span><br><span class="line">                    board[i][j] = k;</span><br><span class="line">                    backtracking(board);</span><br><span class="line">                    board[i][j] = <span class="string">&#x27;.&#x27;</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 9个数都不满足条件，那么说明当前board无法填满</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(<span class="keyword">int</span> row, <span class="keyword">int</span> col, <span class="keyword">char</span> val, <span class="keyword">char</span>[][] board)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 判断行是否重复</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (board[row][i] == val) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 判断列是否重复</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (board[i][col] == val) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 判断9方格是否重复</span></span><br><span class="line">    <span class="keyword">int</span> startRow = (row / <span class="number">3</span>) * <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">int</span> startCol = (col / <span class="number">3</span>) * <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = startRow; i &lt; startRow + <span class="number">3</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = startCol; j &lt; startCol + <span class="number">3</span>; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (board[i][j] == val) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/leetcode/" rel="tag"># leetcode</a>
+              <a href="/tags/%E5%9B%9E%E6%BA%AF/" rel="tag"># 回溯</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-08-07/56219/" rel="prev" title="leetcode刷题记录 - 回溯算法(一)">
+      <i class="fa fa-chevron-left"></i> leetcode刷题记录 - 回溯算法(一)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%88%97%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">排列问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E6%8E%92%E5%88%97"><span class="nav-number">1.1.</span> <span class="nav-text">全排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E6%8E%92%E5%88%97ii"><span class="nav-number">1.2.</span> <span class="nav-text">全排列ii</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E5%AE%89%E6%8E%92%E8%A1%8C%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">重新安排行程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%8B%E7%9B%98%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">棋盘问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#N%E7%9A%87%E5%90%8E"><span class="nav-number">3.1.</span> <span class="nav-text">N皇后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%95%B0%E7%8B%AC"><span class="nav-number">3.2.</span> <span class="nav-text">解数独</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
