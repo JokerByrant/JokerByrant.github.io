@@ -376,7 +376,7 @@ public void solveSudoku(char[][] board) {
 }
 
 public boolean backtracking(char[][] board) {
-    // N皇后给出的条件也是二维数组，但是N皇后里每一行只需填充一个数字，因此我们只需一次遍历操作即可
+    // N皇后给胡的条件也是二维数组，但是N皇后里每一行只需填充一个数字，因此我们只需一次遍历操作即可
     // 但是本题中我们需要将一行中的数字填满，因此我们需要分别对行和列进行遍历
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -389,7 +389,9 @@ public boolean backtracking(char[][] board) {
                 // 如果满足条件，则继续进行递归
                 if (isValid(i, j, k, board)) {
                     board[i][j] = k;
-                    backtracking(board);
+                    if (backtracking(board)) {
+                        return true;
+                    }
                     board[i][j] = '.';
                 }
             }
