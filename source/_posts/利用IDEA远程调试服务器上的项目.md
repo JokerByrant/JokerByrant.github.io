@@ -19,7 +19,7 @@ java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 
 其中`5005`是端口号，`rsdun-app-api.jar` 是要部署的程序。
 
 接着配置 `IDEA`：
-![IDEA配置](https://ae01.alicdn.com/kf/Uad66176b150e47ecb8ddae6d7491f05dT.jpg)
+![IDEA配置](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16919765804281691976579626.png)
 
 最后启动项目，看到控制台中出现如下日志，即代表配置成功，然后就可以进行 `Debug` 了
 ![成功log](https://ae01.alicdn.com/kf/U50d5575397954cd2a72c20d67dfcf44f7.jpg)

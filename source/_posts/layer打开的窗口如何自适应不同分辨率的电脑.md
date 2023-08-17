@@ -134,3 +134,68 @@ let $childIframe = $(layero).find("iframe")[0].contentWindow;
 $childIframe.$(item).bootStrapTable('getData');
 ```
 
+### 补充
+
+日常使用中发现存在一个问题：**如果打开的页面高度比较小，在这个页面中再开一个子页面，子页面的高度因为不能超过父页面的高度，所以显示的内容有限**。针对这个问题，对上面的 `adjustLayerIframeHeight()` 方法做了如下调整：**如果打开的子页面内容高度比父页面要大，那么就调整父页面的高度**。代码如下：
+
+```javascript
+/**
+ * 调整窗口大小，针对layer弹出层，根据弹出页面的表单高度自适应
+ */
+function adjustLayerIframeHeight (height) {
+    if (height === undefined) {
+        // 要调整的整个layer弹窗的高度，所以在页面主题内容高度的基础上加70
+        height = $('.wrapper-content').height() + 70;
+        // 在不超过父页面高度的情况下，子页面的高度不能低于250
+        height = (height < 250) ? 250 : height;
+    }
+    console.log("============================================================")
+    console.log("调整页面高度", $('head title').html(), height)
+    let parentPageHeight = $('body', window.parent.document).height();
+    // 限制窗口高度不会超过父页面面板的高度
+    if (height > parentPageHeight - 20) {
+        // 父页面不是layer弹窗页面，不用调整高度
+        if ($('.J_mainContent', window.parent.parent.document).length === 0) {
+            console.log("调整父页面高度", $('.wrapper-content'))
+            // 这里的height是当前layer弹窗的高度，也就是父页面body的高度，要调整的是父页面layer弹窗的高度，因此加上70
+            parent.adjustLayerIframeHeight(height + 70);
+            // 父页面高度调整完毕，重新获取
+            parentPageHeight = $('body', window.parent.document).height();
+        }
+        // 当前页面高度不能超过父页面的高度
+        height = parentPageHeight - 20;
+    }
+    console.log("目标高度", height, $('head title').html())
+    let $layerWindow = $('.layui-layer-iframe', window.parent.document);
+    let $iframe = $('.layui-layer-iframe iframe', window.parent.document);
+    // 窗口高度
+    $layerWindow.height(height);
+    // 窗口内iframe高度(去除标题栏)
+    $iframe.height(height - 45);
+    // 窗口与顶部的距离
+    let iframeTop = (parentPageHeight - height) / 2;
+    // 限制与顶部的距离不小于10
+    if (iframeTop < 10) {
+        iframeTop = 10;
+    }
+    $layerWindow.css('top', iframeTop + 'px');
+
+    // 父页面宽高发生变化，调整窗口大小
+    parent.window.onresize = function () {
+        console.log("父页面高度变化，调整当前页面高度", $('head title').html())
+        adjustLayerIframeHeight();
+    }
+    // 窗口的高度如果发生变化，那么调整窗口大小
+    let pageHeight = $('.ibox').height();
+    window.onmouseup = function () {
+        // 延迟1ms执行，页面事件优先处理
+        setTimeout(function () {
+            let currentPageHeight = $('.ibox').height();
+            if (pageHeight !== currentPageHeight) {
+                console.log("触发点击事件，调整当前页面高度", $('head title').html())
+                adjustLayerIframeHeight();
+            }
+        }, 1);
+    }
+}
+```
