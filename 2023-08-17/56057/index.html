@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="贪心的本质是选择每一阶段的局部最优，从而达到全局最优。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="leetcode刷题记录 - 贪心算法(一)">
+<meta property="og:url" content="https://jokerbyrant.github.io/2023-08-17/56057/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="贪心的本质是选择每一阶段的局部最优，从而达到全局最优。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-17T02:43:28.000Z">
+<meta property="article:modified_time" content="2023-08-24T03:45:48.342Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="leetcode">
+<meta property="article:tag" content="贪心">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2023-08-17/56057/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>leetcode刷题记录 - 贪心算法(一) | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-17/56057/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          leetcode刷题记录 - 贪心算法(一)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-17 10:43:28" itemprop="dateCreated datePublished" datetime="2023-08-17T10:43:28+08:00">2023-08-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>贪心的本质是选择每一阶段的局部最优，从而达到全局最优。</p>
+</blockquote>
+<span id="more"></span>
+
+<p>在解 <strong>贪心算法</strong> 类的题目时，我们一般遵循下面的步骤就可以了：</p>
+<ol>
+<li>将问题分解为若干个子问题</li>
+<li>找出适合的贪心策略</li>
+<li>求解每一个子问题的最优解</li>
+<li>将局部最优解堆叠成全局最优解</li>
+</ol>
+<h2 id="分发饼干"><a href="#分发饼干" class="headerlink" title="分发饼干"></a>分发饼干</h2><p>相关题目：</p>
+<ul>
+<li>455.分发饼干</li>
+</ul>
+<p>有两个思路：</p>
+<ul>
+<li>从小饼干小胃口开始遍历，找到能满足最小胃口的最小饼干，如果最小的饼干都不能满足最小的胃口，那么这个饼干可以舍弃了，所以我们的外层遍历是对饼干进行的。</li>
+<li>从大饼干大胃口开始遍历，找到能满足最大饼干的最大胃口。如果最大的饼干都不能满足最大的胃口，那么这个胃口可以舍弃了，所以我们的外层遍历是对胃口进行的。</li>
+</ul>
+<p>先看第一种，局部最优：<strong>小饼干喂给胃口小的，充分利用饼干尺寸喂饱一个</strong>，全局最优：<strong>喂饱尽可能多的小孩</strong>。代码如下，优先遍历饼干：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findContentChildren</span><span class="params">(<span class="keyword">int</span>[] g, <span class="keyword">int</span>[] s)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 优先考虑饼干，小饼干先喂饱小胃口</span></span><br><span class="line">    Arrays.sort(g);</span><br><span class="line">    Arrays.sort(s);</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; s.length &amp;&amp; start &lt; g.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (s[i] &gt;= g[start]) &#123;</span><br><span class="line">            start++;</span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再看第二种，局部最优：<strong>大饼干喂给胃口大的，充分利用饼干尺寸喂饱一个</strong>，全局最优：<strong>喂饱尽可能多的小孩</strong>。代码如下，优先遍历胃口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findContentChildren</span><span class="params">(<span class="keyword">int</span>[] g, <span class="keyword">int</span>[] s)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 优先考虑胃口，先喂饱大胃口</span></span><br><span class="line">    Arrays.sort(g);</span><br><span class="line">    Arrays.sort(s);</span><br><span class="line">    <span class="keyword">int</span> start = s.length - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 从最大的饼干和最大的胃口开始遍历</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = g.length - <span class="number">1</span>; i &gt;= <span class="number">0</span> &amp;&amp; start &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="comment">// 如果当前最大的饼干满足当前孩子的胃口，将这个饼干喂给他</span></span><br><span class="line">        <span class="keyword">if</span> (s[start] &gt;= g[i]) &#123;</span><br><span class="line">            <span class="comment">// 继续处理下一个饼干</span></span><br><span class="line">            start--;</span><br><span class="line">            <span class="comment">// 结果+1</span></span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="摆动序列"><a href="#摆动序列" class="headerlink" title="摆动序列"></a>摆动序列</h2><p>相关题目：</p>
+<ul>
+<li>376.摆动序列</li>
+</ul>
+<p>第一种思路，摆动序列的特点是元素在上下波动，相邻的2两个元素一个是波峰元素，一个是波谷元素。那么我们只要在原数组中找存在多少波峰波谷元素，就能知道这个最长摆动序列的长度了。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">wiggleMaxLength</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 从原数组中找到波峰波谷，然后统计数量即可</span></span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> prevDiff = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="keyword">int</span> curDiff = nums[i] - nums[i - <span class="number">1</span>];</span><br><span class="line">        <span class="comment">// 如果当前差值和上一个差值表现出摆动，那么说明找到了一个波峰/波谷</span></span><br><span class="line">        <span class="keyword">if</span> ((curDiff &gt; <span class="number">0</span> &amp;&amp; prevDiff &lt;= <span class="number">0</span>) || (curDiff &lt; <span class="number">0</span> &amp;&amp; prevDiff &gt;= <span class="number">0</span>)) &#123;</span><br><span class="line">            count++;</span><br><span class="line">            <span class="comment">// 这里只有在坡的走向发生变化时，才需要更新prevDiff，因为可能会出现平坡的情况</span></span><br><span class="line">            prevDiff = curDiff;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>延伸一下，本题还可以使用 <strong>动态规划</strong> 来解，由于目前这里看的是 <strong>回溯算法</strong> 相关的题目，因此暂不对 <strong>动态规划</strong> 进行深入，直接看代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">wiggleMaxLength</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用动态规划</span></span><br><span class="line">    <span class="keyword">int</span>[][] dp = <span class="keyword">new</span> <span class="keyword">int</span>[nums.length][<span class="number">2</span>];</span><br><span class="line">    <span class="comment">// dp[i][0]代表第i个元素作为波峰的最长摆动序列长度</span></span><br><span class="line">    <span class="comment">// dp[i][1]代表第i个元素作为波谷的最长摆动序列长度</span></span><br><span class="line">    dp[<span class="number">0</span>][<span class="number">0</span>] = dp[<span class="number">0</span>][<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        dp[i][<span class="number">0</span>] = dp[i][<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[j] &gt; nums[i]) &#123;</span><br><span class="line">                <span class="comment">// 第i处位置元素是波谷，那么它作为波谷的最长摆动序列长度就是它之前的元素作为波峰的最长摆动序列长度+1</span></span><br><span class="line">                dp[i][<span class="number">1</span>] = Math.max(dp[i][<span class="number">1</span>], dp[j][<span class="number">0</span>] + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (nums[j] &lt; nums[i]) &#123;</span><br><span class="line">                <span class="comment">// i是波峰，同理</span></span><br><span class="line">                dp[i][<span class="number">0</span>] = Math.max(dp[i][<span class="number">0</span>], dp[j][<span class="number">1</span>] + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 拿到其中最长的摆动序列即可</span></span><br><span class="line">    <span class="keyword">return</span> Math.max(dp[nums.length - <span class="number">1</span>][<span class="number">0</span>], dp[nums.length - <span class="number">1</span>][<span class="number">1</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="最大子数组和"><a href="#最大子数组和" class="headerlink" title="最大子数组和"></a>最大子数组和</h2><p>相关题目：</p>
+<ul>
+<li>53.最大子数组和</li>
+</ul>
+<p>使用 <strong>贪心算法</strong> 处理，思路是：<strong>如果前面的子数组的和是负数，那么无论接下来的数是正还是负，这个和一定会拉低总和，因此前面的和直接忽略即可，重新从下一个数开始计算总和。</strong></p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxSubArray</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 解法1，使用贪心算法</span></span><br><span class="line">    <span class="comment">// 思路：如果前面的数组的和是负数，那么无论接下来的数是正还是负，这个和一定会拉低总和</span></span><br><span class="line">    <span class="keyword">if</span> (nums.length == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> nums[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 用来存储最大和</span></span><br><span class="line">    <span class="keyword">int</span> sum = Integer.MIN_VALUE;</span><br><span class="line">    <span class="comment">// 用来记录当前连续子数组的和</span></span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        count += nums[i];</span><br><span class="line">        sum = Math.max(sum, count);</span><br><span class="line">        <span class="comment">// 如果前面的子数组总和是负数，那么它一定会拉低下面的数的总和，所以将其重置为0</span></span><br><span class="line">        <span class="keyword">if</span> (count &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            count = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里以及之后的题目就着重看一下 <strong>贪心算法</strong> 的版本，<strong>动态规划</strong> 的版本在之后学习到 <strong>动态规划</strong> 后再去处理。</p>
+</blockquote>
+<h2 id="买卖股票的最佳时机ii"><a href="#买卖股票的最佳时机ii" class="headerlink" title="买卖股票的最佳时机ii"></a>买卖股票的最佳时机ii</h2><p>相关题目：</p>
+<ul>
+<li>122.买卖股票的最佳时机ii</li>
+</ul>
+<p>使用 <strong>贪心算法</strong>，思路：</p>
+<ul>
+<li>前一天买入股票，第二天卖出，那利润就是第二天的价格减去前一天的价格；</li>
+<li>第 <code>i</code> 天买入股票，第 <code>n</code> 天卖出，那么利润就是第 <code>i + 1</code> 天到第 <code>n</code> 天每天利润的和。</li>
+<li>我们只要拿到每天的利润，然后找出那些利润为正的数据，将它们求和即可拿到最大利润。</li>
+<li><strong>局部最优：收集每天的正利润；全局最优：得到最大利润。</strong></li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxProfit</span><span class="params">(<span class="keyword">int</span>[] prices)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 贪心算法</span></span><br><span class="line">    <span class="keyword">if</span> (prices.length == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; prices.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 当天价格 - 前一天价格 = 前一天买入当天卖出能获取的利润</span></span><br><span class="line">        <span class="comment">// 第x天买入，第y天卖出，那么利润就是第x+1天到第y天每天利润之和</span></span><br><span class="line">        <span class="comment">// 这里要计算最大利润，那么只需要求出利润为正的那些天即可</span></span><br><span class="line">        result += Math.max(prices[i] - prices[i - <span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="K次取反后最大化的数组和"><a href="#K次取反后最大化的数组和" class="headerlink" title="K次取反后最大化的数组和"></a>K次取反后最大化的数组和</h2><p>相关题目：</p>
+<ul>
+<li>1005.K次取反后最大化的数组和</li>
+</ul>
+<p>思路如下：</p>
+<ul>
+<li>先将数组元素按照绝对值大小降序排序。</li>
+<li>之后对排序后的数组进行遍历，将值为负的元素变为正数。</li>
+<li>如果处理后 <code>k</code> 的值仍然大于 <code>0</code> 并且是单数，那么就将数组最后一个元素(绝对值最小的元素)取反。</li>
+<li>之后求和即可。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">largestSumAfterKNegations</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 按照元素的绝对值大小降序排序</span></span><br><span class="line">    nums = Arrays.stream(nums).boxed().sorted((o1, o2) -&gt; Math.abs(o2) - Math.abs(o1)).mapToInt(Integer::intValue).toArray();</span><br><span class="line">    <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 按照顺序(先处理较小的负数)，求所有负数的绝对值</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (k &gt; <span class="number">0</span> &amp;&amp; nums[i] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            nums[i] *= -<span class="number">1</span>;</span><br><span class="line">            k--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果最后k是单数，则将最后一个元素(绝对值最小的数)的值取反</span></span><br><span class="line">    <span class="keyword">if</span> (k % <span class="number">2</span> == <span class="number">1</span>) &#123;</span><br><span class="line">        nums[nums.length - <span class="number">1</span>] *= -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Arrays.stream(nums).sum();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="加油站"><a href="#加油站" class="headerlink" title="加油站"></a>加油站</h2><p>相关题目：</p>
+<ul>
+<li>134.加油站</li>
+</ul>
+<p>暴力解法：<strong>依次尝试每个加油站作为起点</strong>。此解法无法通过 <code>leetcode</code> 的测试，提交时会超时。</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">canCompleteCircuit</span><span class="params">(<span class="keyword">int</span>[] gas, <span class="keyword">int</span>[] cost)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 暴力解法，依次尝试每个索引作为起点</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; gas.length; i++) &#123;</span><br><span class="line">        <span class="keyword">int</span> gasLeft = gas[i] - cost[i];</span><br><span class="line">        <span class="comment">// 以i为起点，环一圈</span></span><br><span class="line">        <span class="keyword">int</span> index = (i + <span class="number">1</span>) % gas.length;</span><br><span class="line">        <span class="keyword">while</span> (gasLeft &gt; <span class="number">0</span> &amp;&amp; index != i) &#123;</span><br><span class="line">            gasLeft += gas[index] - cost[index];</span><br><span class="line">            index = (index + <span class="number">1</span>) % gas.length;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果环完一圈，油还有剩余，那么表示有解，返回索引</span></span><br><span class="line">        <span class="keyword">if</span> (gasLeft &gt;= <span class="number">0</span> &amp;&amp; index == i) &#123;</span><br><span class="line">            <span class="keyword">return</span> i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 <strong>贪心算法</strong> 处理，思路：</p>
+<ul>
+<li>从第一个加油站开始遍历，计算走完每个加油站后的剩余油量，如果在第 <code>i</code> 个加油站剩余油量小于 <code>0</code> 了，那么说明前 <code>i</code> 个加油站无法作为起点。</li>
+<li>那么只能从第 <code>i + 1</code> 个加油站开始继续寻找，如果最后所有加油站都遍历完后，剩余油量小于 <code>0</code>，那么说明肯定无法走完一圈。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">canCompleteCircuit</span><span class="params">(<span class="keyword">int</span>[] gas, <span class="keyword">int</span>[] cost)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 贪心算法</span></span><br><span class="line">    <span class="keyword">int</span> curSum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> totalSum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; gas.length; i++) &#123;</span><br><span class="line">        curSum += gas[i] - cost[i];</span><br><span class="line">        totalSum += gas[i] - cost[i];</span><br><span class="line">        <span class="comment">// 如果当前累加的剩余油量小于0，说明如果从第i个加油站之前开始出发，那碰到第i个加油站时一定会出现油量不足的情况</span></span><br><span class="line">        <span class="comment">// 将起点重置为第i+1个加油站，然后进行判断后续加油站是否满足条件</span></span><br><span class="line">        <span class="keyword">if</span> (curSum &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            start = i + <span class="number">1</span>;</span><br><span class="line">            curSum = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果走完所有加油站，剩余油量小于0，说明肯定无法走完一圈</span></span><br><span class="line">    <span class="keyword">if</span> (totalSum &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> start;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="柠檬水找零"><a href="#柠檬水找零" class="headerlink" title="柠檬水找零"></a>柠檬水找零</h2><p>相关题目：</p>
+<ul>
+<li>860.柠檬水找零</li>
+</ul>
+<p>思路如下：</p>
+<ul>
+<li>第一个客户如果付的不是5元面额的，那么肯定不满足。</li>
+<li>找零有3种情况：客户付的10元，可以找零一张5元；客户付的20元，可以找零一张10元和一张5元，或者找零三张5元。<strong>因此我们维护两个变量来记录当前剩余的5元和10元数量即可。</strong></li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">lemonadeChange</span><span class="params">(<span class="keyword">int</span>[] bills)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (bills[<span class="number">0</span>] != <span class="number">5</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> left_5 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> left_10 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; bills.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (bills[i] == <span class="number">5</span>) &#123;</span><br><span class="line">            left_5++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (bills[i] == <span class="number">10</span>) &#123;</span><br><span class="line">            <span class="comment">// 找零一张5元</span></span><br><span class="line">            left_5--;</span><br><span class="line">            left_10++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (bills[i] == <span class="number">20</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (left_10 &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 找零一张10元和一张5元</span></span><br><span class="line">                left_10--;</span><br><span class="line">                left_5--;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 找零三张5元</span></span><br><span class="line">                left_5 -= <span class="number">3</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 最后统一判断，如果5元和10元面额小于0，那么表示无法正确找零</span></span><br><span class="line">        <span class="keyword">if</span> (left_5 &lt; <span class="number">0</span> || left_10 &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="单调递增的数字"><a href="#单调递增的数字" class="headerlink" title="单调递增的数字"></a>单调递增的数字</h2><p>相关题目：</p>
+<ul>
+<li>738.单调递增的数字</li>
+</ul>
+<p>思路：</p>
+<ul>
+<li>先要将数字中各个位数的数分隔出来。</li>
+<li>然后遍历分隔后的数组，如果位数较大的数 <code>i</code> 比位数较小的数 <code>j</code> 要大，那么 <code>i</code> 减一，<code>j</code> 置为 <code>9</code>。这里如果触发需要将位数较小的数置为 <code>9</code> 的操作，那么所有比 <code>i</code> 位数小的数都要被置为 <code>9</code>，因此我们可以先记录一下 <code>i</code> 的位置，后面统一将小于 <code>i</code> 位数的数置为 <code>9</code>。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">monotoneIncreasingDigits</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 将原数字的每一位都提出来，个位放最前面</span></span><br><span class="line">    List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">while</span> (n &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        list.add(n % <span class="number">10</span>);</span><br><span class="line">        n = n / <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; list.size(); i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (list.get(i) &gt; list.get(i - <span class="number">1</span>) ) &#123;</span><br><span class="line">            <span class="comment">// 位数较大的数比位数较小的数还要大，那么位数较大的数减一</span></span><br><span class="line">            list.set(i, list.get(i) - <span class="number">1</span>);</span><br><span class="line">            <span class="comment">// 剩下位数较小的数后面都置为9，这里记录一下开始记录的位置</span></span><br><span class="line">            <span class="comment">// 注意，这里不能直接将i-1置为9，因为可能i-2和i-3也需要被置为9，因此这里先记录，后面再处理</span></span><br><span class="line">            start = i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 位数较小的数都置为9</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; start; i++) &#123;</span><br><span class="line">        list.set(i, <span class="number">9</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 计算结果</span></span><br><span class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> flag = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.size(); i++) &#123;</span><br><span class="line">       result += list.get(i) * flag;</span><br><span class="line">       flag *= <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/leetcode/" rel="tag"># leetcode</a>
+              <a href="/tags/%E8%B4%AA%E5%BF%83/" rel="tag"># 贪心</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-08-11/6975/" rel="prev" title="leetcode刷题记录 - 回溯算法(二)">
+      <i class="fa fa-chevron-left"></i> leetcode刷题记录 - 回溯算法(二)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023-08-24/6749/" rel="next" title="leetcode刷题记录 - 贪心算法(二)">
+      leetcode刷题记录 - 贪心算法(二) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8F%91%E9%A5%BC%E5%B9%B2"><span class="nav-number">1.</span> <span class="nav-text">分发饼干</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%86%E5%8A%A8%E5%BA%8F%E5%88%97"><span class="nav-number">2.</span> <span class="nav-text">摆动序列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C"><span class="nav-number">3.</span> <span class="nav-text">最大子数组和</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAii"><span class="nav-number">4.</span> <span class="nav-text">买卖股票的最佳时机ii</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K%E6%AC%A1%E5%8F%96%E5%8F%8D%E5%90%8E%E6%9C%80%E5%A4%A7%E5%8C%96%E7%9A%84%E6%95%B0%E7%BB%84%E5%92%8C"><span class="nav-number">5.</span> <span class="nav-text">K次取反后最大化的数组和</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E6%B2%B9%E7%AB%99"><span class="nav-number">6.</span> <span class="nav-text">加油站</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A0%E6%AA%AC%E6%B0%B4%E6%89%BE%E9%9B%B6"><span class="nav-number">7.</span> <span class="nav-text">柠檬水找零</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E8%B0%83%E9%80%92%E5%A2%9E%E7%9A%84%E6%95%B0%E5%AD%97"><span class="nav-number">8.</span> <span class="nav-text">单调递增的数字</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

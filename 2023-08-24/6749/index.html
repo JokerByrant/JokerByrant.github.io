@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="上一篇中通过一些题目对贪心算法有了一定的了解，本篇中重点看两种特定类型的贪心题目：两个维度权衡问题、区间问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="leetcode刷题记录 - 贪心算法(二)">
+<meta property="og:url" content="https://jokerbyrant.github.io/2023-08-24/6749/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="上一篇中通过一些题目对贪心算法有了一定的了解，本篇中重点看两种特定类型的贪心题目：两个维度权衡问题、区间问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-24T03:43:28.000Z">
+<meta property="article:modified_time" content="2023-08-24T03:45:47.326Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="leetcode">
+<meta property="article:tag" content="贪心">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2023-08-24/6749/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>leetcode刷题记录 - 贪心算法(二) | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-24/6749/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          leetcode刷题记录 - 贪心算法(二)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-24 11:43:28" itemprop="dateCreated datePublished" datetime="2023-08-24T11:43:28+08:00">2023-08-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>上一篇中通过一些题目对贪心算法有了一定的了解，本篇中重点看两种特定类型的贪心题目：两个维度权衡问题、区间问题。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="两个维度权衡问题"><a href="#两个维度权衡问题" class="headerlink" title="两个维度权衡问题"></a>两个维度权衡问题</h2><p>这类题目给出的条件会包含两个维度，而在使用 <strong>贪心算法</strong> 处理时，我们要对两个维度分别处理。</p>
+<h3 id="分发糖果"><a href="#分发糖果" class="headerlink" title="分发糖果"></a>分发糖果</h3><p>相关题目：</p>
+<ul>
+<li>135.分发糖果</li>
+</ul>
+<p>使用 <strong>贪心算法</strong> 处理，思路如下：</p>
+<ul>
+<li>先从左向右遍历，比较右孩子的评分大于左孩子的情况，满足的话将 [左孩子的糖果数量加一后的值] 作为右孩子的糖果数量。</li>
+<li>之后再从右向左遍历，比较左孩子的评分大于右孩子的情况，满足的话比较 [左糖果数量加一后的值] 和 [原左孩子的值]，取其中较大的那个作为左孩子的值。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">candy</span><span class="params">(<span class="keyword">int</span>[] ratings)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 贪心算法</span></span><br><span class="line">    <span class="comment">// 先从左向右遍历，找到右孩子大于左孩子的情况</span></span><br><span class="line">    <span class="keyword">int</span>[] candyArr = <span class="keyword">new</span> <span class="keyword">int</span>[ratings.length];</span><br><span class="line">    candyArr[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; ratings.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (ratings[i] &gt; ratings[i - <span class="number">1</span>]) &#123;</span><br><span class="line">            candyArr[i] = candyArr[i - <span class="number">1</span>] + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            candyArr[i] = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 再从右向左遍历，找到左孩子大于右孩子的情况</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = ratings.length - <span class="number">2</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="keyword">if</span> (ratings[i] &gt; ratings[i + <span class="number">1</span>]) &#123;</span><br><span class="line">            candyArr[i] = Math.max(candyArr[i], candyArr[i + <span class="number">1</span>] + <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Arrays.stream(candyArr).sum();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="根据身高重建队列"><a href="#根据身高重建队列" class="headerlink" title="根据身高重建队列"></a>根据身高重建队列</h3><p>相关题目：</p>
+<ul>
+<li>406.根据身高重建队列</li>
+</ul>
+<p>本题有两个维度：<code>k</code> 和 <code>h</code>，在使用 <strong>贪心算法</strong> 处理这种多维度的数据时，要将多个维度分别处理：</p>
+<ul>
+<li>本题中考虑先对身高进行处理，对身高进行排序：身高高的站前面，身高相同 <code>k</code> 更小的站前面。</li>
+<li>排序完成后，对 <code>k</code> 这个维度进行处理，按照排序后的顺序将元素插入到新的数组即可，插入的位置就是 <code>k</code> 对应的值。</li>
+<li>这里可能有些难理解，举个例子，比如现在有个元素 <code>[5, 2]</code>，按照身高排序完后，这个 <code>[5, 2]</code> 的前面几个元素身高都大于 <code>5</code>，而 <code>[5, 2]</code> 表示它前面应该有两个身高大于等于它的元素，因此直接将其插入到目标数组下标为 <code>2</code> 的位置即可，插入之后它前面有两个元素，身高一定大于等于它，满足条件。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[][] reconstructQueue(<span class="keyword">int</span>[][] people) &#123;</span><br><span class="line">    <span class="comment">// 先按照身高进行排序</span></span><br><span class="line">    Arrays.sort(people, (a, b) -&gt; &#123;</span><br><span class="line">        <span class="comment">// 身高相同的k小的站前面</span></span><br><span class="line">        <span class="keyword">if</span> (a[<span class="number">0</span>] == b[<span class="number">0</span>]) &#123;</span><br><span class="line">            <span class="keyword">return</span> a[<span class="number">1</span>] - b[<span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 身高高的站前面</span></span><br><span class="line">        <span class="keyword">return</span> b[<span class="number">0</span>] - a[<span class="number">0</span>];</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 排序后的数组按照顺序执行插入操作，插入的下标是对应的k</span></span><br><span class="line">    LinkedList&lt;<span class="keyword">int</span>[]&gt; list = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span>[] arr : people) &#123;</span><br><span class="line">        list.add(arr[<span class="number">1</span>], arr);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list.toArray(<span class="keyword">new</span> <span class="keyword">int</span>[people.length][]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="区间问题"><a href="#区间问题" class="headerlink" title="区间问题"></a>区间问题</h2><p>区间问题一般是要找 <strong>重叠区间</strong> 或 <strong>不重叠区间</strong>，我们要注意的是区间边界的移动。</p>
+<h3 id="跳跃游戏"><a href="#跳跃游戏" class="headerlink" title="跳跃游戏"></a>跳跃游戏</h3><p>相关题目：</p>
+<ul>
+<li>55.跳跃游戏</li>
+</ul>
+<p><strong>贪心算法</strong>，本题的思路是：</p>
+<ul>
+<li>对数组元素进行遍历，遍历的范围是 <strong>当前以及之前的元素可以访问的最大范围</strong>，这个范围随着遍历的进行应该是不断变更的。</li>
+<li>具体的代码实现类似双指针，左指针不断遍历数组元素，右指针用来确定当前可以访问的最大范围。</li>
+<li><strong>局部最优：每次最大跳跃步数(覆盖范围)；整体最优：得到整体最大覆盖范围，看是否能到终点。</strong></li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">canJump</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 贪心算法</span></span><br><span class="line">    <span class="keyword">if</span> (nums.length == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> coverRange = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 相当于使用了双指针</span></span><br><span class="line">    <span class="comment">// 左指针不断遍历数组元素，右指针用来确定当前可以访问的最大范围</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= coverRange; i++) &#123;</span><br><span class="line">        <span class="comment">// 获取当前可以覆盖的最大范围</span></span><br><span class="line">        coverRange = Math.max(coverRange, i + nums[i]);</span><br><span class="line">        <span class="comment">// 如果最大可访问范围超过数组长度，那么返回true</span></span><br><span class="line">        <span class="keyword">if</span> (coverRange &gt;= nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="跳跃游戏ii"><a href="#跳跃游戏ii" class="headerlink" title="跳跃游戏ii"></a>跳跃游戏ii</h3><p>相关题目：</p>
+<ul>
+<li>45.跳跃游戏ii</li>
+</ul>
+<p>贪心算法，思路如下：</p>
+<ul>
+<li>要求的结果是最小步数，那么我们要保证每一步都要充分利用。找到每一步可以覆盖的最大范围，如果当前覆盖范围不能达到数组重点，那么将范围内的元素遍历一遍，找下一步可以覆盖的最大范围。</li>
+<li>当前范围的元素遍历完毕后，步数加一，进入下一个范围，重复上面的过程。</li>
+<li><strong>局部最优：求当前这一步的最大覆盖范围，将覆盖范围内的元素遍历一遍，这是一步；整体最优：到达终点，步数最少。</strong></li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">jump</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (nums.length == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 贪心算法</span></span><br><span class="line">    <span class="comment">// 走的最大步数</span></span><br><span class="line">    <span class="keyword">int</span> step = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 当前覆盖的最远距离下标</span></span><br><span class="line">    <span class="keyword">int</span> currentCoverRange = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 下一步覆盖的最远距离下标</span></span><br><span class="line">    <span class="keyword">int</span> nextCoverRange = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++)&#123;</span><br><span class="line">        <span class="comment">// 记录下一次可以跳跃到的最大元素下标</span></span><br><span class="line">        nextCoverRange = Math.max(nextCoverRange, nums[i] + i);</span><br><span class="line">        <span class="comment">// 到达当前覆盖的最远距离下标</span></span><br><span class="line">        <span class="keyword">if</span> (i == currentCoverRange) &#123;</span><br><span class="line">            <span class="comment">// 进入到下一个覆盖范围</span></span><br><span class="line">            currentCoverRange = nextCoverRange;</span><br><span class="line">            <span class="comment">// 发生跳跃，步数加一</span></span><br><span class="line">            step++;</span><br><span class="line">            <span class="comment">// 如果当前的覆盖范围包括终点，那么说明找到了最小跳跃次数</span></span><br><span class="line">            <span class="keyword">if</span> (currentCoverRange &gt;= nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> step;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="用最少数量的箭引爆气球"><a href="#用最少数量的箭引爆气球" class="headerlink" title="用最少数量的箭引爆气球"></a>用最少数量的箭引爆气球</h3><p>相关题目：</p>
+<ul>
+<li>452.用最少数量的箭引爆气球</li>
+</ul>
+<p>其实本题就是要找坐标 <strong>有重叠</strong> 的坐标有几处，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findMinArrowShots</span><span class="params">(<span class="keyword">int</span>[][] points)</span> </span>&#123;</span><br><span class="line">    Arrays.sort(points, (a, b) -&gt; Integer.compare(a[<span class="number">0</span>], b[<span class="number">0</span>]));</span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; points.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 气球i和气球i-1没有重叠的坐标，需要的箭加一</span></span><br><span class="line">        <span class="keyword">if</span> (points[i][<span class="number">0</span>] &gt; points[i - <span class="number">1</span>][<span class="number">1</span>]) &#123;</span><br><span class="line">            count++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 更新重叠气球的最小右边界，这样如果第i+1个气球想要与当前两个气球重叠，那么它的左边界就必须小于等于这个最小右边界</span></span><br><span class="line">            points[i][<span class="number">1</span>] = Math.min(points[i - <span class="number">1</span>][<span class="number">1</span>], points[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="无重叠区间"><a href="#无重叠区间" class="headerlink" title="无重叠区间"></a>无重叠区间</h3><p>相关题目：</p>
+<ul>
+<li>435.无重叠区间</li>
+</ul>
+<p>与上一题的思路类似，题目要求将 [<strong>重叠区间的重叠部分</strong>] 移除，返回 [<strong>被移除的重叠区间</strong>] 的数量，那么要求结果也就是 [<strong>重叠区间</strong>] 的数量，我们可以先找 [<strong>不重叠区间</strong>] 的数量，然后用 [<strong>总的区间</strong>] 数量减去 [<strong>不重叠区间数量</strong>] 即可。</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">eraseOverlapIntervals</span><span class="params">(<span class="keyword">int</span>[][] intervals)</span> </span>&#123;</span><br><span class="line">    Arrays.sort(intervals, (a, b) -&gt; Integer.compare(a[<span class="number">0</span>], b[<span class="number">0</span>]));</span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; intervals.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (intervals[i][<span class="number">0</span>] &gt;= intervals[i - <span class="number">1</span>][<span class="number">1</span>]) &#123;</span><br><span class="line">            <span class="comment">// count中记录不重合区间的数量</span></span><br><span class="line">            count++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 更新重叠区间的最小右边界</span></span><br><span class="line">            intervals[i][<span class="number">1</span>] = Math.min(intervals[i - <span class="number">1</span>][<span class="number">1</span>], intervals[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> intervals.length - count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="划分字母区间"><a href="#划分字母区间" class="headerlink" title="划分字母区间"></a>划分字母区间</h3><p>相关题目：</p>
+<ul>
+<li>763.划分字母区间</li>
+</ul>
+<p>思路如下：</p>
+<ul>
+<li>先统计每个字符最远出现的位置。</li>
+<li>之后顺序遍历字符串，并同步的更新当前字符片段的最大右边界。</li>
+<li>如果遍历的元素下标到达了当前的最大右边界，那么说明一个字符片段遍历结束，记录当前字符片段的长度。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">partitionLabels</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">    List&lt;Integer&gt; list = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="comment">// 先统计每个字符最远出现的位置</span></span><br><span class="line">    <span class="keyword">int</span>[] position = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">27</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; s.length(); i++) &#123;</span><br><span class="line">        position[s.charAt(i) - <span class="string">&#x27;a&#x27;</span>] = i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 之后遍历整个字符串</span></span><br><span class="line">    <span class="keyword">int</span> preFarthestPosition = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> farthestPosition = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; s.length(); i++) &#123;</span><br><span class="line">        <span class="comment">// 找最大右边界</span></span><br><span class="line">        farthestPosition = Math.max(farthestPosition, position[s.charAt(i) - <span class="string">&#x27;a&#x27;</span>]);</span><br><span class="line">        <span class="comment">// 遍历到了最大右边界，找到一个片段</span></span><br><span class="line">        <span class="keyword">if</span> (i == farthestPosition) &#123;</span><br><span class="line">            list.add(farthestPosition - preFarthestPosition);</span><br><span class="line">            <span class="comment">// 记录上一个最大右边界，方便计算字符片段长度</span></span><br><span class="line">            preFarthestPosition = farthestPosition;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="合并区间"><a href="#合并区间" class="headerlink" title="合并区间"></a>合并区间</h3><p>相关题目：</p>
+<ul>
+<li>56.合并区间</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[][] merge(<span class="keyword">int</span>[][] intervals) &#123;</span><br><span class="line">    List&lt;<span class="keyword">int</span>[]&gt; list = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="comment">// 先对数组进行排序，升序</span></span><br><span class="line">    Arrays.sort(intervals, (a, b) -&gt; Integer.compare(a[<span class="number">0</span>], b[<span class="number">0</span>]));</span><br><span class="line">    <span class="comment">// 记录左区间和右区间</span></span><br><span class="line">    <span class="keyword">int</span> left = intervals[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">int</span> right = intervals[<span class="number">0</span>][<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; intervals.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (intervals[i][<span class="number">0</span>] &gt; right) &#123;</span><br><span class="line">            <span class="comment">// 第i个区间与上个区间不重叠，则记录上个区间的范围</span></span><br><span class="line">            list.add(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;left, right&#125;);</span><br><span class="line">            left = intervals[i][<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        right = Math.max(intervals[i][<span class="number">1</span>], right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 最后一个区间</span></span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;left, right&#125;);</span><br><span class="line">    <span class="keyword">return</span> list.toArray(<span class="keyword">new</span> <span class="keyword">int</span>[list.size()][]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="监控二叉树"><a href="#监控二叉树" class="headerlink" title="监控二叉树"></a>监控二叉树</h2><p>相关题目：</p>
+<ul>
+<li>968.监控二叉树</li>
+</ul>
+<p>本题是 <strong>贪心算法</strong> 和 <strong>二叉树</strong> 两个知识点交叉的题目。</p>
+<p>思路：</p>
+<ul>
+<li>首先要确定节点的状态，有三种：0-&gt;未被覆盖，1-&gt;已安装摄像头，2-&gt;已被覆盖。</li>
+<li>接着在确定遍历方向，安装摄像头要从叶子节点开始，这样才能达到最优。因此使用后序遍历处理。</li>
+<li>维护一个变量用来存储当前已安装摄像头的数量。</li>
+<li>然后按照递归函数三部曲来处理：<ul>
+<li>返回值应该是节点的三种状态。</li>
+<li>终止条件是碰到空节点。这时要确定这种状态的返回值：首先空节点不可能是有摄像头的状态；接着，为了让摄像头的数量最少，那我们就应该尽量让叶子节点的父节点安装摄像头，然后如果空节点是无覆盖的情况，那我们就要在它的父节点(叶子节点)上装摄像头了，这样叶子节点的的父节点就无法安装摄像头了。因此遇到空节点时，我们返回状态：2-&gt;已被覆盖。</li>
+<li>接着确定单层递归逻辑，根据当前节点左右子节点的状态进行判断：①.如果左右子节点都被覆盖了，那么当前节点是无覆盖状态，返回 0；②.如果左右子节点其中任何一个未被覆盖，那么当前节点就要装摄像头，已安装摄像头数量加一，结果返回1；③.如果左右子节点其中任何一个装了摄像头，那么当前节点应该是已被覆盖状态，返回2.</li>
+</ul>
+</li>
+</ul>
+<p>具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minCameraCover</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (minCame(root) == <span class="number">0</span>) &#123;</span><br><span class="line">        res++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 返回值</span></span><br><span class="line"><span class="comment"> * 0 -&gt; 无覆盖</span></span><br><span class="line"><span class="comment"> * 1 -&gt; 有摄像头</span></span><br><span class="line"><span class="comment"> * 2 -&gt; 有覆盖</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> node</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minCame</span><span class="params">(TreeNode node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (node == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 空节点默认有覆盖，避免在叶子节点上放摄像头</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> left = minCame(node.left);</span><br><span class="line">    <span class="keyword">int</span> right = minCame(node.right);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (left == <span class="number">2</span> &amp;&amp; right == <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="comment">// 左右子节点都被覆盖了的话，当前节点应该是无覆盖</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (left == <span class="number">0</span> || right == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 如果左右子节点中有任何一个没有被覆盖，那当前节点就要加一个摄像头</span></span><br><span class="line">        res++;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (left == <span class="number">1</span> || right == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// 如果左右子节点其中任何一个有摄像头，那么当前节点就是被覆盖状态</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 注：上面三个if-else已经将所有情况的涵盖进来了，代码不会走到这里</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/leetcode/" rel="tag"># leetcode</a>
+              <a href="/tags/%E8%B4%AA%E5%BF%83/" rel="tag"># 贪心</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-08-17/56057/" rel="prev" title="leetcode刷题记录 - 贪心算法(一)">
+      <i class="fa fa-chevron-left"></i> leetcode刷题记录 - 贪心算法(一)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E7%BB%B4%E5%BA%A6%E6%9D%83%E8%A1%A1%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">两个维度权衡问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8F%91%E7%B3%96%E6%9E%9C"><span class="nav-number">1.1.</span> <span class="nav-text">分发糖果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E8%BA%AB%E9%AB%98%E9%87%8D%E5%BB%BA%E9%98%9F%E5%88%97"><span class="nav-number">1.2.</span> <span class="nav-text">根据身高重建队列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">区间问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F"><span class="nav-number">2.1.</span> <span class="nav-text">跳跃游戏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8Fii"><span class="nav-number">2.2.</span> <span class="nav-text">跳跃游戏ii</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%9C%80%E5%B0%91%E6%95%B0%E9%87%8F%E7%9A%84%E7%AE%AD%E5%BC%95%E7%88%86%E6%B0%94%E7%90%83"><span class="nav-number">2.3.</span> <span class="nav-text">用最少数量的箭引爆气球</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4"><span class="nav-number">2.4.</span> <span class="nav-text">无重叠区间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%92%E5%88%86%E5%AD%97%E6%AF%8D%E5%8C%BA%E9%97%B4"><span class="nav-number">2.5.</span> <span class="nav-text">划分字母区间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E5%8C%BA%E9%97%B4"><span class="nav-number">2.6.</span> <span class="nav-text">合并区间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">3.</span> <span class="nav-text">监控二叉树</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://ae01.alicdn.com/kf/Ue7867d9a750f461cb9fb7e300606552bT.jpg">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
