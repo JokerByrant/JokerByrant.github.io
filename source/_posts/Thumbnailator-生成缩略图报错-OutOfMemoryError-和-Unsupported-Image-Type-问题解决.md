@@ -3,7 +3,7 @@ title: Thumbnailator 生成缩略图报错 OutOfMemoryError 和 Unsupported Imag
 tags: Java
 categories: 后端技术
 abbrlink: 25740
-date: 2023-10-17 13:58:48
+date: 2023-09-17 13:58:48
 ---
 生产环境最近出现一个问题：**聊天中发送图片会出现 `OutOfMemoryError` 报错**，经过调查是服务端的图片压缩方法导致的。目前的图片压缩方法使用的是 `Thumbnailator` 库：[Github地址](https://github.com/coobird/thumbnailator)。
 
