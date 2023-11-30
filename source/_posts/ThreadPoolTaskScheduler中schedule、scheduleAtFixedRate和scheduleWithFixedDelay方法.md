@@ -3,7 +3,7 @@ title: ThreadPoolTaskScheduler中schedule、scheduleAtFixedRate和scheduleWithFi
 tags: 定时任务
 categories: 后端技术
 abbrlink: 51973
-date: 2023-11-29 12:49:01
+date: 2023-11-16 12:49:01
 ---
 最近项目中一处定时任务出现了问题：**定时任务没有按照原先预想的周期执行。**问题是因为对 `ThreadPoolTaskScheduler` 中定时任务处理类的原理不熟悉导致的，下面就结合问题看下 `ThreadPoolTaskScheduler` 中的三个定时任务处理方法。
 
