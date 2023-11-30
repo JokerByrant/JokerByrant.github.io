@@ -55,11 +55,13 @@ Note that the <context:component-scan> element has an annotation-config attribut
 ![170123651470005fcac43d796a1efafcfe527caeb8364.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/170123651470005fcac43d796a1efafcfe527caeb8364.png)
 
 ## 处理办法
+### 移动目标类
 
 最简单的处理办法，将目标类移动到与启动类同一级目录下即可，本例中就是将 `InvalidManager` 移动到 `application` 包下即可。不过最好还是将项目启动类置于顶层目录下，这样项目内的包都能扫描到。
 
 ![17012365297001e64c0d7023d2aea0829067b8663d6a5.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17012365297001e64c0d7023d2aea0829067b8663d6a5.png)
 
+### 使用ComponentScan限定扫描范围
 如果不想移动目标类，那么就需要我们手动指定 `ComponentScan` 的扫描包了，如下：
 
 ```java
@@ -72,6 +74,7 @@ public class EasyIMClientApplication {}
 
 ![1701236537700e50c71dab3833f80c9c8ef0c99df06d6.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701236537700e50c71dab3833f80c9c8ef0c99df06d6.png)
 
+### 使用ComponentScans限定扫描范围
 这里有个坑需要注意，按上面的方法处理后，**原先项目启动类所在的包将不会被扫描！**
 ![1701236545700e92e935916304ab8ba2db5320c0cacbf.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701236545700e92e935916304ab8ba2db5320c0cacbf.png)
 
