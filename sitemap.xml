@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jokerbyrant.github.io/2023-11-01/38281/</loc>
+    
+    <lastmod>2023-11-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://jokerbyrant.github.io/2023-11-30/21887/</loc>
     
     <lastmod>2023-11-30</lastmod>
@@ -14,15 +23,6 @@
     <loc>https://jokerbyrant.github.io/2023-11-16/51973/</loc>
     
     <lastmod>2023-11-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://jokerbyrant.github.io/2023-11-01/38281/</loc>
-    
-    <lastmod>2023-11-29</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

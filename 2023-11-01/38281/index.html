@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701236545700e92e935916304ab8ba2db5320c0cacbf.png">
 <meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17012365587048fb921d821c140d9a67cd9abf1abc4ad.png">
 <meta property="article:published_time" content="2023-11-01T05:47:28.000Z">
-<meta property="article:modified_time" content="2023-11-29T05:51:23.251Z">
+<meta property="article:modified_time" content="2023-11-30T07:56:19.944Z">
 <meta property="article:author" content="sxh">
 <meta property="article:tag" content="SpringBoot">
 <meta name="twitter:card" content="summary">
@@ -243,14 +243,14 @@
 <p>注意其中描述的：<strong>可以指定 <code>basePackageClasses</code> 或 <code>basePackages</code>（或其别名 <code>value</code>）来定义要扫描的特定包。如果未定义特定的包，将从声明此注解的类所在的包进行扫描。</strong></p>
 <p>而在我的项目中，并没有额外指定 <code>ComponentScan</code> 注解，因此默认使用的是 <code>SpringBootApplication</code> 注解中的 <code>ComponentScan</code>，也就是默认扫描的是启动类所在的包中的 <code>Bean</code>。对 <code>ComponentScanAnnotationParser$parse()</code> 进行 <code>Debug</code>，看下 <code>ComponentScan</code> 的注解是如何生效的：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/170123651470005fcac43d796a1efafcfe527caeb8364.png" alt="170123651470005fcac43d796a1efafcfe527caeb8364.png"></p>
-<h2 id="处理办法"><a href="#处理办法" class="headerlink" title="处理办法"></a>处理办法</h2><p>最简单的处理办法，将目标类移动到与启动类同一级目录下即可，本例中就是将 <code>InvalidManager</code> 移动到 <code>application</code> 包下即可。不过最好还是将项目启动类置于顶层目录下，这样项目内的包都能扫描到。</p>
+<h2 id="处理办法"><a href="#处理办法" class="headerlink" title="处理办法"></a>处理办法</h2><h3 id="移动目标类"><a href="#移动目标类" class="headerlink" title="移动目标类"></a>移动目标类</h3><p>最简单的处理办法，将目标类移动到与启动类同一级目录下即可，本例中就是将 <code>InvalidManager</code> 移动到 <code>application</code> 包下即可。不过最好还是将项目启动类置于顶层目录下，这样项目内的包都能扫描到。</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17012365297001e64c0d7023d2aea0829067b8663d6a5.png" alt="17012365297001e64c0d7023d2aea0829067b8663d6a5.png"></p>
-<p>如果不想移动目标类，那么就需要我们手动指定 <code>ComponentScan</code> 的扫描包了，如下：</p>
+<h3 id="使用ComponentScan限定扫描范围"><a href="#使用ComponentScan限定扫描范围" class="headerlink" title="使用ComponentScan限定扫描范围"></a>使用ComponentScan限定扫描范围</h3><p>如果不想移动目标类，那么就需要我们手动指定 <code>ComponentScan</code> 的扫描包了，如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@ComponentScan(&quot;com.sxh.manager&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EasyIMClientApplication</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
 
 <p>再来对 <code>ComponentScanAnnotationParser$parse()</code> 进行 <code>Debug</code>，可以看到这次扫描的是 <code>ComponentScan</code> 注解中定义的包：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701236537700e50c71dab3833f80c9c8ef0c99df06d6.png" alt="1701236537700e50c71dab3833f80c9c8ef0c99df06d6.png"></p>
-<p>这里有个坑需要注意，按上面的方法处理后，<strong>原先项目启动类所在的包将不会被扫描！</strong><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701236545700e92e935916304ab8ba2db5320c0cacbf.png" alt="1701236545700e92e935916304ab8ba2db5320c0cacbf.png"></p>
+<h3 id="使用ComponentScans限定扫描范围"><a href="#使用ComponentScans限定扫描范围" class="headerlink" title="使用ComponentScans限定扫描范围"></a>使用ComponentScans限定扫描范围</h3><p>这里有个坑需要注意，按上面的方法处理后，<strong>原先项目启动类所在的包将不会被扫描！</strong><br><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701236545700e92e935916304ab8ba2db5320c0cacbf.png" alt="1701236545700e92e935916304ab8ba2db5320c0cacbf.png"></p>
 <p>也就是说，按上面的方法处理后，启动类所在的包将不会被扫描：</p>
 <p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17012365587048fb921d821c140d9a67cd9abf1abc4ad.png" alt="17012365587048fb921d821c140d9a67cd9abf1abc4ad.png"></p>
 <p>针对这个问题，我们可以使用 <code>ComponentScans</code> 注解来解决，如下：</p>
@@ -346,7 +346,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">原因定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%8A%9E%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">处理办法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">原因定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%8A%9E%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">处理办法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E5%8A%A8%E7%9B%AE%E6%A0%87%E7%B1%BB"><span class="nav-number">3.1.</span> <span class="nav-text">移动目标类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8ComponentScan%E9%99%90%E5%AE%9A%E6%89%AB%E6%8F%8F%E8%8C%83%E5%9B%B4"><span class="nav-number">3.2.</span> <span class="nav-text">使用ComponentScan限定扫描范围</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8ComponentScans%E9%99%90%E5%AE%9A%E6%89%AB%E6%8F%8F%E8%8C%83%E5%9B%B4"><span class="nav-number">3.3.</span> <span class="nav-text">使用ComponentScans限定扫描范围</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
