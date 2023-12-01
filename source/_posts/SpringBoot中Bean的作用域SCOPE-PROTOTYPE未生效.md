@@ -3,7 +3,7 @@ title: SpringBoot中Bean的作用域SCOPE_PROTOTYPE未生效
 tags: SpringBoot
 categories: 后端技术
 abbrlink: 21887
-date: 2023-11-30 14:06:24
+date: 2023-11-28 14:06:24
 ---
 
 平常我们用 `Spring` 管理 `Bean` ，都是使用的默认作用域，也就是 **`SCOPE_SINGLETON` - 单例作用域：定义的 `Bean` 在整个应用程序中只有一个实例**。`Spring` 还包含另一个不常用的作用域 **`SCOPE_PROTOTYPE` - 原型作用域：每次请求该 `Bean` 时，都会创建一个新的实例。**
