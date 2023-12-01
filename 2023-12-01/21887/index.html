@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文参考自：Spring Bean 依赖注入常见错误">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot中依赖注入常见问题">
+<meta property="og:url" content="https://jokerbyrant.github.io/2023-12-01/21887/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="本文参考自：Spring Bean 依赖注入常见错误">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17014117061819bcd47f95c1f4ae33220636e80fa76dc.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701411726181bd33565ee25cb078fa0853ece24e4186.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17014117361841de13cd749865a650b564da80918ca09.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701411761183b075938e279353532a0ddd036fa0c05f.png">
+<meta property="article:published_time" content="2023-12-01T06:23:36.000Z">
+<meta property="article:modified_time" content="2023-12-01T06:25:19.677Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="SpringBoot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17014117061819bcd47f95c1f4ae33220636e80fa76dc.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2023-12-01/21887/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringBoot中依赖注入常见问题 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-12-01/21887/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot中依赖注入常见问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-12-01 14:23:36" itemprop="dateCreated datePublished" datetime="2023-12-01T14:23:36+08:00">2023-12-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>本文参考自：<a target="_blank" rel="noopener" href="https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Spring%e7%bc%96%e7%a8%8b%e5%b8%b8%e8%a7%81%e9%94%99%e8%af%af50%e4%be%8b/02%20Spring%20Bean%20%e4%be%9d%e8%b5%96%e6%b3%a8%e5%85%a5%e5%b8%b8%e8%a7%81%e9%94%99%e8%af%af%ef%bc%88%e4%b8%8a%ef%bc%89.md">Spring Bean 依赖注入常见错误</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Autowired无法确定装配的Bean"><a href="#Autowired无法确定装配的Bean" class="headerlink" title="Autowired无法确定装配的Bean"></a>Autowired无法确定装配的Bean</h2><h3 id="问题复现"><a href="#问题复现" class="headerlink" title="问题复现"></a>问题复现</h3><p>下面通过一段代码复现一下这个问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ITestService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ValidManager</span> <span class="keyword">implements</span> <span class="title">ITestService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InvalidManager</span> <span class="keyword">implements</span> <span class="title">ITestService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> ITestService testService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(path = &quot;test&quot;, method = RequestMethod.GET)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==================&quot;</span>);</span><br><span class="line">        testService.print();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>TestController</code> 中，通过 <code>Autowired</code> 装配 <code>ITestService</code>，但是 <code>ITestService</code> 有两个实现类，按照上面的写法，程序就会出现问题，项目无法正常启动。如果使用的是 <code>IDEA</code>，那么编辑器会直接给出报错提示：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17014117061819bcd47f95c1f4ae33220636e80fa76dc.png" alt="17014117061819bcd47f95c1f4ae33220636e80fa76dc.png"></p>
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h3><p>在 <code>TestController</code> 中，成员属性 <code>testService</code> 被 <code>Autowired</code> 注解标记，那么 <code>Spring</code> 就会通过 <code>AutowiredAnnotationBeanPostProcessor</code> 来完成装配：找出合适的 <code>ITestService</code> 的 <code>Bean</code> 并设置给 <code>TestController#testService</code>。</p>
+<p>而上面的问题就是这个装配过程除了问题，我们来对源码进行 <code>Debug</code> 看下问题产生的原因，直接看 <code>DefaultListableBeanFactory#doResolveDependency()</code>，这是 <code>Spring</code> 寻找依赖的具体执行位置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Object&gt; matchingBeans = findAutowireCandidates(beanName, type, descriptor);</span><br></pre></td></tr></table></figure>
+
+<p>上面这行代码就是寻找依赖的具体实现，我们看下 <code>findAutowireCandidates()</code> 方法的注释：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701411726181bd33565ee25cb078fa0853ece24e4186.png" alt="1701411726181bd33565ee25cb078fa0853ece24e4186.png"></p>
+<p>代入上面的案例，执行该方法后，<code>matchingBeans</code> 有两个值：<code>ValidManager</code> 和 <code>InvalidManager</code>。之后会进入到下面的代码段中：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17014117361841de13cd749865a650b564da80918ca09.png" alt="17014117361841de13cd749865a650b564da80918ca09.png"></p>
+<p>再看下 <code>DefaultListableBeanFactory#determineAutowireCandidate()</code> 方法，这个方法是 <code>Spring</code> 从多个 <code>Bean</code> 中选取合适的 <code>Bean</code> 的具体实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Determine the autowire candidate in the given set of beans.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;Looks for &#123;<span class="doctag">@code</span> <span class="doctag">@Primary</span>&#125; and &#123;<span class="doctag">@code</span> <span class="doctag">@Priority</span>&#125; (in that order).</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> candidates a Map of candidate names and candidate instances</span></span><br><span class="line"><span class="comment">	 * that match the required type, as returned by &#123;<span class="doctag">@link</span> #findAutowireCandidates&#125;</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> descriptor the target dependency to match against</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> the name of the autowire candidate, or &#123;<span class="doctag">@code</span> null&#125; if none found</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Nullable</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> String <span class="title">determineAutowireCandidate</span><span class="params">(Map&lt;String, Object&gt; candidates, DependencyDescriptor descriptor)</span> </span>&#123;</span><br><span class="line">		Class&lt;?&gt; requiredType = descriptor.getDependencyType();</span><br><span class="line">		<span class="comment">// 寻找Primary注解</span></span><br><span class="line">		String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);</span><br><span class="line">		<span class="keyword">if</span> (primaryCandidate != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> primaryCandidate;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 寻找Proority注解</span></span><br><span class="line">		String priorityCandidate = determineHighestPriorityCandidate(candidates, requiredType);</span><br><span class="line">		<span class="keyword">if</span> (priorityCandidate != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> priorityCandidate;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// Fallback</span></span><br><span class="line">		<span class="keyword">for</span> (Map.Entry&lt;String, Object&gt; entry : candidates.entrySet()) &#123;</span><br><span class="line">			String candidateName = entry.getKey();</span><br><span class="line">			Object beanInstance = entry.getValue();</span><br><span class="line">			<span class="keyword">if</span> ((beanInstance != <span class="keyword">null</span> &amp;&amp; <span class="keyword">this</span>.resolvableDependencies.containsValue(beanInstance)) ||</span><br><span class="line">					<span class="comment">// 根据beanName匹配</span></span><br><span class="line">					matchesBeanName(candidateName, descriptor.getDependencyName())) &#123;</span><br><span class="line">				<span class="keyword">return</span> candidateName;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如代码所示，优先级的决策是先根据 <code>@Primary</code> 来决策，其次是 <code>@Priority</code> 决策，最后是根据 <code>Bean</code> 名字的严格匹配来决策。如果这些帮助决策优先级的注解都没有被使用，名字也不精确匹配，则返回 <code>null</code>，告知无法决策出哪种最合适。</p>
+<p>而上面的案例中，<code>ValidManager</code> 和 <code>InvalidManager</code> 都没有设置优先级注解，并且 <code>TestController</code> 中 <code>Autowired</code> 标记的成员属性名 <code>testService</code> 也无法匹配是哪个 <code>Bean</code>，因此最终会出现报错的情况。</p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><ol>
+<li><p>增加优先级注解。比如给 <code>ValidManager</code> 添加一个 <code>Primary</code> 注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Primary</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ValidManager</span> <span class="keyword">implements</span> <span class="title">ITestService</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>修改 <code>TestController</code> 中 <code>Autowired</code> 标记的成员属性名。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> ITestService validManager;</span><br></pre></td></tr></table></figure>
+
+<p>比如按上面这种方式修改，最终拿到的 <code>Bean</code> 就是 <code>ValidManager</code>。</p>
+</li>
+<li><p>添加 <code>Qualifier</code> 注解。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="meta">@Qualifier(value = &quot;validManager&quot;)</span></span><br><span class="line"><span class="keyword">private</span> ITestService testService;</span><br></pre></td></tr></table></figure>
+
+<p>这种处理其实与上面一种是一样的，都是通过指定 <code>beanName</code> 来明确具体的 <code>Bean</code></p>
+</li>
+<li><p>成员属性的类型直接更改为要引入的 <code>Bean</code> 对应的类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> ValidManager validManager;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="通过beanName引入Bean时的大小写问题"><a href="#通过beanName引入Bean时的大小写问题" class="headerlink" title="通过beanName引入Bean时的大小写问题"></a>通过beanName引入Bean时的大小写问题</h2><p>这个问题主要针对上面给出的解决方案中的 <code>2</code> 和 <code>3</code>，它们的共同点都是通过 <code>beanName</code> 装配 <code>Bean</code>。</p>
+<p>在上面的案例中，我们并没有给 <code>ValidManager</code> 指定 <code>beanName</code>，但是仍然可以通过这种方式获取，这是因为 <code>Spring</code> 在扫描 <code>Bean</code> 时就自动为这些 <code>Bean</code> 分配了默认的 <code>beanName</code>，看下具体实现，代码位置 <code>ClassPathBeanDefinitionScanner#doScan()</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String beanName = <span class="keyword">this</span>.beanNameGenerator.generateBeanName(candidate, <span class="keyword">this</span>.registry);</span><br></pre></td></tr></table></figure>
+
+<p>然后看下 <code>AnnotationBeanNameGenerator#generateBeanName()</code> 的具体实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">generateBeanName</span><span class="params">(BeanDefinition definition, BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (definition <span class="keyword">instanceof</span> AnnotatedBeanDefinition) &#123;</span><br><span class="line">		String beanName = determineBeanNameFromAnnotation((AnnotatedBeanDefinition) definition);</span><br><span class="line">		<span class="keyword">if</span> (StringUtils.hasText(beanName)) &#123;</span><br><span class="line">			<span class="comment">// Explicit bean name found.</span></span><br><span class="line">			<span class="keyword">return</span> beanName;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Fallback: generate a unique default bean name.</span></span><br><span class="line">	<span class="keyword">return</span> buildDefaultBeanName(definition, registry);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，<code>generateBeanName()</code> 中生成 <code>beanName</code> 有两种方式，根据 <code>Bean</code> 有没有显式指明名称来确定：如果有则用显式名称，如果没有则产生一个默认名称。而上面的案例中，我们都是没有指定的，因此走的是默认生成 <code>beanName</code> 的方式，具体的代码实现见 <code>AnnotationBeanNameGenerator#buildDefaultBeanName()</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Derive a default bean name from the given bean definition.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;The default implementation simply builds a decapitalized version</span></span><br><span class="line"><span class="comment"> * of the short class name: e.g. &quot;mypackage.MyJdbcDao&quot; -&gt; &quot;myJdbcDao&quot;.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Note that inner classes will thus have names of the form</span></span><br><span class="line"><span class="comment"> * &quot;outerClassName.InnerClassName&quot;, which because of the period in the</span></span><br><span class="line"><span class="comment"> * name may be an issue if you are autowiring by name.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> definition the bean definition to build a bean name for</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> the default bean name (never &#123;<span class="doctag">@code</span> null&#125;)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> String <span class="title">buildDefaultBeanName</span><span class="params">(BeanDefinition definition)</span> </span>&#123;</span><br><span class="line">	String beanClassName = definition.getBeanClassName();</span><br><span class="line">	Assert.state(beanClassName != <span class="keyword">null</span>, <span class="string">&quot;No bean class name set&quot;</span>);</span><br><span class="line">	String shortClassName = ClassUtils.getShortName(beanClassName);</span><br><span class="line">	<span class="keyword">return</span> Introspector.decapitalize(shortClassName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体的实现就是，先获取类名，然后再调用 <code>Introspector#decapitalize()</code> 方法。这里要注意一下上面的注释，完整的翻译如下：</p>
+<blockquote>
+<p>从给定的bean定义中派生一个默认的bean名称。 默认实现只是构建一个小写版本的短类名：例如”mypackage.MyJdbcDao” -&gt; “myJdbcDao”。 请注意，内部类的名称将以”outerClassName.InnerClassName”的形式存在，如果您按名称进行自动装配，这可能会成为一个问题，因为名称中有一个句点。</p>
+</blockquote>
+<p>这里提到内部类的名称将会以 <code>outerClassName.InnerClassName</code> 的形式存在，因此生成的 <code>beanName</code> 也会是这个形式。</p>
+<p>我们看下获取到类名后，在 <code>Introspector#decapitalize()</code> 是如何处理的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Utility method to take a string and convert it to normal Java variable</span></span><br><span class="line"><span class="comment"> * name capitalization.  This normally means converting the first</span></span><br><span class="line"><span class="comment"> * character from upper case to lower case, but in the (unusual) special</span></span><br><span class="line"><span class="comment"> * case when there is more than one character and both the first and</span></span><br><span class="line"><span class="comment"> * second characters are upper case, we leave it alone.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * Thus &quot;FooBah&quot; becomes &quot;fooBah&quot; and &quot;X&quot; becomes &quot;x&quot;, but &quot;URL&quot; stays</span></span><br><span class="line"><span class="comment"> * as &quot;URL&quot;.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  name The string to be decapitalized.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span>  The decapitalized version of the string.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">decapitalize</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (name == <span class="keyword">null</span> || name.length() == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (name.length() &gt; <span class="number">1</span> &amp;&amp; Character.isUpperCase(name.charAt(<span class="number">1</span>)) &amp;&amp;</span><br><span class="line">                    Character.isUpperCase(name.charAt(<span class="number">0</span>)))&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">char</span> chars[] = name.toCharArray();</span><br><span class="line">    chars[<span class="number">0</span>] = Character.toLowerCase(chars[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> String(chars);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看下这个方法的注释，翻译一下：</p>
+<blockquote>
+<p>将一个字符串转换为普通的Java变量命名规范的实用方法。通常情况下，这意味着将第一个字符从大写转换为小写，但在（不寻常的）特殊情况下，如果有多个字符并且第一个和第二个字符都是大写，我们保持不变。 因此，”FooBah”变为”fooBah”，”X”变为”x”，但”URL”保持为”URL”。</p>
+</blockquote>
+<p>也就是说，这个方法的具体实现是：<strong>如果传入的字符串是以两个大写字母开头的，则首字母不变，其它情况下默认首字母变成小写。</strong></p>
+<p>到这里我们就可以总结一下 <code>Spring</code> 中 <code>beanName</code> 的生成规则了：<strong>如果指定了 <code>beanName</code>，那么使用这个 <code>beanName</code>。如果没有指定 <code>beanName</code>，则根据 <code>Bean</code> 的类名生成，如果类名的头两个字符都是大写，则首字母不变，其他情况下首字母变为小写；如果是内部类，还需要注意生成的 <code>beanName</code> 是 <code>outerClassName.innerClassName</code> 这种形式的。</strong></p>
+<h2 id="构造器参数隐式注入"><a href="#构造器参数隐式注入" class="headerlink" title="构造器参数隐式注入"></a>构造器参数隐式注入</h2><p>这种方式平常开发时使用的并不多，看下代码实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ValidManager validManager;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestController</span><span class="params">(ValidManager validManager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.validManager = validManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(path = &quot;test&quot;, method = RequestMethod.GET)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==================&quot;</span>);</span><br><span class="line">        validManager.print();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码也可以正常运行，其中 <code>validManager</code> 与通过 <code>Autowired</code> 装配效果是一样的，其中的原理是：<strong>我们定义一个类为 <code>Bean</code>，如果再显式定义了构造器，那么这个 <code>Bean</code> 在构建时，会自动根据构造器参数定义寻找对应的 <code>Bean</code>，然后反射创建出这个 <code>Bean</code>。</strong></p>
+<p>上面案例中，我们显示定义了 <code>TestController</code> 的构造器，其中包含一个参数 <code>ValidManager</code>，那么 <code>Spring</code> 在构建 <code>TestController</code> 时，就会去寻找 <code>ValiadManager</code> 对应的 <code>Bean</code>，然后装配给 <code>TestController</code> 的成员属性。</p>
+<h2 id="Value注释注入的值与预期不符"><a href="#Value注释注入的值与预期不符" class="headerlink" title="Value注释注入的值与预期不符"></a>Value注释注入的值与预期不符</h2><p>看如下案例，在 <code>application.yml</code> 定义了 <code>username</code> 属性：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username: sxh</span><br></pre></td></tr></table></figure>
+
+<p>然后在 <code>TestController</code> 通过 <code>Value</code> 注解获取这个值：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;username&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(path = &quot;test&quot;, method = RequestMethod.GET)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==================&quot;</span>);</span><br><span class="line">        System.out.println(username);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终打印的结果却是如下</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1701411761183b075938e279353532a0ddd036fa0c05f.png" alt="1701411761183b075938e279353532a0ddd036fa0c05f.png"></p>
+<p>这是因为定义的属性名与系统环境变量冲突了，因此我们在命名这类属性时，需要注意不要与环境变量和系统环境变量冲突。</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="noopener" href="https://learn.lianglianglee.com/%e4%b8%93%e6%a0%8f/Spring%e7%bc%96%e7%a8%8b%e5%b8%b8%e8%a7%81%e9%94%99%e8%af%af50%e4%be%8b/02%20Spring%20Bean%20%e4%be%9d%e8%b5%96%e6%b3%a8%e5%85%a5%e5%b8%b8%e8%a7%81%e9%94%99%e8%af%af%ef%bc%88%e4%b8%8a%ef%bc%89.md">Spring Bean 依赖注入常见错误</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_22076345/article/details/104687011">Spring中@Bean注解和@Configuration、@Component注解组合使用的差异</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringBoot/" rel="tag"># SpringBoot</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023-11-28/21887/" rel="prev" title="SpringBoot中Bean的作用域SCOPE_PROTOTYPE未生效">
+      <i class="fa fa-chevron-left"></i> SpringBoot中Bean的作用域SCOPE_PROTOTYPE未生效
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Autowired%E6%97%A0%E6%B3%95%E7%A1%AE%E5%AE%9A%E8%A3%85%E9%85%8D%E7%9A%84Bean"><span class="nav-number">1.</span> <span class="nav-text">Autowired无法确定装配的Bean</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.1.</span> <span class="nav-text">问题复现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">1.2.</span> <span class="nav-text">原因分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">解决办法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87beanName%E5%BC%95%E5%85%A5Bean%E6%97%B6%E7%9A%84%E5%A4%A7%E5%B0%8F%E5%86%99%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">通过beanName引入Bean时的大小写问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%99%A8%E5%8F%82%E6%95%B0%E9%9A%90%E5%BC%8F%E6%B3%A8%E5%85%A5"><span class="nav-number">3.</span> <span class="nav-text">构造器参数隐式注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Value%E6%B3%A8%E9%87%8A%E6%B3%A8%E5%85%A5%E7%9A%84%E5%80%BC%E4%B8%8E%E9%A2%84%E6%9C%9F%E4%B8%8D%E7%AC%A6"><span class="nav-number">4.</span> <span class="nav-text">Value注释注入的值与预期不符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">5.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
