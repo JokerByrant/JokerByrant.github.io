@@ -162,6 +162,82 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021-12-10/11081/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021-12-10/11081/" class="post-title-link" itemprop="url">解决多服务下Logback日志丢失问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-10 13:08:04" itemprop="dateCreated datePublished" datetime="2021-12-10T13:08:04+08:00">2021-12-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>在上一篇文章中：<a href="/2021-12-02/40553/" title="服务器上的过期Logback日志没有自动清理">服务器上的过期Logback日志没有自动清理</a>，发现日志文件后缀错乱的问题与启动了多服务有关。在解决了这个问题后，对 <strong>[日志备份] 和 [历史日志清理]</strong> 又进行了几次测试，发现部分日志文件中存在 <strong>日志丢失</strong> 的问题。</p>
+<p>这个问题应该只有 <strong>多服务共享一个日志文件</strong> 时会产生。在执行备份文件时，对文件重命名，它们使用的后缀是各自单独维护的。<strong>比如现在有ABC三个服务，A的后缀可能累加到了34，B的只有15，C的只有20。如果文件备份恰好在服务B进行，并且 xxx.15.log 已经由A备份过，那么B备份的 xxx.15.log 将会覆盖掉A备份的，导致日志丢失。</strong></p>
+<p>这个问题可以通过修改源码解决，在进行文件备份时，首先判断文件名是否已经存在，如果存在了就不重复执行了，交给别的服务来处理。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021-12-10/11081/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021-12-02/40553/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -822,80 +898,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2021-05-28/2251/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
-      <meta itemprop="name" content="sxh">
-      <meta itemprop="description" content="人类的悲欢并不相通">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Sssxh BLOG">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021-05-28/2251/" class="post-title-link" itemprop="url">Serverless学习</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-28 16:41:39" itemprop="dateCreated datePublished" datetime="2021-05-28T16:41:39+08:00">2021-05-28</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>今天在v2论坛上看一篇帖子，接触了一个新的概念—<code>Serverless</code>(无服务器)。搜集了一下资料，发现很有意思。可以将其看做一种软件架构，类似微服务架构，而这种就叫无服务器架构。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021-05-28/2251/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -967,7 +969,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-count">89</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1007,7 +1009,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

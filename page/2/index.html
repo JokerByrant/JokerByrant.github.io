@@ -162,6 +162,84 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-07/56219/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023-08-07/56219/" class="post-title-link" itemprop="url">leetcode刷题记录 - 回溯算法(一)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-07 13:21:57" itemprop="dateCreated datePublished" datetime="2023-08-07T13:21:57+08:00">2023-08-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>回溯是递归的副产品，只要有递归就会有回溯。</p>
+<p>回溯法解决的问题都可以 <strong>抽象为树形结构</strong>，因为回溯法解决的都是 <strong>在集合中递归查找子集，集合的大小就构成了树的宽度，递归的深度，就构成了树的深度</strong>。</p>
+<p>本篇是 <strong>回溯法</strong> 的第一篇，主要来学习一下 <strong>组合</strong> 类的题目。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023-08-07/56219/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-04/36303/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -849,80 +927,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-13/1435/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
-      <meta itemprop="name" content="sxh">
-      <meta itemprop="description" content="人类的悲欢并不相通">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Sssxh BLOG">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023-07-13/1435/" class="post-title-link" itemprop="url">leetcode刷题记录 - 数组篇</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-07-13 11:49:57" itemprop="dateCreated datePublished" datetime="2023-07-13T11:49:57+08:00">2023-07-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>最近在跟着 <a target="_blank" rel="noopener" href="https://www.programmercarl.com/">代码随想录</a> 刷 <code>leetcode</code> 上的算法题，刷了一段时间数组相关的题目，感觉这种按照某个知识点来刷题的方法效率比较高，但是隔段时间不刷过后又会将解题方法忘记，因此这里将解题的思路和方法记录一下。这是第一篇，数组篇。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023-07-13/1435/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -994,7 +998,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-count">89</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1034,7 +1038,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
