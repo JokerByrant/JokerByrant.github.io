@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言服务器中目前堆积了一部分无效文件，这些无效文件来自下面的一些操作：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图片上传逻辑改造">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-05-06/41619/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="前言服务器中目前堆积了一部分无效文件，这些无效文件来自下面的一些操作：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670095887f9ed6689bfc9cbc518ebf63ee4401124.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670125885b15a27dfea67b6128c2fdd9c7f3250ac.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670135885d74ea00fe03b38ec76217a6e8aef82ad.png">
+<meta property="article:published_time" content="2024-05-06T07:02:47.000Z">
+<meta property="article:modified_time" content="2024-05-14T07:05:57.419Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="文件上传">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670095887f9ed6689bfc9cbc518ebf63ee4401124.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-05-06/41619/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>图片上传逻辑改造 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-05-06/41619/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图片上传逻辑改造
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-05-06 15:02:47" itemprop="dateCreated datePublished" datetime="2024-05-06T15:02:47+08:00">2024-05-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>服务器中目前堆积了一部分无效文件，这些无效文件来自下面的一些操作：</p>
+<span id="more"></span>
+
+<ol>
+<li>已删除信息对应的附件。</li>
+<li>过期的聊天消息：单聊和群聊消息缓存时间都是 <code>120</code> 天，超过 <code>120</code> 天后，消息缓存会被移除，但是消息对应的附件还会保留。</li>
+<li>[上传文件] 和 [提交表单] 分成两个请求处理的功能，用户上传文件成功后，没有提交表单，这类文件就会成为垃圾文件。</li>
+<li>修改头像、车图片等信息后，旧的文件仍然保留在服务器上未被移除。</li>
+</ol>
+<p>除这些无效文件外，还有一部分重复的文件也会浪费服务器的存储空间，比如A给B连续发送多张相同的图片。</p>
+<p>这些垃圾/无效文件，对 <code>App</code> 的功能并不会造成影响，唯一的影响就是会占用服务器的存储空间。就目前的用户数而言，这些垃圾文件其实并不会占用太大的存储空间，因此不作处理也是可以的。但我们针对文件的处理还包含了文件机审操作，每次文件上传都需要将文件提交机审。而 <strong>采用合适方案后，是可以减少提交文件机审的次数的，并且可以减少文件 <code>I/O</code> 的次数，这些都能够提高文件上传的效率</strong>。因此综合来看，还是有必要进行优化的。</p>
+<h2 id="方案选择"><a href="#方案选择" class="headerlink" title="方案选择"></a>方案选择</h2><h3 id="通过临时文件夹处理无效文件"><a href="#通过临时文件夹处理无效文件" class="headerlink" title="通过临时文件夹处理无效文件"></a>通过临时文件夹处理无效文件</h3><ul>
+<li>文件上传后，先保存到临时文件夹，之后提交表单时，再将其移动到指定的文件夹中，临时文件夹中的文件定期清理</li>
+<li>对于删除朋友圈信息这样的操作，将对应的文件移动到指定的文件夹，这个文件夹中的文件定期清理（<em>注：这样操作后，原信息中保存的文件的 <code>URL</code> 将会失效</em>）</li>
+<li>对于过期的聊天文件，定期将存储聊天文件的文件夹中超出期限（<code>120</code> 天）的文件删除即可。</li>
+</ul>
+<p>这是一种较为简单的方案，改动小，但仅仅只是解决了服务器中无效文件的问题，重复文件的问题并没有处理，并且对于文件上传的效率是没有提升的。</p>
+<h3 id="增加文件上传记录"><a href="#增加文件上传记录" class="headerlink" title="增加文件上传记录"></a>增加文件上传记录</h3><p>这里先将大概的逻辑梳理出来，后面再对一些问题进行额外说明：</p>
+<ul>
+<li>增加一个 <strong>文件上传记录表</strong>，表中记录对应文件的 <code>Hash</code> 值，服务端收到上传的文件后，计算其 <code>Hash</code> 值，然后去已有的文件记录中找是否存在相同 <code>Hash</code> 值的文件上传记录。（<em><strong>文件 <code>Hash</code> 值计算方法后面再讲</strong></em>）</li>
+<li>如果表中无记录，那么表示是第一次上传，将文件保存到服务器，如果需要机审则提交机审，需要压缩则进行压缩。之后增加一条记录，<strong>文件引用数设置为0，文件名设置为文件 <code>hash</code> 值，记录文件的审核结果，保存原图和缩略图路径</strong>，最后给 <code>App</code> 端返回对应的文件 <code>url</code>。</li>
+<li>如果表中有记录，那么就直接根据现有记录来处理即可，无需再重复进行 <strong>[文件存储]、[生成缩略图]、[文件审核]</strong> 的操作，直接给 <code>App</code> 端返回对应的文件 <code>url</code> 即可。<em>（注：如果文件缩略图没有生成过，或者没有进行过审核，那么相关操作还是要执行的；并且文件记录如果 <code>isDelete = 1</code>，那么表示被清理了，上面这三个操作也要执行 ）</em></li>
+<li><code>App</code> 端提交表单后，根据 <code>url</code> 拿到 <code>hash</code> 值，找对应的文件上传记录，将 <strong>文件记录的引用计数加1</strong>；文件对应的数据被删除后，比如删除朋友圈，那么 <strong>文件引用数减1</strong>；如果用户上传文件后没有提交表单，那么 <strong>文件引用计数不会变更</strong>。</li>
+<li>增加定时任务，定期清理 <strong>引用数为0，并且更新时间超过1年</strong> 的垃圾文件。</li>
+</ul>
+<h2 id="具体实施"><a href="#具体实施" class="headerlink" title="具体实施"></a>具体实施</h2><p>目前使用的是 <strong>[增加文件上传记录]</strong> 的方式来对文件上传逻辑进行的改造，下面记录一下相关的问题和解决办法。</p>
+<h3 id="文件-Hash-计算"><a href="#文件-Hash-计算" class="headerlink" title="文件 Hash 计算"></a>文件 <code>Hash</code> 计算</h3><p>上面提到通过文件 <code>Hash</code> 值来处理重复图片的问题，具体处理是：<strong>文件上传记录表主键设置为文件 <code>Hash</code> 值；文件通过文件 <code>Hash</code> 值来命名</strong>。</p>
+<p>然而哈希算法存在一个问题，存在哈希碰撞的问题，任何哈希算法都无法避免，但不同的哈希算法碰撞概率不同，就 <strong>文件哈希</strong> 而言， <code>MD5</code> 算法已被验证出会出现碰撞的情况（<strong>两张不同的图片 <code>MD5</code> 值一样</strong>）。如果出现哈希碰撞的话，会导致 <strong>两种不同的图片共用一个链接</strong> 的情况，这在 <code>App</code> 内的表现是 <strong>文件展示错乱</strong>。不过这种碰撞概率极小，对于我们目前的场景来说，<code>MD5</code>  算法就够用了。如果想要减少这种情况的发生，可以考虑使用 <code>SHA-256</code> 算法，<code>MD5</code> 算法对应的 <code>hash</code> 值是 <code>32</code> 位字符，而  <code>SHA-256</code> 算法对应的 <code>hash</code> 值是 <code>64</code>位字符，字符位数越多，那么字符组合就更多，碰撞概率就更小。</p>
+<p>另外，关于文件的 <code>hash</code> 值，即使原始内容只改动一个字节，哈希码也会完全不同。也就是说，图片的样式尺寸等信息发生变更后，它的 <code>hash</code> 值就会变更。</p>
+<blockquote>
+<p>重复 <code>Hash</code> 值的概率虽然小，但是还是存在的，服务端后面可以考虑在逻辑上对这种情况进行处理。</p>
+</blockquote>
+<h3 id="文件记录表结构"><a href="#文件记录表结构" class="headerlink" title="文件记录表结构"></a>文件记录表结构</h3><p>关于文件上传记录表，有两种表结构：</p>
+<ol>
+<li><strong>单表结构</strong>。字段包括：<strong>文件哈希值、文件URL、文件存储路径、文件缩略图、文件审核状态、文件被引用次数</strong>，使用 <strong>文件哈希值</strong>  作为主键。</li>
+<li><strong>双表结构</strong>。如果想看 <strong>文件具体是被什么数据引用的</strong>，那么就需要在第1种设计的基础上 <strong>移除文件被引用次数，额外增加一个文件被引用记录表</strong>，专门记录文件被哪条数据引用了。</li>
+</ol>
+<p>目前并没有要看 <strong>文件具体是被什么数据引用</strong> 的需求，因此目前使用的是第1种表结构，具体的表结构如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">thumbnail_chat<span class="keyword">create</span> <span class="keyword">table</span> t_app_file_upload_record</span><br><span class="line">(</span><br><span class="line">    file_hash        <span class="type">varchar</span>(<span class="number">64</span>)       <span class="keyword">not</span> <span class="keyword">null</span> comment <span class="string">&#x27;文件哈希值&#x27;</span></span><br><span class="line">        <span class="keyword">primary</span> key,</span><br><span class="line">    file_url         <span class="type">varchar</span>(<span class="number">200</span>)      <span class="keyword">not</span> <span class="keyword">null</span> comment <span class="string">&#x27;文件访问Url&#x27;</span>,</span><br><span class="line">    thumbnail_logo   <span class="type">varchar</span>(<span class="number">200</span>)      <span class="keyword">null</span> comment <span class="string">&#x27;缩略图url - logo类缩略图(尺寸较小)&#x27;</span>,</span><br><span class="line">    thumbnail_chat   <span class="type">varchar</span>(<span class="number">200</span>)      <span class="keyword">null</span> comment <span class="string">&#x27;缩略图url - 聊天、朋友圈中图片的缩略图&#x27;</span>,</span><br><span class="line">    file_path        <span class="type">varchar</span>(<span class="number">200</span>)      <span class="keyword">not</span> <span class="keyword">null</span> comment <span class="string">&#x27;文件在服务器中的存储路径&#x27;</span>,</span><br><span class="line">    referenced_count <span class="type">int</span>     <span class="keyword">default</span> <span class="number">0</span> <span class="keyword">null</span> comment <span class="string">&#x27;文件当前被引用次数&#x27;</span>,</span><br><span class="line">    audit_status     tinyint <span class="keyword">default</span> <span class="number">0</span> <span class="keyword">null</span> comment <span class="string">&#x27;文件机审是否通过 默认0 0:未审核，1:通过，2:不通过&#x27;</span>,</span><br><span class="line">    reason           <span class="type">varchar</span>(<span class="number">400</span>)      <span class="keyword">null</span> comment <span class="string">&#x27;审核不通过原因&#x27;</span>,</span><br><span class="line">    update_date      datetime          <span class="keyword">null</span> comment <span class="string">&#x27;修改时间&#x27;</span>,</span><br><span class="line">    update_user      <span class="type">varchar</span>(<span class="number">36</span>)       <span class="keyword">null</span> comment <span class="string">&#x27;修改者uid&#x27;</span>,</span><br><span class="line">    create_date      datetime          <span class="keyword">null</span> comment <span class="string">&#x27;创建时间&#x27;</span>,</span><br><span class="line">    create_user      <span class="type">varchar</span>(<span class="number">36</span>)       <span class="keyword">null</span> comment <span class="string">&#x27;创建者uid&#x27;</span>,</span><br><span class="line">    is_delete        tinyint <span class="keyword">default</span> <span class="number">0</span> <span class="keyword">null</span> comment <span class="string">&#x27;默认0，0：未删除，1：已删除&#x27;</span>,</span><br><span class="line">    version          <span class="type">int</span>     <span class="keyword">default</span> <span class="number">1</span> <span class="keyword">null</span> comment <span class="string">&#x27;新增时，默认1&#x27;</span></span><br><span class="line">)</span><br><span class="line">comment <span class="string">&#x27;文件上传记录表&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>file_hash</code> 使用 <code>64</code> 位存储，这样之后如果需要将 <code>MD5</code> 算法替换为 <code>SHA-256</code> 算法可以直接进行替换。</p>
+<p><code>audit_status</code> 包含如下几种审核状态：<strong>0-&gt;未审核，1-&gt;审核通过，2-&gt;审核不通过，3-&gt;审核失败，4-&gt;已提交异步审核</strong>。</p>
+<p>注意其中缩略图分成了两个字段来存储，分别是 <code>thumbnail_logo</code> 和 <code>thumbnail_chat</code>，因为目前服务端对图片的压缩处理有两种：</p>
+<ol>
+<li>**<code>logo</code> 类缩略图(<code>width&lt;=200 &amp;&amp; heigh&lt;=225</code>)**。通过 <code>POST /fileUpload/image - 普通图片上传</code> 接口上传的图片，如果需要压缩，那么缩略图就是这种</li>
+<li>**聊天/朋友圈信息缩略图(<code>width&lt;=720</code>)**。通过 <code>POST /fileUpload/upload/&#123;type&#125; - 朋友圈、聊天文件的上传</code> 接口上传的图片，如果需要压缩，那么缩略图就是这种</li>
+</ol>
+<h3 id="缩略图为何要单独使用一个字段存储"><a href="#缩略图为何要单独使用一个字段存储" class="headerlink" title="缩略图为何要单独使用一个字段存储"></a>缩略图为何要单独使用一个字段存储</h3><p>上面说过，图片被调整后，对应的 <code>Hash</code>  值会变更，缩略图和原图的哈希值就是不一样的，那么这里 <strong>为什么不将缩略图单独作为一条记录存储呢？</strong></p>
+<p>这是考虑到目前 <code>App</code> 的场景，原图和缩略图可以通过 [<code>Hash</code> 值 + 指定后缀] 的方式获取，通过原图可以拿到缩略图，通过缩略图也可以获取到原图，缩略图和原图是强耦合关系，它们是一起存在一起被删除。额外通过一条记录存储的话，会增加表格复杂度和代码复杂度。</p>
+<p>然而这么处理的话，有一个缺陷，就是 <strong>服务器上会出现重复 <code>Hash</code> 值的图片</strong>。比如现在上传一张图片 <code>p1</code>，它的缩略图为 <code>t1</code>，增加了一条文件上传记录，文件  <code>Hash</code> 值记录的是 <code>p1</code> 的哈希值。之后将缩略图 <code>t1</code> 作为原图上传，就会出现找不到 <code>t1</code>  对应的文件哈希值的情况，因此就会重新存储，并新增一条上传记录。但这种情况 <strong>最多也只是会存在两张相同的图片</strong>，<code>t1</code>  的哈希值被记录之后，之后就不会重新上传了，因此是可以接受的。</p>
+<h3 id="文件审核逻辑说明"><a href="#文件审核逻辑说明" class="headerlink" title="文件审核逻辑说明"></a>文件审核逻辑说明</h3><p><code>audit_status</code> 包含如下几种审核状态：<strong>0-&gt;未审核，1-&gt;审核通过，2-&gt;审核不通过，3-&gt;审核失败，4-&gt;已提交异步审核</strong>。</p>
+<ul>
+<li>在上传文件时，如果需要审核，但文件状态是  [未审核] 或 [审核失败]，那么重新提交机审；</li>
+<li>如果文件状态是 [审核不通过]，那么后续逻辑无需执行，直接返回提示给 <code>App</code> 端；</li>
+<li>如果文件状态是 [已提交异步审核]，那么在 <code>redis</code> 缓存队列中增加缓存，异步审核结束直接处理后续逻辑。（<strong>这种情况在下面 [音视频文件异步审核带来的问题] 中有详细说明</strong>）</li>
+<li>审核不通过的文件，即使文件被移除了，文件记录  <code>isDelete</code> 被置为了 <code>1</code>，后面在接收到相同的文件时，仍然按 <strong>直接返回审核不通过的提示，不执行后续逻辑</strong> 来处理。</li>
+<li>如果提交的音视频在文件记录中存在并且已经完成了审核，那么文件上传接口会直接返回文件审核结果，<code>App</code> 端无需再等待异步回调。</li>
+</ul>
+<p>除了上面的调整外，在对图片审核进行测试时发现会出现下面的问题：<strong>聊天文件上传较大的原图时，会出现审核失败的情况，原因是图片机审接口返回了审核失败的信息</strong>。针对这种情况，进行如下优化：<strong>提交的审核的图片，统一使用缩略图</strong>。</p>
+<h3 id="文件审核包含不同场景带来的问题"><a href="#文件审核包含不同场景带来的问题" class="headerlink" title="文件审核包含不同场景带来的问题"></a>文件审核包含不同场景带来的问题</h3><p>文件记录表中记录文件的审核状态，这存在一个问题：<strong>同一张图片，在不同场景下使用时，需要提交审核的参数是不同的，比如 [群聊]、[单聊] 图片的审核使用的就是不同的审核参数</strong>。</p>
+<p>之前对图片审核进行过一次改造，目前图像审核使用的华为云自定义策略模式，所有场景的图片审核使用的都是同一策略，也就是说，目前图像审核的结果是可以在多个场景下复用的。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670095887f9ed6689bfc9cbc518ebf63ee4401124.png" alt="1715670095887f9ed6689bfc9cbc518ebf63ee4401124.png"></p>
+<h3 id="音视频文件异步审核带来的问题"><a href="#音视频文件异步审核带来的问题" class="headerlink" title="音视频文件异步审核带来的问题"></a>音视频文件异步审核带来的问题</h3><p>目前服务端中进行的图片机审是同步请求，提交机审后接口立刻返回审核结果；而音视频审核是异步审核，提交机审后，需要等待回调。</p>
+<p>异步审核就代表 [提交审核] 到 [审核完成] 中间会有一个时间，如果用户在这个时间内上传了相同的音视频文件，不做处理的话会重复提交审核。最好是能够按照如下的方式进行处理：用户1上传了音视频，文件还在审核中，这时用户2上传音视频，无需重复审核，只要在用户1上传的音视频审核完毕后直接通知用户2即可。</p>
+<p>具体处理办法：</p>
+<ul>
+<li>文件审核状态 <code>auditStatus</code>  增加一种状态：<strong>4 -&gt; 已提交异步审核</strong>。</li>
+<li>视频提交异步审核后，将 [待通知用户/带审核流程的任务]  缓存起来，缓存结构调整为 <code>list</code> 结构。异步审核还没结束时，别的用户又提交了相同的视频审核，那么再在缓存中添加一条即可。</li>
+<li>当音视频任务审核完毕后，给所有缓存的 [待通知用户]  推送通知，而所有 [带审核流程的任务] 继续执行后续的审核流程。</li>
+</ul>
+<h3 id="朋友圈文件审核包含审核流程带来的问题"><a href="#朋友圈文件审核包含审核流程带来的问题" class="headerlink" title="朋友圈文件审核包含审核流程带来的问题"></a>朋友圈文件审核包含审核流程带来的问题</h3><p>常规的文件上传，如果文件需要审核，审核操作和上传操作是一起进行的。而朋友圈中的文件审核操作和上传操作是分开的，审核操作是在后续的审核流程中进行的。因此针对朋友圈文件的审核操作，需要单独进行处理。处理后的朋友圈文件上传审核流程如下：</p>
+<ol>
+<li>上传文件，服务端新增文件上传记录</li>
+<li>App端提交表单，服务端更新引用计数</li>
+<li>开始进行文件的审核，服务端更新文件审核状态</li>
+<li>如果是音视频，等待音视频异步审核结束，拿到审核结果后，再次更新文件的审核状态。</li>
+</ol>
+<p><strong>后续可以进行的优化</strong>。由于朋友圈文件的审核操作与上传文件的逻辑是分开的，因此与其他场景下的文件上传逻辑相比，朋友圈的文件上传对 <code>FileUploadRecord</code> 的更新操作多了一次。如果性能太差，后续可以考虑按如下逻辑进行：第1步上传操作中直接进行审核，在第3步进行文件审核时，就可以无需审核直接拿到文件审核结果，并且无需再进行一次  <code>FileUploadRecord</code> 更新操作。但这种处理的劣势是：朋友圈信息中所有的  [图片/视频/音频] 都会触发审核，而原先是只要有一个附件审核不通过，后续其他附件就不会再进行审核操作了。</p>
+<p><strong>存在的问题。</strong>在上面的第2和第3步中，正常情况下都是能够拿到文件对应的上传记录的，因为第1步已经确保了上传记录的存在。但是存在一种特殊情况：<strong>第2第3步提交的文件链接，没有经过第1步处理，比如提交的文件链接是第三方的，这种情况下找不到对应的文件记录</strong>，并且文件在服务器也不存在。这种情况在使用接口测试工具进行测试时可能会出现，而正常通过 <code>App</code>  端操作时应该不会出现。</p>
+<p>针对这种情况，服务端进行了补偿措施：<strong>如果朋友圈文件提交审核时，根据文件 <code>url</code> 没有找到对应的文件记录，那么直接将这个文件 <code>url</code> 提交审核。</strong></p>
+<p>另外，这种问题后续服务端也需要统一进行一下限制，即 **提交表单时上传的文件 <code>url</code> 必须是我们服务的，禁止第三方文件 <code>url</code>*<em>。因为按照目前的文件上传逻辑，提交第三方文件<code>url</code> 是不会经过机审的，这容易出现问题。（</em>后续可以考虑 <code>App</code> 端提交表单时，统一提交文件 <code>Hash</code> 值，由服务端去数据库找对应的文件 <code>url</code>，再进行后续操作*）</p>
+<h3 id="文件引用计数变更逻辑"><a href="#文件引用计数变更逻辑" class="headerlink" title="文件引用计数变更逻辑"></a>文件引用计数变更逻辑</h3><p>关于文件引用计数变更的处理，最先考虑的是通过切面处理，因为切面处理更易维护。但是尝试之后发现这种处理不太适合目前的场景，切面更适合 <strong>新增文件(引用计数增加)、删除文件(引用计数减少)</strong> 的场景，比如 <strong>朋友圈信息新增、朋友圈信息删除</strong>。而 <strong>文件修改</strong> 场景就不太适合，因为这种场景涉及 <strong>旧文件引用计数减少，新文件引用计数增加</strong>，比如 <strong>用户头像变更、名片图片变更</strong>。</p>
+<p>因此目前按如下方式处理：<strong>在每个引用计数发生变化的位置，分别增加代码</strong>。</p>
+<p>此外，关于文件引用计数的计算，存在一些疑问：<code>App</code> 端存在一些场景，没有触发文件上传操作，但是最终会涉及文件的引用变更。比如添加商友、保存名片，这些操作没有进行文件上传操作，但是最后会将其他数据中的文件冗余到自己的信息中，比如加商友时会从 <code>t_app_user</code> 表中拿到 [商友头像] 填充到 <code>t_app_user_friend</code> 中，那这类文件的引用计数是否需要计算呢？</p>
+<p>目前考虑是：<strong>如果保存有文件的数据，后续用户可以对该数据中的文件重新上传，那么就进行引用计数的变更；否则就无需进行引用计数的变更。</strong>两个例子：</p>
+<ul>
+<li><strong>无需计算引用计数。</strong>B是A的商友，A修改商友头像，头像信息同步至B与A的商友关系中，用户之后是无法主动修改商友关系中的头像的，只能通过修改商友头像才会同步过来，因此这时商友关系中头像的变更是无需进行引用计数的修改的。</li>
+<li><strong>需要计算引用计数。</strong>A有名片并设置了名片正反面图像，B保存A的网络名片，会增加一条 <code>UserCardTemp</code> （本地名片）记录，<code>UserCardTemp</code> 中的名片正反面图像来自网络名片，用户之后是可以对 <code>UserCardTemp</code> 中的图像进行修改的，因此这时 <code>UserCardTemp</code> 中的图像是需要进行文件引用计数变更的。</li>
+</ul>
+<h3 id="聊天文件引用计数的处理"><a href="#聊天文件引用计数的处理" class="headerlink" title="聊天文件引用计数的处理"></a>聊天文件引用计数的处理</h3><p>目前的逻辑中，聊天消息的过期时间是 <code>120</code> 天，消息过期被移除后，附件还存在在服务器中。常规的文件上传逻辑包含两步：①. 文件上传(服务端新增 <code>FileUploadRecord</code>) ②. 提交表单(服务端增加 <code>FileUploadRecord</code> 的引用计数)。对于聊天中发送的文件，第②步提交表单操作是没有的，因此引用计数的计算需要单独处理，目前有如下三种方案：</p>
+<ol>
+<li>文件上传后，立刻增加引用计数；聊天消息过期后，将引用计数减少。使用这个方案的话，需要额外增加一个聊天消息过期监听事件。并且还存在一个问题：<strong>如果文件上传引用计数增加后，聊天消息发送失败，那么聊天消息不会缓存到服务端，这条文件的引用计数就有问题，定时清理文件时这个文件就不会被清理掉。</strong><blockquote>
+<p>如果可以接受后面存在的这个问题，那么可以使用这种方案。</p>
+</blockquote>
+</li>
+<li>聊天消息发送后，增加引用计数；聊天消息过期后，引用计数减少。相比上一种方案，这种方案在 [服务端收到消息并成功缓存后] 才会增加引用计数，可以避免上面提到的问题。</li>
+<li>聊天中上传的文件不记录引用计数的变更，对定时清理文件的逻辑进行调整，清理 [修改时间大于1年，且引用计数为0] 的文件。每一次文件引用计数的变更，都需要修改数据库。真实场景中，聊天文件的数量应该是比其他所有场景中文件数量之和还要多的，如果按照上面两种方式处理，即发送一个文件引用计数加1，那么数据库修改操作会非常频繁。而这种方案不需要记录聊天文件引用计数的变更，过期的文件也能正常被清理。</li>
+</ol>
+<p>目前使用的是第三种方案，这种方案存在一个问题：发送聊天文件时，如果文件记录存在并且无需压缩和审核，那么服务端会直接返回这个文件，不进行其他处理。这时文件记录的 <code>updateDate</code> 是不会变化的，也就是说如果这个文件在 <code>1</code> 天后 <code>updateDate</code> 就满一年了，那么 <code>1</code> 天后它就被清理掉。因此，对文件上传记录进行了如下改造：**文件上传时，如果文件上传记录已存在，那么更新其 <code>updateDate</code>**。这个新增的逻辑只对聊天文件上传的场景进行了处理，因为其他场景下的文件上传都需要进行文件引用计数的变更。</p>
+<p>这样改造后还存在一个问题：<strong>发送收藏文件</strong> 或 <strong>转发图片</strong> 时，是不会走 <strong>上传文件</strong> 接口的，这时文件记录的 <code>updateDate</code> 也不会变更，这可能会导致 <strong>文件无法按照正常的逻辑被清理</strong>：</p>
+<ul>
+<li>这两个操作中，<strong>发送收藏文件</strong> 不会影响文件的清理逻辑，因为只有聊天中只能发送未被删除的收藏文件，这表示这个收藏文件的引用计数肯定大于0，也就不会被异常清除；</li>
+<li>但是文件转发操作就会受到影响了， <code>App</code> 端目前处理的的文件转发逻辑是直接转发文件 <code>url</code>，不经过文件上传接口。看如下案例：<strong>文件 <code>url</code> 在 <code>1</code> 天后会被清除，用户在聊天中转发这个文件，文件上传记录不会更新，1天后文件会被清除，正常的应该是这个文件在1年后才被清除。</strong></li>
+</ul>
+<p>因此需要 <code>App</code> 端进行如下调整：<strong>聊天中转发文件也走上传文件接口，由于服务端目前已对文件进行 <code>Hash</code> 去重，因此这个转发操作不会导致服务端重复存储文件，最终返回的文件 <code>Url</code> 与被转发的图片也是一样的。</strong> 修改为这一步是为了服务端能够更新文件上传记录的 <code>updateDate</code>，以便文件清理逻辑能够正常执行。</p>
+<p><strong>额外补充：</strong>目前文件清理逻辑是 [<strong>定期清理修改时间大于1年，且引用计数为0的文件</strong>]。由于聊天文件未接入引用计数的变更逻辑，因此后续如果需要调整文件清理的逻辑，<strong>要保证清理的文件的修改时间至少大于 <code>120</code> 天，也就是不能小于聊天消息缓存的过期时间</strong>。</p>
+<h3 id="文件命名规则"><a href="#文件命名规则" class="headerlink" title="文件命名规则"></a>文件命名规则</h3><p>上传的文件统一按照 <code>Hash</code> 值命名，针对图片，还需要拼接尺寸后缀以及考虑缩略图。原先的图片命名规则是根据场景划分的，不同场景下命名规则不同：</p>
+<ol>
+<li><code>POST /fileUpload/image - 普通图片上传</code> 接口上传的图片。<strong>原图：</strong>通过 <code>uuid</code> 命名，不携带后缀<strong>缩略图：</strong>原图 <code>url</code> 后增加 <code>_t</code> 后缀</li>
+<li><code>POST /fileUpload/upload/&#123;type&#125; - 朋友圈、聊天文件的上传</code> 接口上传的图片。<strong>原图：</strong>分两种情况</li>
+</ol>
+<p>①. 聊天中选择原图、朋友圈图片，这种图片通过 <code>uuid</code> 命名，并增加 <code>_o</code> 后缀：<code>http://7vw31jdn.dongtaiyuming.net/images/app/63a10c4bc01aa17f36335d2b4197ff08_o.jpg</code><br>②. 聊天中未选择原图，这种图片通过 <code>uuid</code> 命名，并增加 <code>_width*height</code> 后缀：<code>http://7vw31jdn.dongtaiyuming.net/images/app/63a10c4bc01aa17f36335d2b4197ff08_500*450.jpg</code></p>
+<p>   <strong>缩略图：</strong>也分两种情况<br>①. 视频缩略图，视频 <code>url</code> 基础上增加 <code>_t</code> 后缀，图片是 <code>png</code> 格式<br>②. 聊天中选择原图、朋友圈图片，这种会生成缩略图，在原图 <code>url</code> 的基础上去除 <code>_o</code> 后缀。</p>
+<p>而新的图片命名规则不再根据场景进行划分，统一按如下方式命名：</p>
+<ol>
+<li><strong>原图</strong>：通过 <code>hash</code> 值命名，不增加后缀：<code>http://7vw31jdn.dongtaiyuming.net/images/app/63a10c4bc01aa17f36335d2b4197ff08.jpg?size=width*height</code></li>
+<li><strong><code>logo</code> 类缩略图</strong>：在原图基础上增加 <code>_s</code> 后缀：<code>http://7vw31jdn.dongtaiyuming.net/images/app/63a10c4bc01aa17f36335d2b4197ff08_s.jpg?size=width*height</code></li>
+<li><strong>朋友圈、聊天缩略图</strong>：在原图基础上增加 <code>_t</code> 后缀：<code>http://7vw31jdn.dongtaiyuming.net/images/app/63a10c4bc01aa17f36335d2b4197ff08_t.jpg?size=width*height</code></li>
+</ol>
+<p>除了上面的命名规则外，原先还会在图片 <code>url</code> 后拼接图片尺寸信息，原先的规则如下：</p>
+<ol>
+<li><strong>视频：</strong>视频 <code>url</code> 后拼接缩略图尺寸，视频缩略图 <code>url</code> 后拼接自己的尺寸</li>
+<li><strong>图片：</strong>有缩略图的图片，原图后面拼接缩略图尺寸，缩略图后面拼接缩略图尺寸；<br>无缩略图的图片，图片后面拼接当前图片的尺寸信息</li>
+</ol>
+<p>目前统一按照下面的规则拼接尺寸：</p>
+<ol>
+<li><strong>视频：</strong>仍然保持原先的规则。</li>
+<li><strong>图片：</strong>原图和缩略图后面统一拼接自己的尺寸信息。</li>
+</ol>
+<h3 id="图片命名规则变更后对-App-端的影响"><a href="#图片命名规则变更后对-App-端的影响" class="headerlink" title="图片命名规则变更后对 App 端的影响"></a>图片命名规则变更后对 <code>App</code> 端的影响</h3><p>在图片命名规则变更后，会对 <code>App</code> 端现有功能造成影响。因此针对 <code>App</code> 端中所有涉及图片上传的功能进行了测试，测试下来发现下面几个功能受到了影响：</p>
+<ol>
+<li>朋友圈图片中，如果图片被压缩了，点击查看大图时，显示的仍然是缩略图(比较模糊)；点击下载图片时，会提示下载失败；收藏该图片后，收藏列表中加载不出，无法查看。</li>
+<li>[本地名片的正反面图片]、[商友/好友头像]、[车名片图片] 、[群统计/群投票图片]，如果这些图片有缩略图，查看大图时显示的仍然是缩略图(比较模糊)，没有展示原图。</li>
+</ol>
+<p>对 <code>App</code> 端代码进行 <code>Review</code>，目前 <code>App</code> 端处理的图片加载逻辑如下：</p>
+<ol>
+<li><strong>朋友圈图片加载逻辑。</strong>在 [查看大图、下载图片、收藏图片] 操作时，会去获取原图 <code>url</code>：首先判断图片 <code>url</code> 是否携带 <code>_o</code> 后缀，如果携带，说明是原图，那么直接 [下载/收藏/   展示] 即可；如果没有携带，说明是缩略图，那么加上 <code>_o</code> 后缀，拿到原图 <code>url</code>，再进行 [下载/收藏/展示]。</li>
+<li><strong>普通图片加载逻辑。</strong>在 [查看大图] 时，会去获取原图 <code>url</code>：首先判断图片 <code>url</code> 是否携带 <code>_t</code> 后缀，如果携带，说明是缩略图，那么名片详情中展示的正反面图片就去除 <code>_t</code> 后缀，拿到原图 <code>url</code>，再进行 [展示]；如果未携带，说明是原图，直接展示。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670125885b15a27dfea67b6128c2fdd9c7f3250ac.png" alt="1715670125885b15a27dfea67b6128c2fdd9c7f3250ac.png"></li>
+</ol>
+<p>这两个个问题都是由于 <strong>原图缩略图命名规则发生变化</strong> 导致的问题，旧的 [获取原图 <code>url</code>] 逻辑还按 [朋友圈图片] 和 [普通图片] 进行了区分。服务端采用新的命名规则后，<code>App</code> 端针对 [获取原图 <code>url</code>] 逻辑，可以对所有场景的图片统一按照如下方式处理： </p>
+<ul>
+<li>如果图片 <code>Url</code> 后缀携带 <code>_t</code>、<code>_s</code> 后缀，表示图片是缩略图，那么将 <code>_t</code>、<code>_s</code> 后缀去除，拿到原图 <code>Url</code>，进行 [下载/收藏/展示]；</li>
+<li>如果图片 <code>Url</code> 没有携带后缀，那么表示是原图，直接进行 [下载/收藏/展示] 即可。</li>
+</ul>
+<p>另外，图片 <code>url</code> 后拼接尺寸的逻辑也发生了变更，目前测试下来调整后对 <code>App</code> 没有影响，但是没有对相关代码进行 <code>review</code>，因此可能部分被影响的场景未被测试到，如果之后发现问题再做调整。</p>
+<h3 id="文件存储路径优化"><a href="#文件存储路径优化" class="headerlink" title="文件存储路径优化"></a>文件存储路径优化</h3><p>目前是各个模块的文件分开存放，如果同一层级的文件过多，会影响检索效率，比如聊天文件。由于现在统一使用文件 <code>Hash</code> 来去重，后面会出现 <strong>不同模块的数据引用同一张图片</strong> 的情况，比如聊天、朋友圈、头像使用的都是同一图片，这种情况下，分模块存储已经意义不大了，因此目前对存储路径进行改造，统一按照日期对存储路径进行命名，不再区分模块，比如在 <code>2024-04-17</code> 上传的文件，统一存储到 [<strong>20240417</strong>] 文件夹下面。</p>
+<h3 id="同一个视频-Hash-值不一样"><a href="#同一个视频-Hash-值不一样" class="headerlink" title="同一个视频 Hash 值不一样"></a>同一个视频 <code>Hash</code> 值不一样</h3><p>在朋友圈和聊天中发送视频时(聊天中不勾选原图)，存在一个问题，多次发送同一个视频，服务端接收到之后计算其 <code>Hash</code> 值，每次都不一样，<code>Hash</code> 值不一样，服务端就会认为它们是不同的文件，就会分别对它们执行文件保存、新增上传记录的操作。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1715670135885d74ea00fe03b38ec76217a6e8aef82ad.png" alt="1715670135885d74ea00fe03b38ec76217a6e8aef82ad.png"></p>
+<p><code>Hash</code> 值不一样的问题上面提到过，这里的问题应该是 <code>App</code> 端对视频进行压缩后导致的。但是同样是 <code>App</code> 端进行压缩，同一张图片在 <code>App</code> 端多次压缩，上传到服务端时计算得到的 <code>Hash</code> 值却是相同的，因此猜测视频压缩后 <code>Hash</code> 值不一样是因为压缩算法的问题。</p>
+<blockquote>
+<p>注：这个问题仍然需要调查，如果视频压缩后每次 <code>Hash</code> 值都不一样的情况的无法避免，那么就需要寻找其他的解决方案，比如通过原视频的 <code>Hash</code> 值来确定是否重复。</p>
+</blockquote>
+<h2 id="后续可以进行的一些优化"><a href="#后续可以进行的一些优化" class="headerlink" title="后续可以进行的一些优化"></a>后续可以进行的一些优化</h2><ol>
+<li>目前文件上传接口中，耗时较长的操作是获取文件的 <code>Hash</code> 值，该操作后续可以考虑放在 <code>App</code> 端处理。文件 <code>Hash</code> 放在 <code>App</code> 端做还有一个好处，<code>App</code> 端计算完文件 <code>Hash</code> 值后，直接请求服务端查询是否存在相同 <code>Hash</code> 值的文件，如果存在，服务端直接返回；如果不存在，再按照常规的流程进行。相比之前的流程，如果文件 <code>Hash</code> 存在的话，那么就能省去文件上传到服务器的操作，如果是视频，还可以额外省去压缩视频的操作。<strong>不过通过这种方式拿到的文件 <code>Hash</code> 值是原文件的 <code>Hash</code> 值，如果视频/图片需要在 <code>App</code> 端压缩后再发送，那么还是需要先压缩才能拿到对应文件的 <code>Hash</code> 值</strong></li>
+<li><code>App</code> 端提交表单时，统一提交文件 <code>Hash</code> 值，由服务端去数据库找对应的文件 <code>url</code>，如果未找到，则表示文件不存在，返回提示信息，这样可以避免用户通过非常规手段提交第三方 <code>Url</code>。</li>
+<li>二维码、群头像，这类由服务端生成的文件，也接入新的文件上传逻辑：增加对应的文件上传记录。</li>
+<li>目前文件引用计数变更是嵌套在主逻辑之内的，与主逻辑耦合度过高，后期可以考虑针对这一块进行优化，将其从主逻辑解耦出来。</li>
+<li>目前音视频文件在提交审核后，对应文件记录的 <code>auditStatus</code> 会被置为 <code>4</code>。而存在一种情况，阿里云音视频审核任务提交后，由于一些原因，服务端一直没有收到回调，这时音视频的审核状态将不会改变。服务端需要对这种特殊情况进行处理，可以在提交审核任务后，超过指定时间就将审核状态修改为审核失败状态。</li>
+<li>文件记录中审核过的文件，超过一定时间后可以重新提交审核。因为审核规则和尺度可能在各个时间都是不同的，原先审核未通过的信息过1年后就能审核通过，反之亦然。</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="http://www.52im.net/forum.php?mod=viewthread&tid=1356&highlight=%EF%BF%BD%C4%BC%EF%BF%BD">IM开发基础知识补课(二)：如何设计大量图片文件的服务端存储架构？</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.v2ex.com/t/680982">用户上传冗余的图片文件，一般是怎么处理的呀？</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.v2ex.com/t/886398">对于文件服务器上的各类冗余资源，各位一般怎么处理</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.v2ex.com/t/130964">上传图片的逻辑，大家有什么方法的吗？</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2018/09/hash-collision-and-birthday-attack.html">哈希碰撞与生日攻击</a></p>
+<p><a target="_blank" rel="noopener" href="https://v2ex.com/t/739305">文件储存用 md5 做标识可行吗，要考虑会出现相同 md5 的文件的情况吗？</a></p>
+<p><a target="_blank" rel="noopener" href="https://s.v2ex.com/t/981534">如何解决“上传了附件但是最后其实没用”这个问题？</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.woshipm.com/pd/728574.html">产品逻辑中的图片设计方案</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.v2ex.com/t/110161">用户发表一篇文章，插入图片之前先上传图片到了服务器，但他并未发布就把网页关掉了，怎么处理？</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/q/1010000000403769">请问图片存储的路径规则什么样最好？</a></p>
+<p><a target="_blank" rel="noopener" href="https://yanoo1497.github.io/post/zip">相同文件压缩后 HASH 值（MD5）大概率不相同解决方案</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="tag"># 文件上传</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-04-03/6036/" rel="prev" title="商业保险选择">
+      <i class="fa fa-chevron-left"></i> 商业保险选择
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E9%80%89%E6%8B%A9"><span class="nav-number">2.</span> <span class="nav-text">方案选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E4%B8%B4%E6%97%B6%E6%96%87%E4%BB%B6%E5%A4%B9%E5%A4%84%E7%90%86%E6%97%A0%E6%95%88%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">通过临时文件夹处理无效文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E8%AE%B0%E5%BD%95"><span class="nav-number">2.2.</span> <span class="nav-text">增加文件上传记录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E6%96%BD"><span class="nav-number">3.</span> <span class="nav-text">具体实施</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6-Hash-%E8%AE%A1%E7%AE%97"><span class="nav-number">3.1.</span> <span class="nav-text">文件 Hash 计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E8%AE%B0%E5%BD%95%E8%A1%A8%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.</span> <span class="nav-text">文件记录表结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%A9%E7%95%A5%E5%9B%BE%E4%B8%BA%E4%BD%95%E8%A6%81%E5%8D%95%E7%8B%AC%E4%BD%BF%E7%94%A8%E4%B8%80%E4%B8%AA%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8"><span class="nav-number">3.3.</span> <span class="nav-text">缩略图为何要单独使用一个字段存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%AE%A1%E6%A0%B8%E9%80%BB%E8%BE%91%E8%AF%B4%E6%98%8E"><span class="nav-number">3.4.</span> <span class="nav-text">文件审核逻辑说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%AE%A1%E6%A0%B8%E5%8C%85%E5%90%AB%E4%B8%8D%E5%90%8C%E5%9C%BA%E6%99%AF%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.5.</span> <span class="nav-text">文件审核包含不同场景带来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9F%B3%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6%E5%BC%82%E6%AD%A5%E5%AE%A1%E6%A0%B8%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.6.</span> <span class="nav-text">音视频文件异步审核带来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8B%E5%8F%8B%E5%9C%88%E6%96%87%E4%BB%B6%E5%AE%A1%E6%A0%B8%E5%8C%85%E5%90%AB%E5%AE%A1%E6%A0%B8%E6%B5%81%E7%A8%8B%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.7.</span> <span class="nav-text">朋友圈文件审核包含审核流程带来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E5%8F%98%E6%9B%B4%E9%80%BB%E8%BE%91"><span class="nav-number">3.8.</span> <span class="nav-text">文件引用计数变更逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%8A%E5%A4%A9%E6%96%87%E4%BB%B6%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">3.9.</span> <span class="nav-text">聊天文件引用计数的处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99"><span class="nav-number">3.10.</span> <span class="nav-text">文件命名规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99%E5%8F%98%E6%9B%B4%E5%90%8E%E5%AF%B9-App-%E7%AB%AF%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.11.</span> <span class="nav-text">图片命名规则变更后对 App 端的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8%E8%B7%AF%E5%BE%84%E4%BC%98%E5%8C%96"><span class="nav-number">3.12.</span> <span class="nav-text">文件存储路径优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E4%B8%80%E4%B8%AA%E8%A7%86%E9%A2%91-Hash-%E5%80%BC%E4%B8%8D%E4%B8%80%E6%A0%B7"><span class="nav-number">3.13.</span> <span class="nav-text">同一个视频 Hash 值不一样</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD%E5%8F%AF%E4%BB%A5%E8%BF%9B%E8%A1%8C%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BC%98%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">后续可以进行的一些优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">94</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
