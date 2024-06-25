@@ -163,7 +163,7 @@ sidebar:
 # Sidebar Avatar
 avatar:
   # Replace the default image and set the url here.
-  url: http://ww1.sinaimg.cn/large/006jvOIfgy1gesdkf6x4qj30og0rz45a.jpg
+  url: https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719283405058%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240625104317.png
   # If true, the avatar will be dispalyed in circle.
   rounded: false
   # If true, the avatar will be rotated with the cursor.

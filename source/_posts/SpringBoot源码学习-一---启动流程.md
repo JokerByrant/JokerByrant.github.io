@@ -88,8 +88,8 @@ private static final String WEBFLUX_INDICATOR_CLASS = "org." + "springframework.
 private static final String JERSEY_INDICATOR_CLASS = "org.glassfish.jersey.servlet.ServletContainer";
 ```
 判断服务是 `Servlet` 还是 `Reactive` 就是通过下面两个类进行判断
-![avatar](http://ww1.sinaimg.cn/large/006jvOIfgy1gfjpe76j3qj30cv0jygm3.jpg)
-![avatar](http://ww1.sinaimg.cn/large/006jvOIfgy1gfjpfi5hbzj30cq0a90su.jpg)
+![1719283145715微信图片_20240625103448.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719283145715%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240625103448.png)
+![1719283255058微信图片_20240625104036.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719283255058%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240625104036.png)
 
 ### `getSpringFactoriesInstances()`用于从`spring.factories`中获取指定类对应的实例
 在设置初始化器和程序事件监听器时，都调用了`getSpringFactoriesInstances()`，这个方法主要的功能是从`spring.factories`中获取指定类对应的实例，初始化器和程序事件监听器就分别从`spring.factories`中获取`ApplicationContextInitializer.class`和`ApplicationListener.class`的实现类
