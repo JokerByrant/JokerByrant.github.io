@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="JPA 全称 Java Persistence API，它是一套规范，常见的 JPA 实现包括：Hibernate、Spring Data JPA，目前一般使用 Spring Data JPA 框架。JPA 直接提供了抽象好的 CRUD 方法供开发人员使用，无需再编写 SQL 语句， Mybatis 的增强框架就借鉴了一部分 JPA 的思想。Spring Data JPA 进一步在 JPA 之上提">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Data JPA使用">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-07-03/43738/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="JPA 全称 Java Persistence API，它是一套规范，常见的 JPA 实现包括：Hibernate、Spring Data JPA，目前一般使用 Spring Data JPA 框架。JPA 直接提供了抽象好的 CRUD 方法供开发人员使用，无需再编写 SQL 语句， Mybatis 的增强框架就借鉴了一部分 JPA 的思想。Spring Data JPA 进一步在 JPA 之上提">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171997746289833bc5a655d9a44fe03c3c73f21f069a8.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17199774949002a58e246934148748f336d0b4c69f698.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719977549897e17a134ebabd9168f2b5acfd6fb39183.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171997756189797a284269f2e77a74a48575f0a95d015.png">
+<meta property="article:published_time" content="2024-07-03T03:30:24.000Z">
+<meta property="article:modified_time" content="2024-07-03T05:44:43.263Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="后端技术">
+<meta property="article:tag" content="Spring Data JPA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171997746289833bc5a655d9a44fe03c3c73f21f069a8.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-07-03/43738/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Spring Data JPA使用 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-07-03/43738/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Data JPA使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-03 11:30:24" itemprop="dateCreated datePublished" datetime="2024-07-03T11:30:24+08:00">2024-07-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>JPA</code> 全称 <code>Java Persistence API</code>，它是一套规范，常见的 <code>JPA</code> 实现包括：<code>Hibernate</code>、<code>Spring Data JPA</code>，目前一般使用 <code>Spring Data JPA</code> 框架。<code>JPA</code> 直接提供了抽象好的 <code>CRUD</code> 方法供开发人员使用，无需再编写 <code>SQL</code> 语句， <code>Mybatis</code> 的增强框架就借鉴了一部分 <code>JPA</code> 的思想。<code>Spring Data JPA</code> 进一步在 <code>JPA</code> 之上提供了更高层次的抽象和便利性，使得开发更加高效。</p>
+<span id="more"></span>
+
+<h2 id="接入过程"><a href="#接入过程" class="headerlink" title="接入过程"></a>接入过程</h2><p>官方文档指引：<a target="_blank" rel="noopener" href="https://spring.io/guides/gs/accessing-data-mysql">Accessing data with MySQL</a></p>
+<p>环境说明：</p>
+<ul>
+<li><code>JDK21</code></li>
+<li><code>Spring Boot 3.3.1</code></li>
+<li><code>Mybatis Plus 3.5.7</code></li>
+</ul>
+<p>引入如下依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-jpa<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>application.yml</code> 中添加数据库配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8811</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">jdbc:mysql://localhost:3306/im?useUnicode=true&amp;characterEncoding=utf-8&amp;serverTimezone=Asia/Shanghai</span></span><br><span class="line">    <span class="attr">driver-class-name:</span> <span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">  <span class="attr">jpa:</span></span><br><span class="line">    <span class="attr">show-sql:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>创建数据库表对应的实体类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sxh.entity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jakarta.persistence.Entity;</span><br><span class="line"><span class="keyword">import</span> jakarta.persistence.GeneratedValue;</span><br><span class="line"><span class="keyword">import</span> jakarta.persistence.GenerationType;</span><br><span class="line"><span class="keyword">import</span> jakarta.persistence.Id;</span><br><span class="line"><span class="keyword">import</span> lombok.Data;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.time.LocalDateTime;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> sxh</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2024/6/26</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// 标记为 JPA 实体</span></span><br><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 标记为主键，自动填充uuid</span></span><br><span class="line">    <span class="meta">@Id</span></span><br><span class="line">    <span class="meta">@GeneratedValue(strategy= GenerationType.UUID)</span></span><br><span class="line">    <span class="keyword">private</span> String userUid;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String account;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String userName;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String userAvatar;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Integer sex;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String mobile;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LocalDateTime updateDate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LocalDateTime createDate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Integer isDelete;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Integer version;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建 <code>mapper</code> 文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * JpaRepository&lt;JavaBean, 主键类型&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> sxh</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2024/6/26</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> <span class="keyword">extends</span> <span class="title">JpaRepository</span>&lt;<span class="title">User</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>Spring Data JPA</code> 官方文档中，这里继承的是 <code>CrudRepository</code> 类，而实际开发中推荐继承 <code>JpaRepository</code>，因为 <code>JpaRepository</code> 继承自 <code>CrudRepository</code>，这意味着它包含了 <code>CrudRepository</code> 的所有方法：</p>
+<ul>
+<li><code>CrudRepository</code>：提供了最基本的 <code>CRUD</code> 操作方法，适合不需要复杂数据库操作的应用场景。</li>
+<li><code>JpaRepository</code>：在 <code>CrudRepository</code> 基础上扩展了更多功能，包括分页、排序和批量操作，适合需要更多 <code>JPA</code> 特性支持的应用场景。</li>
+</ul>
+<p>之后我们编写一个测试类测试一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">queryTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    printQueryResult(<span class="string">&quot;查询全部数据&quot;</span>, userMapper.findAll());</span><br><span class="line">    printQueryResult(<span class="string">&quot;自定义查询&quot;</span>, userMapper.findByUserName(<span class="string">&quot;张三&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>Spring Data JPA</code> 的官方 <code>API</code> 文档中，提供了更多相关特性的介绍，建议阅读一下，地址见：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-data/jpa/reference/repositories/core-concepts.html">Spring Data JPA</a></p>
+<h2 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h2><p>在阅读下面的内容前，关于 <code>jpql</code> 和原生 <code>sql</code> 的区别需要先理解下。</p>
+<p><code>jpql</code>：查询的是实体对象及其关系，而不是直接查询数据库表。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// User和userName是实体对象和属性</span></span><br><span class="line">select A from User A where A.userName = ?<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>原生 <code>SQL</code>：直接查询数据库表和列。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// user和user_name是数据库表名和列名</span></span><br><span class="line">select * from user where user_name = ?<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义查询-使用关键词"><a href="#自定义查询-使用关键词" class="headerlink" title="自定义查询 - 使用关键词"></a>自定义查询 - 使用关键词</h3><p><code>Spring Data JPA</code> 提供了一套查询方法命名规则，使得我们可以通过命名来构建复杂的查询，<code>Spring Data JPA</code> 会基于方法名称的解析来自动生成查询语句。</p>
+<p><code>Spring Data JPA</code> 保留了一些关键词，用于解析我们自定义的查询方法，见：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-data/jpa/reference/repositories/query-keywords-reference.html">Repository query keywords</a>。关键词类型共有3种，如下</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171997746289833bc5a655d9a44fe03c3c73f21f069a8.png" alt="171997746289833bc5a655d9a44fe03c3c73f21f069a8.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/17199774949002a58e246934148748f336d0b4c69f698.png" alt="17199774949002a58e246934148748f336d0b4c69f698.png"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719977549897e17a134ebabd9168f2b5acfd6fb39183.png" alt="1719977549897e17a134ebabd9168f2b5acfd6fb39183.png"></p>
+<p>通过这套命名规则，我们可以自定义复杂的查询语句，具体可以见官方文档：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html">JPA Query Methods</a>。下面的表格展示了包含特定关键词的方法的映射规则：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171997756189797a284269f2e77a74a48575f0a95d015.png" alt="171997756189797a284269f2e77a74a48575f0a95d015.png"></p>
+<h3 id="自定义查询-使用-EntityManger"><a href="#自定义查询-使用-EntityManger" class="headerlink" title="自定义查询 - 使用 EntityManger"></a>自定义查询 - 使用 <code>EntityManger</code></h3><p><code>EntityManager</code> 是 <code>JPA（Java Persistence API）</code>的核心接口之一，提供了对持久化上下文（<code>Persistence Context</code>）进行操作的方法。在 <code>Spring Data JPA</code> 中，<code>EntityManager</code> 被用来与数据库进行交互，执行 <code>CRUD</code> 操作、查询和事务管理。</p>
+<p>在 <code>EntityManager</code> 中，我们可以构建下面几种查询：</p>
+<ol>
+<li><code>entityManager.createQuery(jpqlQuery)</code> - 创建基于 <code>jpql</code> 语句的查询。</li>
+<li><code>entityManager.createNativeQuery(sqlQuery)</code> - 创建基于原生 <code>sql</code> 语句的查询</li>
+<li><code>entityManager.createNamedQuery(queryName)</code> - 创建基于 <code>@NamedQuery</code>、<code>@NamedNativeQuery</code> 定义的语句的命名查询</li>
+</ol>
+<p>当然 <code>EntityManager</code> 中还能创建其他查询，比如 <code>entityManager.createStoredProcedureQuery</code> - 构建基于存储过程的查询，日常开发使用频率较低，这里就不深入了。</p>
+<p>下面测试下上面提到的三种查询。</p>
+<p>使用 <code>entityManager.createNamedQuery(queryName)</code> 前，需要先在实体类中定义 <code>@NamedQuery</code>，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@NamedQuery(name = &quot;customNamedQuery&quot;, query = &quot;select A from User A where userName not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;)</span></span><br><span class="line"><span class="meta">@NamedNativeQuery(name = &quot;customNamedNativeQuery&quot;, query = &quot;select * from user where user_name not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;, resultClass = User.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...代码省略...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的测试类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line">    <span class="comment">// 为何EntityManger要使用@PersistenceContext注解而不是@Autowired注解，建议阅读：https://chenhe.me/post/inject-entitymanager-in-spring-correctly</span></span><br><span class="line">    <span class="meta">@PersistenceContext</span></span><br><span class="line">    <span class="keyword">private</span> EntityManager entityManager;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commonQueryTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ====================================================== 使用entityManager查询</span></span><br><span class="line">        <span class="comment">// 注：调用 query.getResultList() 后，对应的query就会被关闭，如果后面继续调用会报错 &#x27;EntityManager is closed&#x27;</span></span><br><span class="line">        <span class="comment">// createQuery，构建一个jpql查询</span></span><br><span class="line">        TypedQuery&lt;User&gt; query = entityManager.createQuery(<span class="string">&quot;select A from User A where A.userName not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;</span>, User.class);</span><br><span class="line">        query.setParameter(<span class="number">1</span>, <span class="string">&quot;张&quot;</span>);</span><br><span class="line">        printQueryResult(<span class="string">&quot;使用EntityManger-createQuery构建查询&quot;</span>, query.getResultList());</span><br><span class="line">        <span class="comment">// createNativeQuery，构建一个原生sql查询</span></span><br><span class="line">        Query nativeQuery = entityManager.createNativeQuery(<span class="string">&quot;select * from user where user_name not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;</span>, User.class);</span><br><span class="line">        nativeQuery.setParameter(<span class="number">1</span>, <span class="string">&quot;张&quot;</span>);</span><br><span class="line">        printQueryResult(<span class="string">&quot;使用EntityManger-createNativeQuery构建查询&quot;</span>, nativeQuery.getResultList());</span><br><span class="line">        <span class="comment">// createNamedQuery，通过在实体中定义过的@NamedQuery构建查询（@NameQuery使用的是jpql语句）</span></span><br><span class="line">        TypedQuery&lt;User&gt; customNamedQuery = entityManager.createNamedQuery(<span class="string">&quot;customNamedQuery&quot;</span>, User.class);</span><br><span class="line">        customNamedQuery.setParameter(<span class="number">1</span>, <span class="string">&quot;张&quot;</span>);</span><br><span class="line">        printQueryResult(<span class="string">&quot;使用EntityManger-createQuery构建@NamedQuery查询&quot;</span>, customNamedQuery.getResultList());</span><br><span class="line">        <span class="comment">// createNamedQuery，通过在实体中定义过的@NamedNativeQuery构建查询（@NamedNativeQuery使用的是原生sql语句）</span></span><br><span class="line">        TypedQuery&lt;User&gt; customNamedNativeQuery = entityManager.createNamedQuery(<span class="string">&quot;customNamedNativeQuery&quot;</span>, User.class);</span><br><span class="line">        customNamedNativeQuery.setParameter(<span class="number">1</span>, <span class="string">&quot;张&quot;</span>);</span><br><span class="line">        printQueryResult(<span class="string">&quot;使用EntityManger-createQuery构建@NamedNativeQuery查询&quot;</span>, customNamedNativeQuery.getResultList());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printQueryResult</span><span class="params">(String actionName, Object result)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;============================================&quot;</span> + actionName + <span class="string">&quot;============================================&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (result <span class="keyword">instanceof</span> List&lt;?&gt; list) &#123;</span><br><span class="line">            list.forEach(System.out::println);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (result <span class="keyword">instanceof</span> Page&lt;?&gt; page) &#123;</span><br><span class="line">            System.out.printf(<span class="string">&quot;数据总数：%d，当前页：%d，总页数：%d，当前页数据：%d \n&quot;</span>, page.getTotalElements(), page.getNumber() + <span class="number">1</span>, page.getTotalPages(), page.getNumberOfElements());</span><br><span class="line">            page.forEach(System.out::println);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义查询-使用-Query"><a href="#自定义查询-使用-Query" class="headerlink" title="自定义查询 - 使用 @Query"></a>自定义查询 - 使用 <code>@Query</code></h3><p>可以通过 <code>@Query</code> 自定义查询语句，在 <code>@Query</code> 中有一个 <code>nativeQuery</code> 参数：</p>
+<ul>
+<li>值为 <code>true</code> 时，使用的是原生 <code>sql</code> 语句进行的查询</li>
+<li>值为 <code>false</code> 时，使用的是 <code>jpql</code> 语句进行的查询</li>
+</ul>
+<p>如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> <span class="keyword">extends</span> <span class="title">JpaRepository</span>&lt;<span class="title">User</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 使用原生sql语句查询，查询语句中使用的是数据库表名和字段</span></span><br><span class="line">    <span class="meta">@Query(value = &quot;select * from user where is_delete = 1&quot;, nativeQuery = true)</span></span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">selectDeletedUserWithNativeQuery</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用jpql语句查询，查询语句中使用的是实体类的名称和属性</span></span><br><span class="line">    <span class="meta">@Query(&quot;select A from User A where A.isDelete = 1&quot;)</span></span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">selectDeletedUserWithoutNativeQuery</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后在测试类中调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commonQueryTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        printQueryResult(<span class="string">&quot;@Query定义的查询语句-jpql&quot;</span>, userMapper.selectDeletedUserWithoutNativeQuery());</span><br><span class="line">        printQueryResult(<span class="string">&quot;@Query定义的查询语句-原生sql&quot;</span>, userMapper.selectDeletedUserWithNativeQuery());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printQueryResult</span><span class="params">(String actionName, Object result)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;============================================&quot;</span> + actionName + <span class="string">&quot;============================================&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (result <span class="keyword">instanceof</span> List&lt;?&gt; list) &#123;</span><br><span class="line">            list.forEach(System.out::println);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (result <span class="keyword">instanceof</span> Page&lt;?&gt; page) &#123;</span><br><span class="line">            System.out.printf(<span class="string">&quot;数据总数：%d，当前页：%d，总页数：%d，当前页数据：%d \n&quot;</span>, page.getTotalElements(), page.getNumber() + <span class="number">1</span>, page.getTotalPages(), page.getNumberOfElements());</span><br><span class="line">            page.forEach(System.out::println);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义查询-Specification"><a href="#自定义查询-Specification" class="headerlink" title="自定义查询 - Specification"></a>自定义查询 - <code>Specification</code></h3><p>在 <code>Spring Data JPA</code> 中，<code>Specification</code> 是用于构建动态查询条件的一个功能强大的工具。它可以帮助你根据各种条件动态生成 <code>SQL</code> 查询，并支持复杂的查询条件组合。官方文档见：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-data/jpa/reference/jpa/specifications.html">Specifications</a></p>
+<p>实际使用中，我们的 <code>Mapper</code> 只需要继承 <code>JpaSpecificationExecutor</code> 类，就可以拥有通过 <code>Specification</code> 进行查询的能力。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> <span class="keyword">extends</span> <span class="title">JpaRepository</span>&lt;<span class="title">User</span>, <span class="title">String</span>&gt;, <span class="title">JpaSpecificationExecutor</span>&lt;<span class="title">User</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看下 <code>JpaSpecificationExecutor.java</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">JpaSpecificationExecutor</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="function">Optional&lt;T&gt; <span class="title">findOne</span><span class="params">(Specification&lt;T&gt; spec)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function">List&lt;T&gt; <span class="title">findAll</span><span class="params">(Specification&lt;T&gt; spec)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function">Page&lt;T&gt; <span class="title">findAll</span><span class="params">(Specification&lt;T&gt; spec, Pageable pageable)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function">List&lt;T&gt; <span class="title">findAll</span><span class="params">(Specification&lt;T&gt; spec, Sort sort)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">long</span> <span class="title">count</span><span class="params">(Specification&lt;T&gt; spec)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">exists</span><span class="params">(Specification&lt;T&gt; spec)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">long</span> <span class="title">delete</span><span class="params">(Specification&lt;T&gt; spec)</span></span>;</span><br><span class="line"></span><br><span class="line">	&lt;S extends T, R&gt; <span class="function">R <span class="title">findBy</span><span class="params">(Specification&lt;T&gt; spec, Function&lt;FluentQuery.FetchableFluentQuery&lt;S&gt;, R&gt; queryFunction)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>写个测试类测试下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleTest</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Autowired</span></span><br><span class="line">  <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commonQueryTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="comment">// ====================================================== 使用Specification查询</span></span><br><span class="line">      Specification&lt;User&gt; specification = (root, query, cb) -&gt; cb.notLike(root.get(<span class="string">&quot;userName&quot;</span>).as(String.class),<span class="string">&quot;%张%&quot;</span>);</span><br><span class="line">      printQueryResult(<span class="string">&quot;使用Specification查询&quot;</span>, userMapper.findAll(specification));</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printQueryResult</span><span class="params">(String actionName, Object result)</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">&quot;============================================&quot;</span> + actionName + <span class="string">&quot;============================================&quot;</span>);</span><br><span class="line">      <span class="keyword">if</span> (result <span class="keyword">instanceof</span> List&lt;?&gt; list) &#123;</span><br><span class="line">          list.forEach(System.out::println);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (result <span class="keyword">instanceof</span> Page&lt;?&gt; page) &#123;</span><br><span class="line">          System.out.printf(<span class="string">&quot;数据总数：%d，当前页：%d，总页数：%d，当前页数据：%d \n&quot;</span>, page.getTotalElements(), page.getNumber() + <span class="number">1</span>, page.getTotalPages(), page.getNumberOfElements());</span><br><span class="line">          page.forEach(System.out::println);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          System.out.println(result);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建分页查询的几种方式"><a href="#构建分页查询的几种方式" class="headerlink" title="构建分页查询的几种方式"></a>构建分页查询的几种方式</h3><p>上面提到，实际开发中建议继承 <code>JpaRepository</code> 完成 <code>CRUD</code> 操作，除了 <code>CRUD</code> 操作外，<code>JpaRepository</code> 还提供了分页、排序、批量处理的操作，其中分页功能是通过继承了 <code>PagingAndSortingRepository</code> 类实现的，我们看下这个类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">PagingAndSortingRepository</span>&lt;<span class="title">T</span>, <span class="title">ID</span>&gt; <span class="keyword">extends</span> <span class="title">Repository</span>&lt;<span class="title">T</span>, <span class="title">ID</span>&gt; </span>&#123;</span><br><span class="line">  <span class="comment">// 排序</span></span><br><span class="line">	<span class="function">Iterable&lt;T&gt; <span class="title">findAll</span><span class="params">(Sort sort)</span></span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 分页</span></span><br><span class="line">	<span class="function">Page&lt;T&gt; <span class="title">findAll</span><span class="params">(Pageable pageable)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个类提供了一个简单的分页操作，我们从返回值 <code>Page</code> 可以拿到如下几个属性： 总数据量、当前页、总页数、当前页数据量。</p>
+<p>实际开发中，分页查询还需要提供各种查询条件，我们可以通过上面提到的几种自定义查询方法来构建分页查询。</p>
+<p>通过 <code>@Query</code> 来构建分页查询，需要在 <code>Mapper</code> 中事先定义好对应的语句；通过 <code>Specification</code> 构建分页查询，则需要 <code>Mapper</code> 继承 <code>JpaSpecificationExecutor</code> 类，<code>Mapper</code> 文件如下，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> <span class="keyword">extends</span> <span class="title">JpaRepository</span>&lt;<span class="title">User</span>, <span class="title">String</span>&gt;, <span class="title">JpaSpecificationExecutor</span>&lt;<span class="title">User</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 模糊匹配userName，结果分页</span></span><br><span class="line">    <span class="function">Page&lt;User&gt; <span class="title">findByUserNameNotLike</span><span class="params">(String userName, Pageable pageable)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用原生sql构建一个分页查询</span></span><br><span class="line">    <span class="meta">@Query(value = &quot;select * from user where user_name not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;,</span></span><br><span class="line"><span class="meta">            countQuery = &quot;select count(1) from user where user_name not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;,</span></span><br><span class="line"><span class="meta">            nativeQuery = true)</span></span><br><span class="line">    <span class="function">Page&lt;User&gt; <span class="title">selectByUserNameNotLikeWithNativeQuery</span><span class="params">(String userName, Pageable pageable)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用jpql构建一个分页查询</span></span><br><span class="line">    <span class="meta">@Query(value = &quot;select A from User A where A.userName not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;,</span></span><br><span class="line"><span class="meta">            countQuery = &quot;select count(1) from User A where A.userName not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;)</span></span><br><span class="line">    <span class="function">Page&lt;User&gt; <span class="title">selectByUserNameNotLikeWithoutNativeQuery</span><span class="params">(String userName, Pageable pageable)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整测试类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleTest</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Autowired</span></span><br><span class="line">  <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line">  <span class="comment">// 为何EntityManger要使用@PersistenceContext注解而不是@Autowired注解，建议阅读：https://chenhe.me/post/inject-entitymanager-in-spring-correctly</span></span><br><span class="line">  <span class="meta">@PersistenceContext</span></span><br><span class="line">  <span class="keyword">private</span> EntityManager entityManager;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 分页查询</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pageQueryTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="comment">// 通过PagingAndSortingRepository类进行查询，返回的是Page，Page包含数据总量、总页数等信息</span></span><br><span class="line">      printQueryResult(<span class="string">&quot;分页查询&quot;</span>, userMapper.findAll(PageRequest.of(<span class="number">0</span>, <span class="number">5</span>)));</span><br><span class="line">      <span class="comment">// PagingAndSortingRepository类还有一个返回Iterator的方法，这个方法是用来进行排序的；在ListPagingAndSortingRepository类中也有类似的排序方法，返回的是List</span></span><br><span class="line">      Sort sort1 = Sort.by(Sort.Direction.DESC, <span class="string">&quot;createDate&quot;</span>);</span><br><span class="line">      printQueryResult(<span class="string">&quot;排序查询&quot;</span>, userMapper.findAll(sort1));</span><br><span class="line">      <span class="comment">// 也可以将在分页时排序</span></span><br><span class="line">      Sort sort2 = Sort.by(<span class="string">&quot;createDate&quot;</span>).descending().and(Sort.by(<span class="string">&quot;updateDate&quot;</span>).ascending());</span><br><span class="line">      printQueryResult(<span class="string">&quot;排序并分页&quot;</span>, userMapper.findAll(PageRequest.of(<span class="number">0</span>, <span class="number">5</span>, sort2)));</span><br><span class="line">      <span class="comment">// 自定义分页查询语句</span></span><br><span class="line">      printQueryResult(<span class="string">&quot;自定义分页查询&quot;</span>, userMapper.findByUserNameNotLike(<span class="string">&quot;%张%&quot;</span>, PageRequest.of(<span class="number">0</span>, <span class="number">5</span>, Sort.by(<span class="string">&quot;createDate&quot;</span>).descending())));</span><br><span class="line">      <span class="comment">// 使用Specification自定义分页查询条件，Mapper需要继承JpaSpecificationExecutor类</span></span><br><span class="line">      Specification&lt;User&gt; specification = (root, query, cb) -&gt; cb.notLike(root.get(<span class="string">&quot;userName&quot;</span>).as(String.class),<span class="string">&quot;%张%&quot;</span>);</span><br><span class="line">      printQueryResult(<span class="string">&quot;使用Specification进行分页条件查询&quot;</span>, userMapper.findAll(specification, PageRequest.of(<span class="number">0</span>, <span class="number">5</span>, Sort.by(<span class="string">&quot;createDate&quot;</span>).descending())));</span><br><span class="line">      <span class="comment">// ============================================================= 通过原生sql构建分页查询</span></span><br><span class="line">      <span class="comment">// 通过EntityManager构建分页查询</span></span><br><span class="line">      printQueryResult(<span class="string">&quot;通过EntityManager-nativeQuery构建分页查询&quot;</span>, pageQueryByEntityManager(PageRequest.of(<span class="number">0</span>, <span class="number">5</span>)));</span><br><span class="line">      <span class="comment">// 通过@Query-nativeQuery构建分页查询</span></span><br><span class="line">      printQueryResult(<span class="string">&quot;通过@Query-nativeQuery构建分页查询&quot;</span>, userMapper.selectByUserNameNotLikeWithNativeQuery(<span class="string">&quot;张&quot;</span>, PageRequest.of(<span class="number">0</span>, <span class="number">5</span>)));</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 通过EntityManager构建一个分页查询</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param</span> pageRequest</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> Page&lt;User&gt; <span class="title">pageQueryByEntityManager</span><span class="params">(PageRequest pageRequest)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// 使用原生sql</span></span><br><span class="line">      String sqlStr = <span class="string">&quot;select * from user where user_name not like concat(&#x27;%&#x27;, ?1, &#x27;%&#x27;)&quot;</span>;</span><br><span class="line">      Query nativeQuery = entityManager.createNativeQuery(sqlStr, User.class);</span><br><span class="line">      nativeQuery.setParameter(<span class="number">1</span>, <span class="string">&quot;张&quot;</span>);</span><br><span class="line">      <span class="comment">// 设置分页参数</span></span><br><span class="line">      nativeQuery.setFirstResult((<span class="keyword">int</span>) pageRequest.getOffset());</span><br><span class="line">      nativeQuery.setMaxResults(pageRequest.getPageSize());</span><br><span class="line">      <span class="comment">// 获取结果列表</span></span><br><span class="line">      <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">      List&lt;User&gt; users = nativeQuery.getResultList();</span><br><span class="line">      <span class="comment">// 获取总记录数</span></span><br><span class="line">      Query countQuery = entityManager.createNativeQuery(<span class="string">&quot;select count(1) from user where user_name not like &#x27;%张%&#x27;&quot;</span>);</span><br><span class="line">      <span class="keyword">long</span> total = ((Number) countQuery.getSingleResult()).longValue();</span><br><span class="line">      <span class="comment">// 构造 Page 对象</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> PageImpl&lt;&gt;(users, pageRequest, total);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printQueryResult</span><span class="params">(String actionName, Object result)</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">&quot;============================================&quot;</span> + actionName + <span class="string">&quot;============================================&quot;</span>);</span><br><span class="line">      <span class="keyword">if</span> (result <span class="keyword">instanceof</span> List&lt;?&gt; list) &#123;</span><br><span class="line">          list.forEach(System.out::println);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (result <span class="keyword">instanceof</span> Page&lt;?&gt; page) &#123;</span><br><span class="line">          System.out.printf(<span class="string">&quot;数据总数：%d，当前页：%d，总页数：%d，当前页数据：%d \n&quot;</span>, page.getTotalElements(), page.getNumber() + <span class="number">1</span>, page.getTotalPages(), page.getNumberOfElements());</span><br><span class="line">          page.forEach(System.out::println);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          System.out.println(result);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a target="_blank" rel="noopener" href="https://spring.io/guides/gs/accessing-data-jpa">Accessing Data with JPA - 官方接入文档</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000037755804">Spring Data JPA使用:看这一篇就够了</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/31335211/autowired-vs-persistencecontext-for-entitymanager-bean/58891587#58891587">@Autowired vs @PersistenceContext for EntityManager bean</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/659e9715d01d">【一目了然】Spring Data JPA使用Specification动态构建多表查询、复杂查询及排序示例</a></p>
+<p>[<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-data/jpa/reference/repositories/core-concepts.html">Spring Data JPA - 官方Api文档</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" rel="tag"># 后端技术</a>
+              <a href="/tags/Spring-Data-JPA/" rel="tag"># Spring Data JPA</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-07-01/51328/" rel="prev" title="Mybatis Plus使用">
+      <i class="fa fa-chevron-left"></i> Mybatis Plus使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A5%E5%85%A5%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">接入过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.</span> <span class="nav-text">查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2-%E4%BD%BF%E7%94%A8%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">2.1.</span> <span class="nav-text">自定义查询 - 使用关键词</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2-%E4%BD%BF%E7%94%A8-EntityManger"><span class="nav-number">2.2.</span> <span class="nav-text">自定义查询 - 使用 EntityManger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2-%E4%BD%BF%E7%94%A8-Query"><span class="nav-number">2.3.</span> <span class="nav-text">自定义查询 - 使用 @Query</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2-Specification"><span class="nav-number">2.4.</span> <span class="nav-text">自定义查询 - Specification</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E5%88%86%E9%A1%B5%E6%9F%A5%E8%AF%A2%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">2.5.</span> <span class="nav-text">构建分页查询的几种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">2.6.</span> <span class="nav-text">参考文档</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">109</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

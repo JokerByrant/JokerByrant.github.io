@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="MIME 的主要作用是定义一种机制，允许发送和接收包括文本、图片、音频、视频等多种类型的数据格式。它在 HTTP 协议中也起到了重要作用，帮助 Web 服务器和客户端明确传递的内容类型。 MIME 类型（也称为媒体类型）是由两部分组成的字符串，用于标识传输数据的具体类型和格式。格式为 type&#x2F;subtype，例如 text&#x2F;html 表示 HTML 文档，image&#x2F;jpeg 表示 JPEG 图">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mime和Spring MVC的内容协商">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-06-04/7747/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="MIME 的主要作用是定义一种机制，允许发送和接收包括文本、图片、音频、视频等多种类型的数据格式。它在 HTTP 协议中也起到了重要作用，帮助 Web 服务器和客户端明确传递的内容类型。 MIME 类型（也称为媒体类型）是由两部分组成的字符串，用于标识传输数据的具体类型和格式。格式为 type&#x2F;subtype，例如 text&#x2F;html 表示 HTML 文档，image&#x2F;jpeg 表示 JPEG 图">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984362268895dd34f98cf8b8b0c86f4300bb55dae.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984370271fe13fb75b89d03618a7cf46257c755de.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984386271c319590a037b20c35e2dfe49e9a165d8.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171998440327119134d284c8d86ddd584ada435c190f7.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984413271717122807b3c63ce3782b7cf1479a317.png">
+<meta property="article:published_time" content="2024-06-04T05:24:31.000Z">
+<meta property="article:modified_time" content="2024-07-03T05:54:29.944Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="后端技术">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="内容协商">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984362268895dd34f98cf8b8b0c86f4300bb55dae.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-06-04/7747/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mime和Spring MVC的内容协商 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-06-04/7747/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mime和Spring MVC的内容协商
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-04 13:24:31" itemprop="dateCreated datePublished" datetime="2024-06-04T13:24:31+08:00">2024-06-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>MIME 的主要作用是定义一种机制，允许发送和接收包括文本、图片、音频、视频等多种类型的数据格式。它在 HTTP 协议中也起到了重要作用，帮助 Web 服务器和客户端明确传递的内容类型。</p>
+<p>MIME 类型（也称为媒体类型）是由两部分组成的字符串，用于标识传输数据的具体类型和格式。格式为 type/subtype，例如 text/html 表示 HTML 文档，image/jpeg 表示 JPEG 图像。</p>
+<span id="more"></span>
+
+<h3 id="Http-请求中的-ContentType-和-Accept"><a href="#Http-请求中的-ContentType-和-Accept" class="headerlink" title="Http 请求中的 ContentType 和 Accept"></a><code>Http</code> 请求中的 <code>ContentType</code> 和 <code>Accept</code></h3><p>关于这个的概念参考：<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000013056786">Http请求中的Content-Type</a></p>
+<p><code>Content-Type</code> 是返回消息中非常重要的内容，表示后面的文档属于什么 <code>MIME</code> 类型。例如最常见的就是 <code>text/html</code>，它的意思是说返回的内容是文本类型，这个文本又是 <code>HTML</code> 格式的。原则上浏览器会根据 <code>Content-Type</code> 来决定如何显示返回的消息体内容。</p>
+<ul>
+<li><code>Accept</code> 属于请求头，代表发送端（客户端）希望接受的数据类型。比如：<code>Accept:text/xml</code>，代表客户端希望接受的数据类型是 <code>xml</code> 类型</li>
+<li><code>Content-Type</code> 属于实体头，代表发送端（客户端|服务器）发送的实体数据的数据类型。比如：<code>Content-Type:text/html</code>，代表发送端发送的数据格式是 <code>html</code></li>
+</ul>
+<p>比如一次 <code>Http</code> 请求中 <code>Accept:text/xml</code>、<code>Content-Type:text/html</code>，代表希望接受的数据类型是 <code>xml</code> 格式，本次请求发送的数据的数据格式是 <code>html</code></p>
+<h3 id="Spring-MVC-中的内容协商"><a href="#Spring-MVC-中的内容协商" class="headerlink" title="Spring MVC 中的内容协商"></a><code>Spring MVC</code> 中的内容协商</h3><p>参考 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/yourbatman/p/11420796.html">Spring MVC内置支持的4种内容协商方式【享学Spring MVC】</a></p>
+<blockquote>
+<p>一个 <code>URL</code> 资源服务端可以以多种形式进行响应：即 <code>MIME（MediaType）</code>媒体类型。但对于某一个客户端（浏览器、<code>APP</code>、<code>Excel</code> 导出…）来说它只需要一种。<code>so</code>这样客户端和服务端就得有一种机制来保证这个事情，这种机制就是内容协商机制。</p>
+</blockquote>
+<p>下面说一下 <code>Spring MVC</code> 中支持的几种内容协商方式，我们这里使用 <code>SpringBoot</code> 进行演示，首先创建一个 <code>Spring Web</code> 项目，增加一个接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/auth&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/test&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setUserUid(UuidUtil.getUid());</span><br><span class="line">        user.setRealName(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> user;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这时我们在浏览器或 <code>Postman</code> 中请求这个接口，返回的 <code>ContentType</code> 是 <code>application/json</code>，而我们如果在 <code>pom.xml</code> 加入下面的依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 此处需要导入databind包即可， jackson-annotations、jackson-core都不需要显示自己的导入了--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.core<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-databind<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.8<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- jackson默认只会支持的json。若要xml的支持，需要额外导入如下包 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.dataformat<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-dataformat-xml<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.8<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这时请求接口，返回的 <code>ContentType</code> 就是 <code>application/xml</code> 了。这是因为默认情况下 <code>Spring MVC</code> 并不支持 <code>application/xml</code> 这种媒体格式，而默认情况下 <code>xml</code> 的优先级高于 <code>json</code>，所以增加了 <code>xml</code> 支持后，默认返回的媒体格式就是 <code>application/xml</code>。而没有引入上面依赖时，不支持 <code>appliction/xml</code> 媒体格式，所以才轮到 <code>json</code> 的。</p>
+<p>下面看下 <code>Spring MVC</code> 支持的几种内容协商方式：</p>
+<ol>
+<li>在 <code>Http</code> 请求头 <code>Accept</code> 中指定数据类型。<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984362268895dd34f98cf8b8b0c86f4300bb55dae.png" alt="1719984362268895dd34f98cf8b8b0c86f4300bb55dae.png"></li>
+<li><code>Http</code> 请求的 <code>Url</code> 增加拓展名，比如 <code>xxx.json</code>、<code>xxx.xml</code><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984370271fe13fb75b89d03618a7cf46257c755de.png" alt="1719984370271fe13fb75b89d03618a7cf46257c755de.png"><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984386271c319590a037b20c35e2dfe49e9a165d8.png" alt="1719984386271c319590a037b20c35e2dfe49e9a165d8.png"></li>
+<li>在请求参数中传递 <code>xxx?format=xml</code> 参数，需要用户手动开启配置<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableWebMvc</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebMvcConfig</span> <span class="keyword">extends</span> <span class="title">WebMvcConfigurerAdapter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureContentNegotiation</span><span class="params">(ContentNegotiationConfigurer configurer)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 支持请求参数协商</span></span><br><span class="line">        configurer.favorParameter(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171998440327119134d284c8d86ddd584ada435c190f7.png" alt="171998440327119134d284c8d86ddd584ada435c190f7.png"></li>
+<li>接口中固定媒体类型：指定 <code>produces</code><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="meta">@GetMapping(value = &quot;/test&quot;, produces = MediaType.APPLICATION_JSON_VALUE)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> User <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    User user = <span class="keyword">new</span> User();</span><br><span class="line">    user.setUserUid(UuidUtil.getUid());</span><br><span class="line">    user.setRealName(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+按上面的方式改造后，即使引入了上面支持 <code>xml</code> 媒体类型的依赖，最终默认返回的仍然是 <code>application/json</code>。该方式有一个注意事项：**<code>produces</code> 指定的 <code>MediaType</code> 类型不能和后缀、请求参数、<code>Accept</code> 冲突**。如果有冲突，那么接口就会出现报错提示。</li>
+</ol>
+<h3 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h3><p>具体见：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/yourbatman/p/11420805.html">Spring MVC内容协商实现原理及自定义配置【享学Spring MVC】</a></p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719984413271717122807b3c63ce3782b7cf1479a317.png" alt="1719984413271717122807b3c63ce3782b7cf1479a317.png"></p>
+<p>继承树见上图，上面提到的4种协商方式对应的实现类分别是：</p>
+<ol>
+<li><code>HeaderContentNegotiationStrategy</code>  - 根据请求头 <code>Accept</code> 完成内容协商</li>
+<li><code>ServletPathExtensionContentNegotiationStrategy</code> - 根据文件拓展名进行内容协商<blockquote>
+<p>一个 <code>MediaType</code> 对应多个拓展名，一个拓展名只属于一个 <code>MediaType</code></p>
+</blockquote>
+</li>
+<li><code>ParameterContentNegotiationStrategy</code> - 根据 <code>url</code> 中携带的请求参数（默认是 <code>format</code>）进行内容协商（<em><strong>注：<code>Spring MVC</code> 默认关闭，需要手动开启</strong></em>）</li>
+<li><code>FixedContentNegotiationStrategy</code> - 根据 <code>@RequestMapping.produces</code>这个注解属性进行内容协商</li>
+</ol>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000013056786">Http请求中的Content-Type</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yourbatman/p/11420796.html">Spring MVC内置支持的4种内容协商方式【享学Spring MVC】</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" rel="tag"># 后端技术</a>
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+              <a href="/tags/%E5%86%85%E5%AE%B9%E5%8D%8F%E5%95%86/" rel="tag"># 内容协商</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-05-29/65521/" rel="prev" title="apple-app-site-association在SpringBoot文件服务上的配置">
+      <i class="fa fa-chevron-left"></i> apple-app-site-association在SpringBoot文件服务上的配置
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024-06-07/11424/" rel="next" title="训后碳水对疲劳值的影响">
+      训后碳水对疲劳值的影响 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Http-%E8%AF%B7%E6%B1%82%E4%B8%AD%E7%9A%84-ContentType-%E5%92%8C-Accept"><span class="nav-number">1.</span> <span class="nav-text">Http 请求中的 ContentType 和 Accept</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring-MVC-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AE%B9%E5%8D%8F%E5%95%86"><span class="nav-number">2.</span> <span class="nav-text">Spring MVC 中的内容协商</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">源码解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">109</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

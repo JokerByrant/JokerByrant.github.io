@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在使用 Mybatis 过程中碰到了一个问题，当使用 &lt;if test&#x3D;&quot;sex !&#x3D; null and sex !&#x3D; &#39;&#39;&quot;&gt; 判空操作时，如果 sex 是数值类型的参数，并且值为 0 时，该判断条件的值为 false。 搜寻相关博客，得知出现该问题的原因是：Mybatis 语法中 0 是等于空字符串的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么Mybatis中 [0&#x3D;&#x3D;&#39;&#39;] 被判断为true">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-04-08/35743/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="在使用 Mybatis 过程中碰到了一个问题，当使用 &lt;if test&#x3D;&quot;sex !&#x3D; null and sex !&#x3D; &#39;&#39;&quot;&gt; 判空操作时，如果 sex 是数值类型的参数，并且值为 0 时，该判断条件的值为 false。 搜寻相关博客，得知出现该问题的原因是：Mybatis 语法中 0 是等于空字符串的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171998287627065584bb8e5f6d0f90ea8a5d07656e563.png">
+<meta property="article:published_time" content="2024-04-08T03:58:07.000Z">
+<meta property="article:modified_time" content="2024-07-03T05:56:32.541Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="Mybatis">
+<meta property="article:tag" content="后端技术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171998287627065584bb8e5f6d0f90ea8a5d07656e563.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-04-08/35743/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>为什么Mybatis中 [0==''] 被判断为true | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-04-08/35743/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          为什么Mybatis中 [0==''] 被判断为true
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-04-08 11:58:07" itemprop="dateCreated datePublished" datetime="2024-04-08T11:58:07+08:00">2024-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在使用 <code>Mybatis</code> 过程中碰到了一个问题，当使用 <code>&lt;if test=&quot;sex != null and sex != &#39;&#39;&quot;&gt;</code> 判空操作时，如果 <code>sex</code> 是数值类型的参数，并且值为 <code>0</code> 时，该判断条件的值为 <code>false</code>。</p>
+<p>搜寻相关博客，得知出现该问题的原因是：<code>Mybatis</code> 语法中 <code>0</code> 是等于空字符串的</p>
+<span id="more"></span>
+
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>我们从源码角度看下为什么会这样，直接看 <code>XMLScriptBuilder.java</code> 这个类，在这个类内部，定义了一个 <code>NodeHandler</code> 接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">interface</span> <span class="title">NodeHandler</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">handleNode</span><span class="params">(XNode nodeToHandle, List&lt;SqlNode&gt; targetContents)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>Mybatis</code> 语句中存在的 <code>&lt;if&gt;</code>、<code>&lt;where&gt;</code> 等标签是通过各个 <code>NodeHandler</code>实现类来完成解析的，如下：</p>
+<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/171998287627065584bb8e5f6d0f90ea8a5d07656e563.png" alt="171998287627065584bb8e5f6d0f90ea8a5d07656e563.png"></p>
+<p>如下，在类创建时，标签和对应的 <code>NodeHandler</code> 会被放入一个 <code>Map</code> 中 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">XMLScriptBuilder</span><span class="params">(Configuration configuration, XNode context, Class&lt;?&gt; parameterType)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">super</span>(configuration);</span><br><span class="line">  <span class="keyword">this</span>.context = context;</span><br><span class="line">  <span class="keyword">this</span>.parameterType = parameterType;</span><br><span class="line">  initNodeHandlerMap();</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initNodeHandlerMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;trim&quot;</span>, <span class="keyword">new</span> TrimHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;where&quot;</span>, <span class="keyword">new</span> WhereHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;set&quot;</span>, <span class="keyword">new</span> SetHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;foreach&quot;</span>, <span class="keyword">new</span> ForEachHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;if&quot;</span>, <span class="keyword">new</span> IfHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;choose&quot;</span>, <span class="keyword">new</span> ChooseHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;when&quot;</span>, <span class="keyword">new</span> IfHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;otherwise&quot;</span>, <span class="keyword">new</span> OtherwiseHandler());</span><br><span class="line">  nodeHandlerMap.put(<span class="string">&quot;bind&quot;</span>, <span class="keyword">new</span> BindHandler());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后我们看下解析 <code>Sql</code> 的步骤：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> SqlSource <span class="title">parseScriptNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 解析动态标签</span></span><br><span class="line">  MixedSqlNode rootSqlNode = parseDynamicTags(context);</span><br><span class="line">  <span class="comment">// 构造sqlSource，sqlSource会构建最终的Sql语句，其中#&#123;&#125;会在这里被解析</span></span><br><span class="line">  SqlSource sqlSource = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">if</span> (isDynamic) &#123;</span><br><span class="line">    <span class="comment">// 动态Sql处理</span></span><br><span class="line">    sqlSource = <span class="keyword">new</span> DynamicSqlSource(configuration, rootSqlNode);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 静态Sql处理</span></span><br><span class="line">    sqlSource = <span class="keyword">new</span> RawSqlSource(configuration, rootSqlNode, parameterType);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> sqlSource;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">protected</span> MixedSqlNode <span class="title">parseDynamicTags</span><span class="params">(XNode node)</span> </span>&#123;</span><br><span class="line">  List&lt;SqlNode&gt; contents = <span class="keyword">new</span> ArrayList&lt;SqlNode&gt;();</span><br><span class="line">  <span class="comment">// 获取所有的标签</span></span><br><span class="line">  NodeList children = node.getNode().getChildNodes();</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; children.getLength(); i++) &#123;</span><br><span class="line">    XNode child = node.newXNode(children.item(i));</span><br><span class="line">     <span class="comment">// 普通sql处理</span></span><br><span class="line">    <span class="keyword">if</span> (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) &#123;</span><br><span class="line">      String data = child.getStringBody(<span class="string">&quot;&quot;</span>);</span><br><span class="line">      <span class="comment">// 判断语句中是否包含$&#123;&#125;，$&#123;&#125;的内容需要替换</span></span><br><span class="line">      TextSqlNode textSqlNode = <span class="keyword">new</span> TextSqlNode(data);</span><br><span class="line">      <span class="keyword">if</span> (textSqlNode.isDynamic()) &#123;</span><br><span class="line">        contents.add(textSqlNode);</span><br><span class="line">        isDynamic = <span class="keyword">true</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        contents.add(<span class="keyword">new</span> StaticTextSqlNode(data));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (child.getNode().getNodeType() == Node.ELEMENT_NODE) &#123;<span class="comment">// issue #628</span></span><br><span class="line">      <span class="comment">// 动态Sql处理</span></span><br><span class="line">      String nodeName = child.getNode().getNodeName();</span><br><span class="line">      <span class="comment">// 根据nodeName获取对应的NodeHandler</span></span><br><span class="line">      NodeHandler handler = nodeHandlerMap.get(nodeName);</span><br><span class="line">      <span class="keyword">if</span> (handler == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BuilderException(<span class="string">&quot;Unknown element &lt;&quot;</span> + nodeName + <span class="string">&quot;&gt; in SQL statement.&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 对动态sql进行解析</span></span><br><span class="line">      handler.handleNode(child, contents);</span><br><span class="line">      isDynamic = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> MixedSqlNode(contents);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中每种 <code>NodeHandler</code> 的处理方式大致类似：先将动态标签的一些属性解析出来，然后根据这些属性构造一个 <code>SqlNode</code>，之后在 <code>SqlNode</code> 中处理具体逻辑。</p>
+<p>比如我们要找的 <code>&lt;if&gt;</code> 标签，它对应的 <code>NodeHanler</code> 是 <code>IfHandler</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">IfHandler</span> <span class="keyword">implements</span> <span class="title">NodeHandler</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">IfHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Prevent Synthetic Access</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleNode</span><span class="params">(XNode nodeToHandle, List&lt;SqlNode&gt; targetContents)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 解析&lt;if&gt;标签</span></span><br><span class="line">    MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);</span><br><span class="line">    <span class="comment">// 获取test属性的值</span></span><br><span class="line">    String test = nodeToHandle.getStringAttribute(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">    <span class="comment">// 相关属性构造成一个SqlNode</span></span><br><span class="line">    IfSqlNode ifSqlNode = <span class="keyword">new</span> IfSqlNode(mixedSqlNode, test);</span><br><span class="line">    targetContents.add(ifSqlNode);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看下具体的处理逻辑，在 <code>IfSqlNode</code> 中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IfSqlNode</span> <span class="keyword">implements</span> <span class="title">SqlNode</span> </span>&#123;</span><br><span class="line">  <span class="comment">// &lt;if&gt;标签解析处理类</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> ExpressionEvaluator evaluator;</span><br><span class="line">  <span class="comment">// test属性值</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> String test;</span><br><span class="line">  <span class="comment">// 解析出的&lt;if&gt;标签信息</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> SqlNode contents;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">IfSqlNode</span><span class="params">(SqlNode contents, String test)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.test = test;</span><br><span class="line">    <span class="keyword">this</span>.contents = contents;</span><br><span class="line">    <span class="keyword">this</span>.evaluator = <span class="keyword">new</span> ExpressionEvaluator();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">apply</span><span class="params">(DynamicContext context)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 逻辑判断在这里进行</span></span><br><span class="line">    <span class="keyword">if</span> (evaluator.evaluateBoolean(test, context.getBindings())) &#123;</span><br><span class="line">      contents.apply(context);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ExpressionEvaluator</code> 使用了 <code>ognl</code> 表达式来获取 <code>test</code> 中逻辑判断的结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">evaluateBoolean</span><span class="params">(String expression, Object parameterObject)</span> </span>&#123;</span><br><span class="line">  Object value = OgnlCache.getValue(expression, parameterObject);</span><br><span class="line">  <span class="keyword">if</span> (value <span class="keyword">instanceof</span> Boolean) &#123;</span><br><span class="line">    <span class="keyword">return</span> (Boolean) value;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (value <span class="keyword">instanceof</span> Number) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> BigDecimal(String.valueOf(value)).compareTo(BigDecimal.ZERO) != <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> value != <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到这里，我们可以得出结论：**<code>Mybatis</code> 使用 <code>Ognl</code> 表达式来获取 <code>&lt;if&gt;</code> 标签中逻辑判断的值**。</p>
+<p>我们来验证一下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>ognl<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>ognl<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.4.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Object&gt; objectMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">objectMap.put(<span class="string">&quot;sex&quot;</span>, <span class="number">0</span>);</span><br><span class="line">Object value = Ognl.getValue(<span class="string">&quot;sex == &#x27;&#x27;&quot;</span>, objectMap);</span><br><span class="line">System.out.println(value);</span><br></pre></td></tr></table></figure>
+
+<p>最终输出结果为 <code>true</code>。</p>
+<h3 id="处理办法"><a href="#处理办法" class="headerlink" title="处理办法"></a>处理办法</h3><p><code>ognl</code> 表达式输出的这个结果实在与我们的常规认知不符，要处理这个问题只能顺应它或改变它。</p>
+<p>我目前采用的是第一种：**<code>Mybatis</code> 中的 <code>&lt;if&gt;</code> 标签，对数值类型只做是否为 <code>null</code> 的判断，移除所有判断是否为空字符的逻辑**。</p>
+<p>也可以选择改变它，就是修改它的源码，但是个人认为这一块儿的风险比较大，因此就没有实践，可以参考这篇文章中的处理：<a target="_blank" rel="noopener" href="https://blog.51cto.com/u_13270529/5962025">Mybatis的if标签判断空字符串 == 0</a></p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_13270529/5962025">Mybatis的if标签判断空字符串 == 0</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000038420877">MyBatis if 标签的坑，居然被我踩到了</a></p>
+<p><a target="_blank" rel="noopener" href="https://whb1990.github.io/posts/9dd16667">Mybatis-0值问题</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.pdai.tech/md/framework/orm-mybatis/mybatis-y-dynamic-sql.html">MyBatis详解 - 动态SQL使用与原理</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41063182/article/details/106865959">mybatis源码解读(五)：XMLScriptBuilder详解-各种SQLNODE</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mybatis/" rel="tag"># Mybatis</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" rel="tag"># 后端技术</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-04-03/6036/" rel="prev" title="商业保险选择">
+      <i class="fa fa-chevron-left"></i> 商业保险选择
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024-04-15/3746/" rel="next" title="公路车如何科学训练">
+      公路车如何科学训练 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%8A%9E%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">处理办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">3.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">109</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

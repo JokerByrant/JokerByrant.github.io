@@ -162,7 +162,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-04-23/6356/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-07/56219/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -176,7 +176,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023-04-23/6356/" class="post-title-link" itemprop="url">Netty的读空闲检测机制</a>
+            <a href="/2023-08-07/56219/" class="post-title-link" itemprop="url">leetcode刷题记录 - 回溯算法(一)</a>
         </h2>
 
         <div class="post-meta">
@@ -186,7 +186,85 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-04-23 13:41:15" itemprop="dateCreated datePublished" datetime="2023-04-23T13:41:15+08:00">2023-04-23</time>
+              <time title="创建时间：2023-08-07 13:21:57" itemprop="dateCreated datePublished" datetime="2023-08-07T13:21:57+08:00">2023-08-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>回溯是递归的副产品，只要有递归就会有回溯。</p>
+<p>回溯法解决的问题都可以 <strong>抽象为树形结构</strong>，因为回溯法解决的都是 <strong>在集合中递归查找子集，集合的大小就构成了树的宽度，递归的深度，就构成了树的深度</strong>。</p>
+<p>本篇是 <strong>回溯法</strong> 的第一篇，主要来学习一下 <strong>组合</strong> 类的题目。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023-08-07/56219/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-04/36303/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023-08-04/36303/" class="post-title-link" itemprop="url">优化项目中的软件测试流程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-04 15:32:07" itemprop="dateCreated datePublished" datetime="2023-08-04T15:32:07+08:00">2023-08-04</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -210,13 +288,11 @@
 
       
           <blockquote>
-<p>这篇文章记录了一次因对 <code>Netty</code> 读空闲机制了解不够透彻导致的问题。</p>
+<p>一套标准化的测试流程能够让软件的每次版本迭代都能保持稳定，每次的手动测试过程其实都是重复性劳动，这个过程很容易让人感到疲累。</p>
 </blockquote>
-<p>最近 <code>App</code> 的 <code>Socket</code> 连接出现了问题，客户端的 <code>Socket</code> 连接已经中断了，但是服务端还保留着与客户端的连接信息，导致转发消息时出现了消息没有送达并且丢失的问题。</p>
-<p>定位到问题是 <code>Netty</code> 心跳机制导致的问题，服务端代码中设置的是如果 <code>150s</code> 没有收到来自客户端的数据时(<em><strong>服务端是通过 <code>channelRead()</code> 方法是否触发来判断的</strong></em>)，判断客户端读空闲，将客户端的 <code>Socket</code> 连接中断。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023-04-23/6356/#more" rel="contents">
+              <a class="btn" href="/2023-08-04/36303/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -240,7 +316,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-03-24/61694/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-04/24556/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -254,7 +330,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023-03-24/61694/" class="post-title-link" itemprop="url">敏感数据加密</a>
+            <a href="/2023-08-04/24556/" class="post-title-link" itemprop="url">leetcode刷题记录 - 二叉树篇(四)</a>
         </h2>
 
         <div class="post-meta">
@@ -264,7 +340,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-03-24 13:56:23" itemprop="dateCreated datePublished" datetime="2023-03-24T13:56:23+08:00">2023-03-24</time>
+              <time title="创建时间：2023-08-04 15:27:27" itemprop="dateCreated datePublished" datetime="2023-08-04T15:27:27+08:00">2023-08-04</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -272,87 +348,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="目前的情况"><a href="#目前的情况" class="headerlink" title="目前的情况"></a>目前的情况</h3><p>这一模块目前在项目中主要有两个地方用到：</p>
-<ol>
-<li>二维码</li>
-<li>用户密码</li>
-</ol>
-<p>二维码目前未加密，目前的解决方案是采用 <strong>Base64</strong> 行 “加密”。</p>
-<p>用户密码目前使用的是 <strong>散列算法-Md5</strong> 进行的加密(前端处理，未加 <code>salt</code>)。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023-03-24/61694/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-02-27/22771/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
-      <meta itemprop="name" content="sxh">
-      <meta itemprop="description" content="人类的悲欢并不相通">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Sssxh BLOG">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023-02-27/22771/" class="post-title-link" itemprop="url">减脂规划</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-02-27 13:36:07" itemprop="dateCreated datePublished" datetime="2023-02-27T13:36:07+08:00">2023-02-27</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E6%83%B3/" itemprop="url" rel="index"><span itemprop="name">随想</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -368,11 +364,11 @@
 
       
           <blockquote>
-<p>此项计划开始于3月1号。</p>
+<p>这是二叉树系列的最后一篇，上一篇看了二叉树 <strong>回溯算法</strong> 和 <strong>二叉树的构造</strong> 相关的题目，本篇要着重看一下 <strong>二叉搜索树</strong> 以及 <strong>最近公共祖先</strong> 相关的题目。</p>
 </blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023-02-27/22771/#more" rel="contents">
+              <a class="btn" href="/2023-08-04/24556/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -396,7 +392,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-01-24/17735/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-08-02/51472/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -410,7 +406,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023-01-24/17735/" class="post-title-link" itemprop="url">配置Zookeeper集群和IDEA热部署插件</a>
+            <a href="/2023-08-02/51472/" class="post-title-link" itemprop="url">leetcode刷题记录 - 二叉树篇(三)</a>
         </h2>
 
         <div class="post-meta">
@@ -420,7 +416,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-01-24 13:53:45" itemprop="dateCreated datePublished" datetime="2023-01-24T13:53:45+08:00">2023-01-24</time>
+              <time title="创建时间：2023-08-02 15:25:10" itemprop="dateCreated datePublished" datetime="2023-08-02T15:25:10+08:00">2023-08-02</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -428,7 +424,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -444,11 +440,11 @@
 
       
           <blockquote>
-<p>记录一下工作开发环境的搭建。</p>
+<p>有关二叉树的题目，最好是能掌握其递归的解法，递归的解法熟练运用后，就能清晰的知道题目的整体逻辑，之后再延伸到迭代的解法。</p>
 </blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023-01-24/17735/#more" rel="contents">
+              <a class="btn" href="/2023-08-02/51472/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -472,7 +468,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-12-12/30595/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-31/22962/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -486,7 +482,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022-12-12/30595/" class="post-title-link" itemprop="url">Springboot启动时创建LOG_FILE_IS_UNDEFINED文件夹</a>
+            <a href="/2023-07-31/22962/" class="post-title-link" itemprop="url">leetcode刷题记录 - 二叉树篇(二)</a>
         </h2>
 
         <div class="post-meta">
@@ -496,7 +492,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-12-12 13:50:56" itemprop="dateCreated datePublished" datetime="2022-12-12T13:50:56+08:00">2022-12-12</time>
+              <time title="创建时间：2023-07-31 13:26:55" itemprop="dateCreated datePublished" datetime="2023-07-31T13:26:55+08:00">2023-07-31</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -504,157 +500,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>如下，之前从未在意过这个文件夹</p>
-<p><img src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16901887329649eea9741c20b415aa565d77c02ebed5f.png" alt="16901887329649eea9741c20b415aa565d77c02ebed5f.png"></p>
-<p>在 <code>Debug</code> 时发现可能是一个 <code>Bug</code></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022-12-12/30595/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-11-23/54234/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
-      <meta itemprop="name" content="sxh">
-      <meta itemprop="description" content="人类的悲欢并不相通">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Sssxh BLOG">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022-11-23/54234/" class="post-title-link" itemprop="url">频繁的大文件IO导致服务器卡顿</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-11-23 15:41:20" itemprop="dateCreated datePublished" datetime="2022-11-23T15:41:20+08:00">2022-11-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>之前搭建的 <code>jenkins</code> 平台，为了在 <code>jenkins</code> 的 <code>job</code> 中打印项目的启动日志，在 <code>jar</code> 包启动时使用了将日志输出到指定文件的方式。这种方式存在一个问题：<strong>日志文件的大小会无限的增大下去</strong>。而 <code>java</code> 写日志是一个频繁的 <code>I/O</code> 操作，日志文件大小越大，<code>I/O</code> 操作越费时，并且会导致服务器卡顿。所以之前有几次定位到服务器异常的卡顿，可能就是这个问题引起的。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022-11-23/54234/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-10-25/44443/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
-      <meta itemprop="name" content="sxh">
-      <meta itemprop="description" content="人类的悲欢并不相通">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Sssxh BLOG">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022-10-25/44443/" class="post-title-link" itemprop="url">支付业务中的“二清”和支付牌照</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-10-25 13:46:38" itemprop="dateCreated datePublished" datetime="2022-10-25T13:46:38+08:00">2022-10-25</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E6%83%B3/" itemprop="url" rel="index"><span itemprop="name">随想</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -670,11 +516,11 @@
 
       
           <blockquote>
-<p>在着手进行一项业务之前，一定要搞清楚政策是否允许，以及对常见的解决方案进行调研，埋头苦干到最后只会竹篮打水，到最后还得推倒重来。</p>
+<p>上一篇学习了二叉树的遍历方式：<strong>前中后序遍历</strong> 和 <strong>层序遍历</strong>。本篇学习一下二叉树其他的一些特性。</p>
 </blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022-10-25/44443/#more" rel="contents">
+              <a class="btn" href="/2023-07-31/22962/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -698,7 +544,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-10-14/39924/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-26/9573/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -712,7 +558,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022-10-14/39924/" class="post-title-link" itemprop="url">测试服务器Cpu占用过高</a>
+            <a href="/2023-07-26/9573/" class="post-title-link" itemprop="url">leetcode刷题记录 - 二叉树篇(一)</a>
         </h2>
 
         <div class="post-meta">
@@ -722,7 +568,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-10-14 15:45:54" itemprop="dateCreated datePublished" datetime="2022-10-14T15:45:54+08:00">2022-10-14</time>
+              <time title="创建时间：2023-07-26 16:56:58" itemprop="dateCreated datePublished" datetime="2023-07-26T16:56:58+08:00">2023-07-26</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -730,7 +576,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -745,11 +591,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前出现过一次服务器<code>Cpu</code>占用率达到100%的问题，经分析是<code>Jenkins</code>的重启<code>Jar</code>包脚本导致的。</p>
-<p>最近在使用测试服务器时，发现服务器卡顿仍然很严重，定位到问题是 <code>rsdun-zuul-balance</code> 网关服务导致的，下面是调查过程：</p>
+          <blockquote>
+<p>树相关的知识点有点多，这里将它拆分开，这是第一篇。本篇先对二叉树做个简单的介绍，然后着重看一下二叉树的遍历，包括：<strong>前中后序遍历(深度优先遍历)</strong> 和 <strong>层序遍历(广度优先遍历)</strong> 。</p>
+</blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022-10-14/39924/#more" rel="contents">
+              <a class="btn" href="/2023-07-26/9573/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -773,7 +620,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-09-29/49319/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-25/20598/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -787,7 +634,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022-09-29/49319/" class="post-title-link" itemprop="url">hexo侧边导航栏功能异常，报错Cannot read properties of null (reading getBoundingClientRect)</a>
+            <a href="/2023-07-25/20598/" class="post-title-link" itemprop="url">leetcode刷题记录 - 栈与队列</a>
         </h2>
 
         <div class="post-meta">
@@ -797,7 +644,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-09-29 13:13:46" itemprop="dateCreated datePublished" datetime="2022-09-29T13:13:46+08:00">2022-09-29</time>
+              <time title="创建时间：2023-07-25 11:53:02" itemprop="dateCreated datePublished" datetime="2023-07-25T11:53:02+08:00">2023-07-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -805,7 +652,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -820,10 +667,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>最近在整理博客，发现网站的侧边导航栏功能无法正常使用了。</p>
+          <ul>
+<li>  栈 - <code>Stack</code>：<code>LIFO</code> - 后进先出</li>
+<li>  队列 - <code>Queue</code>：<code>FIFO</code> - 先进先出。</li>
+</ul>
+<blockquote>
+<p>可以这么记忆，栈需要压栈和出栈，想到压栈就想到把一个物体压到底部，因此这个物体只能最后才出来，因此栈是 <code>FILO</code>；相对的，队列接是 <code>FIFO</code>。</p>
+</blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022-09-29/49319/#more" rel="contents">
+              <a class="btn" href="/2023-07-25/20598/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -847,7 +700,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2022-09-27/60142/">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-20/55708/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
@@ -861,7 +714,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022-09-27/60142/" class="post-title-link" itemprop="url">《Redis设计与实现》学习笔记</a>
+            <a href="/2023-07-20/55708/" class="post-title-link" itemprop="url">leetcode刷题记录 - 字符串</a>
         </h2>
 
         <div class="post-meta">
@@ -871,7 +724,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-09-27 10:26:41" itemprop="dateCreated datePublished" datetime="2022-09-27T10:26:41+08:00">2022-09-27</time>
+              <time title="创建时间：2023-07-20 11:51:58" itemprop="dateCreated datePublished" datetime="2023-07-20T11:51:58+08:00">2023-07-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -879,7 +732,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -894,10 +747,167 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>本文主要用来记录在阅读《Redis设计与实现》一书时的学习笔记，其中包括一些我总结的知识以及书中我认为比较重要的知识点。<code>PDF</code> 文件链接：<a target="_blank" rel="noopener" href="https://github.com/JokerByrant/iBook/blob/main/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0.pdf">《Redis设计与实现》</a>, 建议使用 <code>PDF XChange Editor</code> 打开，可以看到其中我添加的一些注释，也可以自己完善。</p>
+          <p>对于字符串相关的题目，双指针解法出现的频率非常高。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022-09-27/60142/#more" rel="contents">
+              <a class="btn" href="/2023-07-20/55708/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-18/8582/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023-07-18/8582/" class="post-title-link" itemprop="url">leetcode刷题记录 - 哈希表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-18 11:51:34" itemprop="dateCreated datePublished" datetime="2023-07-18T11:51:34+08:00">2023-07-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>当我们需要 <strong>查询一个元素是否出现过，或者一个元素是否在集合里的时候</strong>，就要第一时间想到 <strong>哈希法</strong>。</p>
+<p>哈希法是牺牲了空间换取了时间。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023-07-18/8582/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2023-07-17/45798/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023-07-17/45798/" class="post-title-link" itemprop="url">leetcode刷题记录 - 链表篇</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-17 11:50:59" itemprop="dateCreated datePublished" datetime="2023-07-17T11:50:59+08:00">2023-07-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在跟着 <a target="_blank" rel="noopener" href="https://www.programmercarl.com/">代码随想录</a> 刷链表篇的过程中，发现链表相关的题目绕不开两种解法：</p>
+<ul>
+<li>  虚拟头结点</li>
+<li>  双指针</li>
+</ul>
+<p>其中 <strong>虚拟头结点</strong> 主要是在调整链表元素的位置时会用到，使用了这种方式可以省去对头结点单独处理的逻辑。相关题目包括：[203.移除链表元素]、[707.设计链表]、[206.反转链表]、[24.两两交换链表中的节点]、[19.删除链表的倒数第N个节点]</p>
+<p><strong>双指针</strong> 则是用在 <strong>寻找链表中指定节点的位置</strong> 相关题目中，比如普通双指针相关的题目：[160.链表相交]，快慢指针的题目：[19.删除链表的倒数第N个节点]、[8.环形链表II]</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023-07-17/45798/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -920,7 +930,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -988,7 +998,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">94</span>
+          <span class="site-state-item-count">109</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1001,7 +1011,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
