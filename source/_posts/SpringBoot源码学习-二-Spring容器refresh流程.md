@@ -493,7 +493,7 @@ public static void invokeBeanFactoryPostProcessors(
 *(注：下面这一段来自 [SpringBoot源码分析之Spring容器的refresh过程](https://fangjian0423.github.io/2017/05/10/springboot-context-refresh/) )*
 > 在这一步中有一个比较重要的类会被执行，它就是：`ConfigurationClassPostProcessor.class`。这个类实现了 `BeanDefinitionRegistryPostProcessor.class` 和 `PriorityOrdered.class`，它的优先级最高，会被最先执行。它会对项目中的 `@Configuration` 注解修饰的类(`@Component`、`@ComponentScan`、`@Import`、`@ImportResource` 修饰的类也会被处理)进行解析，解析完成之后把这些 `bean` 注册到 `BeanFactory` 中。需要注意的是这个时候注册进来的 `bean` 还没有实例化。这里 `ConfigurationClassPostProcessor` 最先被处理还有另外一个原因，如果程序中有自定义的 `BeanFactoryPostProcessor` ，那么这个 `PostProcessor` 首先得通过 `ConfigurationClassPostProcessor` 被解析出来，然后才能被 Spring 容器找到并执行。<br>(`ConfigurationClassPostProcessor`不先执行的话，这个 `Processor` 是不会被解析的，不会被解析的话也就不会执行了)。下图就是对`ConfigurationClassPostProcessor`的执行流程的解读：
 
-![avatar](http://ww1.sinaimg.cn/large/006jvOIfgy1gfqgfpcf19j315n1c6gtr.jpg)
+![1719283333057微信图片_20240625104156.png](https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/1719283333057%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240625104156.png)
 
 关于这个方法的更详细解释可以参考这篇文章：[Spring IoC：invokeBeanFactoryPostProcessors 详解](https://zhuanlan.zhihu.com/p/83473498)
 
