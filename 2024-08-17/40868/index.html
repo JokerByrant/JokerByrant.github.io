@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近在着手 APP 上架 App Store 的事儿，苹果要求 App 内的支付功能要对接 IAP 支付，本篇文章就记录一下对接过程中踩过的坑。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="服务端接入苹果IAP支付">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-08-17/40868/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="最近在着手 APP 上架 App Store 的事儿，苹果要求 App 内的支付功能要对接 IAP 支付，本篇文章就记录一下对接过程中踩过的坑。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3a5433e09b37e045958eae688dff6adea1f2ec6bb92dfd5feaec8a65a6ffb641.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/dc63925b2da0e17f69301ea9a30df5fc5e699d8384b84fe68c47756e34c3d17a.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/a7700bcd1ddfe474b301bd4ff0ecb10ffef3aadf136cc12bb5e44a7ddc4d8a18.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/240213dac783fcfc49829f11a16e830ccf079e0f046260e509cd8d455581cdbd.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/342f51261add2e442f586323b02852b08fbda520211326526346acb70da0f3d2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/13b2aed857b7f302973dffdbed79e8bf7c8a62d235c13ac8648aac2bb92ebdde.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/a3493cb5fe0d36bc90a9036d8b336fe5e037025e9df837419781a342045d1d87.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/899b885ca3fcf9f1715264ea3d0e6bee8742bed7c6348100efc3a6ddb3f53466.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c85ed3de4fc8a8350248e805cc03c8763270467669d3df697b0e57cd6f32e9a6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/397bca4a5977b459f9d57df4e6d6ec7a0b160e3d124343394617ecc7be252c76.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/e84c3c968d30e482ef4dc8c6625c17534db803460d60bbae1a345dc0fc4447b7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/26dff49a2bf9ac4f9246e38b6d959577aef91c016f9fad271095ca6fee79ea73.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/f3030cf9aa958385f6740b81b897a48cebb8432076f2c92987cc3f1ef65d547c.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/dac87838bb9bd56eca89bb108a7f23d76f98513b72844470f262d740097bef8f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/5cb74f4040a2a4ec5a84750fcdfc2fb96f8dc10612e79e5461eef4381eb7d7fb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/2e5edde04eb465c100a226b59d20095ccafe4d280a42961fba7371d282b5d7c4.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/e504462d25ad2fc7f920606892d0579bb35f4ff46ab5634c8ab0793e17c29a57.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/82d001a9974b45c93109876c529a119fad5db1e21891e8b0deff67ae962b68fd.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/ef10e2ee4ed8ecacb068269426a447ba4000b3627c340227b8bf5bda9be6c8e7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3522582a6dc64cc130b287f6ef977144d8684313b30443833a92903b8cbf57f5.png">
+<meta property="article:published_time" content="2024-08-17T05:41:00.000Z">
+<meta property="article:modified_time" content="2024-08-29T05:55:49.799Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="IAP支付">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3a5433e09b37e045958eae688dff6adea1f2ec6bb92dfd5feaec8a65a6ffb641.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-08-17/40868/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>服务端接入苹果IAP支付 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-08-17/40868/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          服务端接入苹果IAP支付
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-08-17 13:41:00" itemprop="dateCreated datePublished" datetime="2024-08-17T13:41:00+08:00">2024-08-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近在着手 APP 上架 App Store 的事儿，苹果要求 App 内的支付功能要对接 IAP 支付，本篇文章就记录一下对接过程中踩过的坑。</p>
+<span id="more"></span>
+
+<h3 id="方案调查"><a href="#方案调查" class="headerlink" title="方案调查"></a>方案调查</h3><p><code>App</code> 端支付成功后，苹果服务器会直接返回支付结果给 <code>App</code> 端，这时 <code>App</code> 端需要根据拿到的支付结果请求服务端，服务端 <strong>请求苹果服务器验证支付结果的有效性</strong>。</p>
+<p>调查发现 <strong>服务端验证支付结果的有效性</strong> 有下面几种方式可以使用：</p>
+<ol>
+<li><strong>服务端验证 <code>receipt</code>。</strong><code>App</code> 支付成功，拿到苹果服务器返回的 <code>receipt</code> 数据，请求服务端，服务端根据 <code>Receipt</code> 进行验证。网上的大部分处理方案都是这种，但这种方式已被标记为 <code>Deprecated</code>。文档地址：<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstorereceipts">appstorereceipts</a></li>
+<li><strong>服务端请求 <code>App Store Server Api</code> 验证 <code>TransactionId</code>。</strong><code>App</code> 支付成功，拿到苹果服务器返回的 <code>TransactionId</code> 数据，请求服务端，服务端请求 <code>App Store Server API</code> 获取具体的交易结果。文档地址：<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi">appstoreserverapi</a></li>
+<li><strong>等待 <code>Apple</code> 服务器的异步回调。</strong>预想的是 <code>App</code> 支付成功，无需再请求服务端，服务端等待 <code>Apple</code> 服务器的异步回调(与 <strong>支付宝支付、微信支付</strong> 的处理一样)。但在和 <code>App</code> 端对接时，发现这种方式不可行。<code>Apple</code> 服务器回调的支付信息，只携带了 <code>Apple</code> 内定义的交易号(<code>TransactionId</code>)，服务端收到这个回调，无法确定属于哪一个订单。因此 <code>App</code> 支付成功后，必须请求服务端，服务端将苹果返回的 <code>TransactionId</code> 和订单绑定。文档地址：<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreservernotifications/app_store_server_notifications_v2">app_store_server_notifications_v2</a></li>
+</ol>
+<p>因此最终有如下几种处理方式：</p>
+<ol>
+<li><code>App</code> 拿到苹果支付成功的回调后，请求服务端，服务端进行支付结果校验，校验通过，直接处理后续发放权益的逻辑。</li>
+<li><code>App</code> 拿到苹果支付成功的回调后，请求服务端，服务端进行支付结果校验，将 <code>TransactionId</code> 和订单ID绑定。发放权益的逻辑在收到苹果支付回调后再处理。</li>
+</ol>
+<h3 id="根据-Receipt-进行验证"><a href="#根据-Receipt-进行验证" class="headerlink" title="根据 Receipt 进行验证"></a>根据 <code>Receipt</code> 进行验证</h3><p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstorereceipts">App Store Receipts</a></p>
+<p>首先是根据 <code>Receipt</code> 进行验证，<code>Receipt</code> 是 <code>App</code> 支付成功后由苹果服务器返回的，服务端拿到 <code>Receipt</code> 请求 <code>verifyReceipt</code> 接口：<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstorereceipts/verifyreceipt">verifyReceipt - 官方文档</a>。</p>
+<p>相关的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Api(tags = &quot;001 苹果支付&quot;, description = &quot;ApplePayController&quot;)</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;applePay&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplePayController</span> <span class="keyword">extends</span> <span class="title">BaseController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 购买凭证验证地址(真实环境)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String certificateUrl = <span class="string">&quot;https://buy.itunes.apple.com/verifyReceipt&quot;</span>;</span><br><span class="line">    <span class="comment">// 购买凭证验证地址(沙箱环境)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String certificateUrlTest = <span class="string">&quot;https://sandbox.itunes.apple.com/verifyReceipt&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(ApplePayController.class);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 验证App苹果支付成功后返回的结果</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> receipt 支付成功后苹果返回的支付结果</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> envType 区分真实环境和沙箱环境 0:真实环境 1:沙箱环境</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@PostMapping(&quot;/verifyApplePayResult&quot;)</span></span><br><span class="line">    <span class="meta">@ApiImplicitParams(&#123;</span></span><br><span class="line"><span class="meta">            @ApiImplicitParam(paramType=&quot;header&quot;, name = &quot;authorization&quot;, value = &quot;token&quot;, required = true, dataType = &quot;String&quot;),</span></span><br><span class="line"><span class="meta">            @ApiImplicitParam(paramType=&quot;query&quot;, name = &quot;receipt&quot;, value = &quot;苹果传递前端支付成功的值&quot;, required = true, dataType = &quot;String&quot;),</span></span><br><span class="line"><span class="meta">            @ApiImplicitParam(paramType=&quot;query&quot;, name = &quot;envType&quot;, value = &quot;默认0 0:真实环境 1:沙箱环境&quot;, required = true, dataType = &quot;int&quot;)</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line">    <span class="meta">@LogAnnotation(actionname = &quot;苹果支付结果验证&quot;,module = &quot;苹果支付&quot;,actiontype = &quot;POST&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResponseMessage <span class="title">verifyApplePayResult</span><span class="params">(<span class="meta">@RequestParam</span> String receipt, <span class="meta">@RequestParam</span> <span class="keyword">int</span> envType)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">&quot;开始验证苹果支付结果：&#123;&#125;&quot;</span>, receipt);</span><br><span class="line">        String url = (envType == <span class="number">0</span>) ? certificateUrl : certificateUrlTest;</span><br><span class="line">        Object object = doVerifyApplePayResult(url, receipt);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseMessage(<span class="string">&quot;处理成功！&quot;</span>, object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 向苹果服务器发送请求，验证App端提交的支付结果是否有效</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> url receipt验证地址</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> receipt</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 苹果响应的请求结果</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Object <span class="title">doVerifyApplePayResult</span><span class="params">(String url, String receipt)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 向苹果服务器发送请求</span></span><br><span class="line">            String result = sendRequestToAppleServer(url, receipt);</span><br><span class="line">            <span class="comment">// 处理苹果响应的结果</span></span><br><span class="line">            log.info(<span class="string">&quot;苹果服务器回调响应：&#123;&#125;&quot;</span>, result);</span><br><span class="line">            JSONObject appleResponse = JSONObject.parseObject(result);</span><br><span class="line">            String status = appleResponse.getString(<span class="string">&quot;status&quot;</span>);</span><br><span class="line">            <span class="comment">// status值参考：https://developer.apple.com/documentation/appstorereceipts/status</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="string">&quot;0&quot;</span>.equals(status)) &#123;</span><br><span class="line">                <span class="comment">// status=0，成功</span></span><br><span class="line">                JSONArray jsonArray = appleResponse.getJSONObject(<span class="string">&quot;receipt&quot;</span>).getJSONArray(<span class="string">&quot;in_app&quot;</span>);</span><br><span class="line">                <span class="keyword">for</span> (Object object : jsonArray) &#123;</span><br><span class="line">                    JSONObject jsonObject = (JSONObject) object;</span><br><span class="line">                    String transactionId = jsonObject.getString(<span class="string">&quot;transaction_id&quot;</span>);</span><br><span class="line">                    String productId = jsonObject.getString(<span class="string">&quot;product_id&quot;</span>);</span><br><span class="line">                    String quantity = jsonObject.getString(<span class="string">&quot;quantity&quot;</span>);</span><br><span class="line">                    <span class="comment">// TODO 校验productId、金额等数据，校验通过则表示支付成功，进行发放权益的逻辑</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">&quot;21007&quot;</span>.equals(status)) &#123;</span><br><span class="line">                <span class="comment">// status=21007，支付结果来自沙箱环境，苹果在审核时，会通过沙箱环境提交请求，这里需要特殊处理一下，参考：https://www.jianshu.com/p/7e7c3a918946</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            log.error(<span class="string">&quot;请求苹果服务器验证发生异常！&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 向苹果服务器发送请求，验证App端提交的支付结果是否有效</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> url 购买凭证验证地址</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> receipt</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 苹果响应的请求结果</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">sendRequestToAppleServer</span><span class="params">(String url, String receipt)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 防止因HTTPS证书认证失败造成API调用失败，忽略证书信任问题</span></span><br><span class="line">        HostnameVerifier hv = (hostname, session) -&gt; <span class="keyword">true</span>;</span><br><span class="line">        trustAllHttpsCertificates();</span><br><span class="line">        HttpsURLConnection conn = (HttpsURLConnection) <span class="keyword">new</span> URL(url).openConnection();</span><br><span class="line">        conn.setHostnameVerifier(hv);</span><br><span class="line">        conn.setRequestMethod(<span class="string">&quot;POST&quot;</span>);</span><br><span class="line">        conn.setDoOutput(<span class="keyword">true</span>);</span><br><span class="line">        conn.setRequestProperty(<span class="string">&quot;Content-type&quot;</span>, <span class="string">&quot;application/json&quot;</span>);</span><br><span class="line">        JSONObject obj = <span class="keyword">new</span> JSONObject();</span><br><span class="line">        obj.put(<span class="string">&quot;receipt-data&quot;</span>, receipt);</span><br><span class="line">        <span class="comment">// 发送请求</span></span><br><span class="line">        BufferedOutputStream buffOutStr = <span class="keyword">new</span> BufferedOutputStream(conn.getOutputStream());</span><br><span class="line">        buffOutStr.write(obj.toString().getBytes());</span><br><span class="line">        buffOutStr.flush();</span><br><span class="line">        buffOutStr.close();</span><br><span class="line">        <span class="comment">// 获取请求结果</span></span><br><span class="line">        BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(conn.getInputStream()));</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        String line = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> ((line = reader.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            sb.append(line);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 忽略证书信任问题</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">trustAllHttpsCertificates</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        TrustManager[] trustAllCerts = <span class="keyword">new</span> TrustManager[] &#123;</span><br><span class="line">                <span class="keyword">new</span> X509TrustManager() &#123;</span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkClientTrusted</span><span class="params">(X509Certificate[] chain, String authType)</span> </span>&#123;&#125;</span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkServerTrusted</span><span class="params">(X509Certificate[] chain, String authType)</span> </span>&#123;&#125;</span><br><span class="line">                    <span class="keyword">public</span> X509Certificate[] getAcceptedIssuers() &#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        SSLContext sc = SSLContext.getInstance(<span class="string">&quot;SSL&quot;</span>);</span><br><span class="line">        sc.init(<span class="keyword">null</span>, trustAllCerts, <span class="keyword">null</span>);</span><br><span class="line">        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据 <code>Receipt</code> 进行校验存在一个坑，<code>receipt</code> 解析出的交易信息存在两种格式，因此在处理交易信息时需要同时考虑这两种格式的数据，具体参考文章：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c3c0ed5af309">谈谈苹果应用内支付(IAP)的坑</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3a5433e09b37e045958eae688dff6adea1f2ec6bb92dfd5feaec8a65a6ffb641.png" alt="picture 0">  </p>
+<p>在对接过程中发现 <code>verifyReceipt</code> 方法已被弃用，并且根据 <code>Receipt</code> 进行验证的方式也被弃用了，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/dc63925b2da0e17f69301ea9a30df5fc5e699d8384b84fe68c47756e34c3d17a.png" alt="picture 1">  </p>
+<p>按照文档中的提示，可以使用 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstorereceipts/validating_receipts_with_the_app_store">Validating receipts with the App Store</a> 这种方式替代已被弃用的 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstorereceipts/verifyreceipt">verifyReceipt</a>。但是根据上面的提示，<strong>根据 <code>Receipts</code> 进行验证这种方式已经被弃用了，可以使用 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi">App Store Server API</a> 或者 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreservernotifications/app_store_server_notifications_v2">App Store Server Notifications V2</a> 进行接入</strong>，因此这里就不再验证 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstorereceipts/validating_receipts_with_the_app_store">Validating receipts with the App Store</a> 这种接入方式了。</p>
+<h3 id="根据-App-Store-Server-API-进行验证"><a href="#根据-App-Store-Server-API-进行验证" class="headerlink" title="根据 App Store Server API 进行验证"></a>根据 <code>App Store Server API</code> 进行验证</h3><p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi">App Store Server API</a></p>
+<p>根据文档的指引，可以通过请求 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi/get_transaction_info">Get Transaction Info</a> 接口来获取交易信息。上面说过，App端支付完成后，Apple服务器会返回支付结果给App端，返回结果除了上面的 <code>receipt</code> 外，还包含一个 <code>TransactionId</code>，这是苹果定义的交易ID，服务端拿到这个 <code>TransactionId</code> 去请求 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi/get_transaction_info">Get Transaction Info</a> 接口获取具体的交易信息即可。</p>
+<p>直接在上面 <code>verifyReceipt</code> 相关的代码基础上进行调整，但是直接请求会报 <code>401</code> 异常，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/a7700bcd1ddfe474b301bd4ff0ecb10ffef3aadf136cc12bb5e44a7ddc4d8a18.png" alt="picture 2">  </p>
+<p>继续看文档，发现需要构建 <code>JWT</code> 令牌：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/240213dac783fcfc49829f11a16e830ccf079e0f046260e509cd8d455581cdbd.png" alt="picture 3">  </p>
+<p>在 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi/generating_json_web_tokens_for_api_requests">Generating JSON Web Tokens for API requests</a> 这篇文档中，有完整的构建 <code>JWT</code>的指引。但文档中提到，苹果提供了官方库来简化这个操作：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/342f51261add2e442f586323b02852b08fbda520211326526346acb70da0f3d2.png" alt="picture 4">  </p>
+<p>在 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi/simplifying_your_implementation_by_using_the_app_store_server_library">Simplifying your implementation by using the App Store Server Library</a> 这篇文档中提到，可以使用 <a target="_blank" rel="noopener" href="https://github.com/apple/app-store-server-library-java">app-store-server-library</a> 这个库来简化流程。阅读这个库的源码后发现，<code>App Sotre Server API</code> 中的接口请求在这个库中都封装好了，只需要提供必要的配置参数调用对应的方法即可。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/13b2aed857b7f302973dffdbed79e8bf7c8a62d235c13ac8648aac2bb92ebdde.png" alt="picture 5">  </p>
+<p>但这个库仅支持 <code>Java 11+</code> 项目，我们的项目是 <code>Java 8</code>，因此无法使用，引入之后打包时会出现如下报错：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/a3493cb5fe0d36bc90a9036d8b336fe5e037025e9df837419781a342045d1d87.png" alt="picture 6">  </p>
+<p>因此只能自己再造一次轮子了，直接在 <code>app-store-server-library</code> 库的代码基础上进行改造，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 校验交易ID</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> transactionId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> JSONObject <span class="title">verifyTransactionFromAppleServer</span><span class="params">(String transactionId)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    String keyId = <span class="string">&quot;xxxxx&quot;</span>;</span><br><span class="line">    String issuerId = <span class="string">&quot;xxxxxx-ccccc-bbbb-xxx-aaaaa&quot;</span>;</span><br><span class="line">    String bundleId = <span class="string">&quot;xxx&quot;</span>;</span><br><span class="line">    String signedTransactionInfo = getTransactionInfo(transactionId, generateJWT(keyId, issuerId, bundleId));</span><br><span class="line">    log.info(<span class="string">&quot;获取到的Transaction信息: &#123;&#125;&quot;</span>, signedTransactionInfo);</span><br><span class="line">    JSONObject transactionInfo = verifyAndGet(signedTransactionInfo);</span><br><span class="line">    log.info(<span class="string">&quot;解签后的信息：&#123;&#125;&quot;</span>, transactionInfo);</span><br><span class="line">    <span class="keyword">return</span> transactionInfo;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 从Apple服务器获取交易信息</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> transactionId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> jwt</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getTransactionInfo</span><span class="params">(String transactionId, String jwt)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    URL url = <span class="keyword">new</span> URL(getTransactionUrlTest + transactionId);</span><br><span class="line">    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();</span><br><span class="line">    connection.setRequestMethod(<span class="string">&quot;GET&quot;</span>);</span><br><span class="line">    connection.setRequestProperty(<span class="string">&quot;Authorization&quot;</span>, <span class="string">&quot;Bearer &quot;</span> + jwt);</span><br><span class="line">    connection.setRequestProperty(<span class="string">&quot;Accept&quot;</span>, <span class="string">&quot;application/json&quot;</span>);</span><br><span class="line">    connection.setDoOutput(<span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">int</span> responseCode = connection.getResponseCode();</span><br><span class="line">    <span class="keyword">if</span> (responseCode == HttpsURLConnection.HTTP_OK) &#123; <span class="comment">// success</span></span><br><span class="line">        <span class="keyword">try</span> (BufferedReader in = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(connection.getInputStream()))) &#123;</span><br><span class="line">            String inputLine;</span><br><span class="line">            StringBuilder response = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">            <span class="keyword">while</span> ((inputLine = in.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                response.append(inputLine);</span><br><span class="line">            &#125;</span><br><span class="line">            JSONObject jsonObject = JSONObject.parseObject(response.toString());</span><br><span class="line">            <span class="keyword">return</span> jsonObject.getString(<span class="string">&quot;signedTransactionInfo&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;请求Apple Server获取交易信息失败！code: &quot;</span> + responseCode);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 生成JWT信息，用于请求Apple服务器</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> keyId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> issuerId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> bundleId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">generateJWT</span><span class="params">(String keyId, String issuerId, String bundleId)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 读取私钥文件内容，并移除干扰字符</span></span><br><span class="line">    InputStream keyInputStream = getClass().getClassLoader().getResourceAsStream(<span class="string">&quot;appleRootCertificates/AuthKey_79Y987YU9N.p8&quot;</span>);</span><br><span class="line">    String encodedKey = readInputStreamToString(keyInputStream).replace(<span class="string">&quot;-----BEGIN PRIVATE KEY-----&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">            .replace(<span class="string">&quot;-----END PRIVATE KEY-----&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">            .replaceAll(<span class="string">&quot;\\s+&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="comment">// 解码并生成私钥对象</span></span><br><span class="line">    <span class="keyword">byte</span>[] pkcs8EncodedKey = Base64.getDecoder().decode(encodedKey);</span><br><span class="line">    PKCS8EncodedKeySpec keySpec = <span class="keyword">new</span> PKCS8EncodedKeySpec(pkcs8EncodedKey);</span><br><span class="line">    KeyFactory keyFactory = KeyFactory.getInstance(<span class="string">&quot;EC&quot;</span>);</span><br><span class="line">    PrivateKey privateKey = keyFactory.generatePrivate(keySpec);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 生成 JWT Token</span></span><br><span class="line">    Map&lt;String, Object&gt; claimsMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    claimsMap.put(<span class="string">&quot;bid&quot;</span>, bundleId);</span><br><span class="line">    <span class="comment">// 使用的是io.jsonwebtoken:jjwt库生成JWT</span></span><br><span class="line">    <span class="keyword">return</span> Jwts.builder()</span><br><span class="line">            .setAudience(<span class="string">&quot;appstoreconnect-v1&quot;</span>)</span><br><span class="line">            .setExpiration(DateUtils.plusMinute(<span class="number">5</span>, <span class="keyword">new</span> Date()))</span><br><span class="line">            .setIssuer(issuerId)</span><br><span class="line">            .setHeaderParam(<span class="string">&quot;kid&quot;</span>, keyId)</span><br><span class="line">            .addClaims(claimsMap)</span><br><span class="line">            .signWith(SignatureAlgorithm.ES256, privateKey)</span><br><span class="line">            .compact();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 读取文件中的字符</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> inputStream</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> String <span class="title">readInputStreamToString</span><span class="params">(InputStream inputStream)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    StringBuilder content = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="keyword">try</span> (BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(inputStream))) &#123;</span><br><span class="line">        String line;</span><br><span class="line">        <span class="keyword">while</span> ((line = reader.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            content.append(line).append(System.lineSeparator());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> content.toString();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 解析加签的返回结果</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> signedPayload</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> CertificateException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> JSONObject <span class="title">verifyAndGet</span><span class="params">(String signedPayload)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用的是com.auth0:java-jwt库解析数据</span></span><br><span class="line">    DecodedJWT decodedJWT = JWT.decode(signedPayload);</span><br><span class="line">    <span class="comment">// 拿到 header 中 x5c 数组中第一个</span></span><br><span class="line">    String header = <span class="keyword">new</span> String(Base64.getUrlDecoder().decode(decodedJWT.getHeader()));</span><br><span class="line">    String x5c = JSONObject.parseObject(header).getJSONArray(<span class="string">&quot;x5c&quot;</span>).getString(<span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 获取公钥</span></span><br><span class="line">    PublicKey publicKey = getPublicKeyByX5c(x5c);</span><br><span class="line">    <span class="comment">// 验证 token</span></span><br><span class="line">    Algorithm algorithm = Algorithm.ECDSA256((ECPublicKey) publicKey, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        algorithm.verify(decodedJWT);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (SignatureVerificationException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;签名验证失败！&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 解析数据</span></span><br><span class="line">    <span class="keyword">return</span> JSONObject.parseObject(<span class="keyword">new</span> String(Base64.getDecoder().decode(decodedJWT.getPayload())));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 获取公钥</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> x5c</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> CertificateException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> PublicKey <span class="title">getPublicKeyByX5c</span><span class="params">(String x5c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">byte</span>[] x5c0Bytes = Base64.getDecoder().decode(x5c);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        CertificateFactory fact = CertificateFactory.getInstance(<span class="string">&quot;X.509&quot;</span>);</span><br><span class="line">        X509Certificate cer = (X509Certificate) fact.generateCertificate(<span class="keyword">new</span> ByteArrayInputStream(x5c0Bytes));</span><br><span class="line">        <span class="keyword">return</span> cer.getPublicKey();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (CertificateException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;签名验证失败！&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要引入下面两个依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.jsonwebtoken<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jjwt<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.auth0<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>java-jwt<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.4.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>生成的 <code>JWT</code>的处理，我这里使用的是 <code>io.jsonwebtoken:jjwt</code> 库，而 <code>app-store-server-library</code> 库中用的是 <code>com.auth0:java-jwt</code> 库。之所以这么处理，是因为 <code>com.auth0:java-jwt</code> 库在我项目中存在依赖冲突，会导致生成 <code>JWT</code> 时出现报错（但解析是正常，之后又有时间深入调查下，依赖冲突的问题应该可以修复）。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/899b885ca3fcf9f1715264ea3d0e6bee8742bed7c6348100efc3a6ddb3f53466.png" alt="picture 7">  </p>
+<h3 id="使用-app-store-server-library-库"><a href="#使用-app-store-server-library-库" class="headerlink" title="使用 app-store-server-library 库"></a>使用 <code>app-store-server-library</code> 库</h3><p>在项目中引入这个库</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.apple.itunes.storekit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>app-store-server-library<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这个库的 <code>README.md</code> 中已经提供了示例，我们在它提供的示例代码上进行调整即可，下面是获取交易请求相关的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.client.APIException;</span><br><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.client.AppStoreServerAPIClient;</span><br><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.model.Environment;</span><br><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.model.SendTestNotificationResponse;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Files;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Path;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">APIExample</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String issuerId = <span class="string">&quot;99b16628-15e4-4668-972b-eeff55eeff55&quot;</span>;</span><br><span class="line">        String keyId = <span class="string">&quot;ABCDEFGHIJ&quot;</span>;</span><br><span class="line">        String bundleId = <span class="string">&quot;com.example&quot;</span>;</span><br><span class="line">        Path filePath = Path.of(<span class="string">&quot;/path/to/key/SubscriptionKey_ABCDEFGHIJ.p8&quot;</span>);</span><br><span class="line">        String encodedKey = Files.readString(filePath);</span><br><span class="line">        Environment environment = Environment.SANDBOX;</span><br><span class="line"></span><br><span class="line">        AppStoreServerAPIClient client =</span><br><span class="line">                <span class="keyword">new</span> AppStoreServerAPIClient(encodedKey, keyId, issuerId, bundleId, environment);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            SendTestNotificationResponse response = client.getTransactionInfo(<span class="string">&quot;xxx&quot;</span>);</span><br><span class="line">            System.out.println(response);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (APIException | IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中我们要提供几个参数：<code>issuerId</code>、<code>keyId</code>、<code>SubscriptionKey_ABCDEFGHIJ.p8</code> 私钥证书文件、<code>bundleId</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c85ed3de4fc8a8350248e805cc03c8763270467669d3df697b0e57cd6f32e9a6.png" alt="picture 8">  </p>
+<p><code>bundleId</code> 是 <code>iOS</code> 应用的唯一标识符，可以在下面拿到</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/397bca4a5977b459f9d57df4e6d6ec7a0b160e3d124343394617ecc7be252c76.png" alt="picture 9">  </p>
+<p>剩下3个参数需要配置 <code>App Store Connect API</code> 密钥，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/e84c3c968d30e482ef4dc8c6625c17534db803460d60bbae1a345dc0fc4447b7.png" alt="picture 10">  </p>
+<p>请求 <code>Apple Server</code> 拿到的交易信息还需要进行解签，解签方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.model.Environment;</span><br><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;</span><br><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.verification.SignedDataVerifier;</span><br><span class="line"><span class="keyword">import</span> com.apple.itunes.storekit.verification.VerificationException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExampleVerification</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String bundleId = <span class="string">&quot;com.example&quot;</span>;</span><br><span class="line">        Environment environment = Environment.SANDBOX;</span><br><span class="line">        Set&lt;InputStream&gt; rootCAs = Set.of(</span><br><span class="line">                <span class="keyword">new</span> FileInputStream(<span class="string">&quot;/path/to/rootCA1&quot;</span>),</span><br><span class="line">                <span class="keyword">new</span> FileInputStream(<span class="string">&quot;/path/to/rootCA2&quot;</span>)</span><br><span class="line">        );</span><br><span class="line">        Long appAppleId = <span class="keyword">null</span>; <span class="comment">// appAppleId must be provided for the Production environment</span></span><br><span class="line"></span><br><span class="line">        SignedDataVerifier signedPayloadVerifier = <span class="keyword">new</span> SignedDataVerifier(rootCAs, bundleId, appAppleId, environment, <span class="keyword">true</span>);</span><br><span class="line">        </span><br><span class="line">        String notificationPayload = <span class="string">&quot;ey...&quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ResponseBodyV2DecodedPayload payload = signedPayloadVerifier.verifyAndDecodeNotification(notificationPayload);</span><br><span class="line">            System.out.println(payload);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (VerificationException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法要求我们提供 <code>Apple Root Certificates</code> 和 <code>Apple ID</code>，<code>Apple ID</code> 在下面拿到：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/26dff49a2bf9ac4f9246e38b6d959577aef91c016f9fad271095ca6fee79ea73.png" alt="picture 11">  </p>
+<p><code>Apple Root Certificates</code>直接去 <a target="_blank" rel="noopener" href="https://www.apple.com/certificateauthority/">Apple PKI</a> 下载即可</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/f3030cf9aa958385f6740b81b897a48cebb8432076f2c92987cc3f1ef65d547c.png" alt="picture 12">  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/dac87838bb9bd56eca89bb108a7f23d76f98513b72844470f262d740097bef8f.png" alt="picture 13">  </p>
+<p>下面放上完整的代码：<strong>根据 <code>App</code> 端提供的 <code>TransactionId</code>，请求 <code>Apple Server</code> 获取对应的交易信息，并进行解签</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Main main = <span class="keyword">new</span> Main();</span><br><span class="line">        main.getTransactionThrowApple(<span class="string">&quot;2000000690856066&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">getTransactionThrowApple</span><span class="params">(String transactionId)</span> <span class="keyword">throws</span> IOException, APIException, VerificationException </span>&#123;</span><br><span class="line">        String keyId = <span class="string">&quot;xxx&quot;</span>;</span><br><span class="line">        String issuerId = <span class="string">&quot;aaaa-01b6-480c-ccccc-dddddd&quot;</span>;</span><br><span class="line">        String bundleId = <span class="string">&quot;xxxxxxx&quot;</span>;</span><br><span class="line">        Long appleId = <span class="number">1562213344L</span>;</span><br><span class="line"></span><br><span class="line">        Path filePath = Path.of(<span class="string">&quot;E://AuthKey_xxx.p8&quot;</span>);</span><br><span class="line">        String encodedKey = Files.readString(filePath);</span><br><span class="line">        Environment environment = Environment.SANDBOX;</span><br><span class="line">        Set&lt;InputStream&gt; rootCAs =  Set.of(</span><br><span class="line">                <span class="keyword">new</span> FileInputStream(<span class="string">&quot;E://AppleComputerRootCertificate.cer&quot;</span>),</span><br><span class="line">                <span class="keyword">new</span> FileInputStream(<span class="string">&quot;E://AppleIncRootCertificate.cer&quot;</span>),</span><br><span class="line">                <span class="keyword">new</span> FileInputStream(<span class="string">&quot;E://AppleRootCA-G2.cer&quot;</span>),</span><br><span class="line">                <span class="keyword">new</span> FileInputStream(<span class="string">&quot;E://AppleRootCA-G3.cer&quot;</span>)</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        <span class="comment">//创建appleStoreServer对象</span></span><br><span class="line">        AppStoreServerAPIClient client = <span class="keyword">new</span> AppStoreServerAPIClient(encodedKey,keyId,issuerId,bundleId,environment);</span><br><span class="line">        <span class="comment">//根据传输的订单号获取订单信息</span></span><br><span class="line">        TransactionInfoResponse sendResponse = client.getTransactionInfo(transactionId);</span><br><span class="line">        Long appAppleId = <span class="keyword">null</span> ;</span><br><span class="line">        Boolean onlineChecks = <span class="keyword">false</span> ;</span><br><span class="line">        SignedDataVerifier signedDataVerifier = <span class="keyword">new</span> SignedDataVerifier(rootCAs,bundleId,appAppleId,environment, onlineChecks);</span><br><span class="line">        String signedPayLoad = sendResponse.getSignedTransactionInfo();</span><br><span class="line">        <span class="comment">//对订单信息进行解析得到订单信息</span></span><br><span class="line">        JWSTransactionDecodedPayload payload = signedDataVerifier.verifyAndDecodeTransaction(signedPayLoad);</span><br><span class="line">        <span class="comment">//进行订单信息处理</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="苹果服务器的异步回调"><a href="#苹果服务器的异步回调" class="headerlink" title="苹果服务器的异步回调"></a>苹果服务器的异步回调</h3><p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreservernotifications/app_store_server_notifications_v2">App Store Server Notifications V2</a></p>
+<p>苹果的异步回调无法携带 [用户自定义的订单ID]，不太理解苹果这么设计异步回调的意义，支付宝和微信的异步回调都可以携带这些信息。如果回调信息中携带了这个值，那么 <code>App</code> 支付成功后就无需再请求服务端了，<code>App</code> 支付成功后还必须去请求服务端将 [苹果交易ID] 和 [自定义订单] 绑定，既然已经有了异步通知，那这一步操作总觉得有些多余。（<em>之后可以调查一下苹果这么设计的原因</em>）</p>
+<p>下面看一下如何在服务端实现接收 <code>Apple Server</code> 的异步回调，首先需要配置服务器通知地址，配置方式见：<a target="_blank" rel="noopener" href="https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/enter-server-urls-for-app-store-server-notifications">Enter server URLs for App Store Server Notifications</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/5cb74f4040a2a4ec5a84750fcdfc2fb96f8dc10612e79e5461eef4381eb7d7fb.png" alt="picture 14">  </p>
+<p>然后就是服务端代码，参考文档：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37896194/article/details/137933425">使用Java接入苹果内购流程（附主要代码）</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 苹果支付-服务器异步通知</span></span><br><span class="line"><span class="comment"> * https://developer.apple.com/documentation/appstoreservernotifications</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@PostMapping(&quot;/returnPayAsynchronousFromApplePay&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">returnPayAsynchronousFromApplePay</span><span class="params">(<span class="meta">@RequestBody</span> Map&lt;String, String&gt; postData)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">&quot;收到来自苹果支付的回调请求: &#123;&#125;&quot;</span>, postData);</span><br><span class="line">    String signedPayload = postData.get(<span class="string">&quot;signedPayload&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(signedPayload)) &#123;</span><br><span class="line">        logger.error(<span class="string">&quot;非法请求！&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    dealAsyncResultFromApplePay(signedPayload);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 处理来自苹果支付回调的异步请求</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> signedPayload 加签的返回信息</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dealAsyncResultFromApplePay</span><span class="params">(String signedPayload)</span> </span>&#123;</span><br><span class="line">    JSONObject payload = verifyAndGet(signedPayload);</span><br><span class="line">    logger.info(<span class="string">&quot;解签后的 [signedPayload] 数据：&#123;&#125;&quot;</span>, payload);</span><br><span class="line">    JSONObject data = payload.getJSONObject(<span class="string">&quot;data&quot;</span>);</span><br><span class="line">    String signedTransactionInfo = data.get(<span class="string">&quot;signedTransactionInfo&quot;</span>).toString();</span><br><span class="line">    JSONObject transactionInfo = verifyAndGet(signedTransactionInfo);</span><br><span class="line">    logger.info(<span class="string">&quot;解签后的 [signedTransactionInfo] 数据：&#123;&#125;&quot;</span>, transactionInfo);</span><br><span class="line">    String transactionId = transactionInfo.get(<span class="string">&quot;transactionId&quot;</span>).toString();</span><br><span class="line">    String originalTransactionId = transactionInfo.get(<span class="string">&quot;originalTransactionId&quot;</span>).toString();</span><br><span class="line">    String productId = transactionInfo.get(<span class="string">&quot;productId&quot;</span>).toString();</span><br><span class="line"></span><br><span class="line">    String environment = data.get(<span class="string">&quot;environment&quot;</span>).toString();</span><br><span class="line">    String notificationType = payload.get(<span class="string">&quot;notificationType&quot;</span>).toString();</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">&quot;ONE_TIME_CHARGE&quot;</span>.equals(notificationType)) &#123;</span><br><span class="line">        <span class="comment">// 只需要处理 [一次性消费] 类型</span></span><br><span class="line">        <span class="comment">// payReturnService.updateForSpecificLogic(transactionId, null);</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        logger.warn(<span class="string">&quot;notificationType: [&#123;&#125;]，不做处理...&quot;</span>, notificationType);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 解析加签的返回结果</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> signedPayload</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> CertificateException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> JSONObject <span class="title">verifyAndGet</span><span class="params">(String signedPayload)</span> </span>&#123;</span><br><span class="line">    DecodedJWT decodedJWT = JWT.decode(signedPayload);</span><br><span class="line">    <span class="comment">// 拿到 header 中 x5c 数组中第一个</span></span><br><span class="line">    String header = <span class="keyword">new</span> String(Base64.getUrlDecoder().decode(decodedJWT.getHeader()));</span><br><span class="line">    String x5c = JSONObject.parseObject(header).getJSONArray(<span class="string">&quot;x5c&quot;</span>).getString(<span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 获取公钥</span></span><br><span class="line">    PublicKey publicKey = getPublicKeyByX5c(x5c);</span><br><span class="line">    <span class="comment">// 验证 token</span></span><br><span class="line">    Algorithm algorithm = Algorithm.ECDSA256((ECPublicKey) publicKey, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        algorithm.verify(decodedJWT);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (SignatureVerificationException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;签名验证失败！&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 解析数据</span></span><br><span class="line">    <span class="keyword">return</span> JSONObject.parseObject(<span class="keyword">new</span> String(Base64.getDecoder().decode(decodedJWT.getPayload())));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 获取公钥</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> x5c</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> CertificateException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> PublicKey <span class="title">getPublicKeyByX5c</span><span class="params">(String x5c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">byte</span>[] x5c0Bytes = Base64.getDecoder().decode(x5c);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        CertificateFactory fact = CertificateFactory.getInstance(<span class="string">&quot;X.509&quot;</span>);</span><br><span class="line">        X509Certificate cer = (X509Certificate) fact.generateCertificate(<span class="keyword">new</span> ByteArrayInputStream(x5c0Bytes));</span><br><span class="line">        <span class="keyword">return</span> cer.getPublicKey();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (CertificateException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;签名验证失败！&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="异常情况的处理"><a href="#异常情况的处理" class="headerlink" title="异常情况的处理"></a>异常情况的处理</h3><p>如果支付完成后 <code>App</code> 请求服务端失败，导致 [苹果交易ID] 和 [自定义订单] 没有绑定，那么后续的权益发放将不会进行，也就是虽然用户支付成功了，但是并没有收到对应的权益。需要对这种异常请开干进行补偿处理，建议阅读：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/ricklz/p/17993800">苹果支付有哪些坑，为什么苹果支付比支付宝和微信容易丢单？</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/2e5edde04eb465c100a226b59d20095ccafe4d280a42961fba7371d282b5d7c4.png" alt="picture 15">  </p>
+<p>除此之外，服务端在进行支付校验时，还需要完善校验逻辑，<code>productID</code>、<code>BundleID</code>、支付金额 这些信息都要校验，并且要保证 <code>TransactionId</code> 不会被重复绑定。</p>
+<p>相关文章：<a target="_blank" rel="noopener" href="https://juejin.cn/post/7118770506702012453">iOS 内购处理方案与流程的探究</a></p>
+<h3 id="Apple-StoreKit-2"><a href="#Apple-StoreKit-2" class="headerlink" title="Apple StoreKit 2"></a>Apple StoreKit 2</h3><p>上面提到，支付宝和微信支付的支付回调中携带了自定义的订单ID，而苹果支付回调没有携带，因此需要App主动请求服务器完成 [苹果支付ID] 和 [自定义订单ID] 的绑定。在阅读文档时，发现Apple是支持传递这个 [自定义订单ID] 的，见 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi/appaccounttoken">appAccountToken</a>。这个特性是Apple StoreKit 2 新引入的，只要App开发时接入了这个，那么在发起支付时就可以传递这个值。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/e504462d25ad2fc7f920606892d0579bb35f4ff46ab5634c8ab0793e17c29a57.png" alt="picture 16">  </p>
+<p>看到文档中提到，SotreKit 2最低支持版本是IOS15，产生了一个疑问：如果用户的系统低于IOS15，Storekit2可能就无法用了？调查之后发现确实是这样，那么App端接入了StoreKit 2，还需要保留StoreKit1，也就是说App端需要使用两套代码：<strong>用户系统是IOS15以下，使用StoreKit1的代码；用户系统是IOS15以上，使用StoreKit2的代码。</strong></p>
+<p>具体接入处理参考：<a target="_blank" rel="noopener" href="https://juejin.cn/post/7122458652945956878">StoreKit2 实际接入时候的踩坑与解决实录</a></p>
+<h3 id="处理苹果内购退款"><a href="#处理苹果内购退款" class="headerlink" title="处理苹果内购退款"></a>处理苹果内购退款</h3><p>之前对接的支付宝和微信支付，退款操作都是需要通过服务器中转才能发起的。但是苹果比较特殊，商家不能发起退款，退款只能由用户发起，并且这个操作不会经过商家服务器，用户的退款申请会直接发起到苹果，苹果客服审核通过，会直接打款给用户，具体见这篇文档：<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/handling_refund_notifications">Handling refund notifications</a>。文档中提到，用户可以通过下面几种方式发起退款：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/82d001a9974b45c93109876c529a119fad5db1e21891e8b0deff67ae962b68fd.png" alt="picture 17">  </p>
+<blockquote>
+<p>上面提到的第2种退款方式，操作步骤参考文档：<a target="_blank" rel="noopener" href="https://support.apple.com/zh-cn/118223">针对从 Apple 购买的 App 或内容请求退款</a></p>
+</blockquote>
+<p>用户可以不经过商家直接向苹果发起退款，如果退款成功，那商家就等于是被薅羊毛了。因此商家有必要对用户发起的退款订单做出响应，苹果官方提供的方法是，监听苹果回调的退款通知，然后执行相应的逻辑：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/ef10e2ee4ed8ecacb068269426a447ba4000b3627c340227b8bf5bda9be6c8e7.png" alt="picture 18">  </p>
+<p>上面讲的是 <strong>在用户退款成功后，苹果服务器会给商户服务器发送一个回调请求</strong>。在 <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/appstoreserverapi/send_consumption_information">Send Consumption Information</a> 这篇文档中了解到，<strong>用户发起退款时，苹果服务器也会给商户服务器发送一个回调请求</strong>。商户服务器收到这个请求后，可以在12小时内给苹果服务器反馈一些协助退款的信息，这个信息苹果只做参考用。个人认为这个反馈操作可有可无，但商户服务器可以通过这个回调请求来获取有哪些用户发起了退款请求。</p>
+<p>目前考虑苹果内购退款的整体逻辑按下面的步骤处理：</p>
+<ol>
+<li>用户向苹果发起退款。</li>
+<li>苹果收到退款请求，给服务器发送通知，服务器在日志中记录发起退款的用户的信息。</li>
+<li>苹果同意退款，用户成功收到苹果的打款。服务器收到苹果回调的通知，对用户进行退款成功后权益收回的操作。</li>
+</ol>
+<p>对于退款期限，苹果并没有明确的说明，网上找到的说法是90天可以申请退款。苹果的这种退款机制，很容易出现用户恶意退款薅羊毛的情况(<em>搜索关键词：苹果 退款 羊毛</em>)。这种情况在我们的App中也可以找到对应的案例：用户购买了云豆，然后用云豆购买了礼物送给其他人，云豆余额变为0之后，该用户向苹果申请退款并成功收到了退款。这种情况考虑按如下逻辑处理：仍然按正常逻辑对该用户的云豆余额进行扣除，但这会导致用户的云豆余额变为负数。如果之后开放了VIP服务，用户在VIP到期后向苹果申请退款并且成功，这种情况也需要考虑。</p>
+<p>参考文档：<a target="_blank" rel="noopener" href="https://blog.csdn.net/zxc_user/article/details/134561731">对接苹果支付退款退单接口</a></p>
+<h3 id="转账红包功能接入IAP"><a href="#转账红包功能接入IAP" class="headerlink" title="转账红包功能接入IAP"></a>转账红包功能接入IAP</h3><p>在 <a target="_blank" rel="noopener" href="https://developer.apple.com/cn/app-store/review/guidelines/">App 审核指南 - Apple</a> 文档中，其中 <strong>[3.2.1-应做事项]</strong> 中提到如下内容：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3522582a6dc64cc130b287f6ef977144d8684313b30443833a92903b8cbf57f5.png" alt="picture 19">  </p>
+<p>而我们 <code>App</code> 中的红包功能，似乎满足上面说的两种情况，因此应该无需接入 <code>IAP</code>。</p>
+<h3 id="IAP功能测试"><a href="#IAP功能测试" class="headerlink" title="IAP功能测试"></a>IAP功能测试</h3><p>参考文档：<a target="_blank" rel="noopener" href="https://www.jane-dev.com/technology/IAP/">IAP支付测试</a></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/7e7c3a918946">苹果应用内购买(IAP)，服务器端开发处理流程</a></p>
+<p><a target="_blank" rel="noopener" href="https://sq.sf.163.com/blog/article/195248945842995200">苹果应用内购买(IAP)—从入门到放弃</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/25933fcc400e">iOS应用内购买In-App-Purchase流程及前后端交互流程</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zanglikun.com/7408.html">Java接入苹果支付</a></p>
+<p><a target="_blank" rel="noopener" href="https://1pxup.ook.fun/post/2022-12/in-apps-purchase-server.html">In-App Purchase 服务端接入实用技术</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/76438494/validating-receipts-with-the-app-store-deprecated">Validating receipts with the App Store deprecated - stackoverflow</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/forums/thread/731550">When will the verifyReceipt api be deprecated?</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.v2ex.com/t/937771">想抄作业了，有没有 Apple 内购的后端设计方案</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7373944051294666778">Apple Storekit2 服务器API升级 (Apple开源内购库) (已上线)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37896194/article/details/137933425">使用Java接入苹果内购流程（附主要代码）</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41871864/article/details/138130003">app-store订阅消息开发\内购票据验证</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7118770506702012453">iOS 内购处理方案与流程的探究</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.linhuiy.com/posts/2385.html">ApplePay 服务端单据验证</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/IAP%E6%94%AF%E4%BB%98/" rel="tag"># IAP支付</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-08-03/41231/" rel="prev" title="Android Studio打开emulator卡在starting up阶段">
+      <i class="fa fa-chevron-left"></i> Android Studio打开emulator卡在starting up阶段
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024-08-28/13172/" rel="next" title="腾讯桌面整理图标错乱恢复">
+      腾讯桌面整理图标错乱恢复 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E8%B0%83%E6%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">方案调查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE-Receipt-%E8%BF%9B%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">2.</span> <span class="nav-text">根据 Receipt 进行验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE-App-Store-Server-API-%E8%BF%9B%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">3.</span> <span class="nav-text">根据 App Store Server API 进行验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-app-store-server-library-%E5%BA%93"><span class="nav-number">4.</span> <span class="nav-text">使用 app-store-server-library 库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8B%B9%E6%9E%9C%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%BC%82%E6%AD%A5%E5%9B%9E%E8%B0%83"><span class="nav-number">5.</span> <span class="nav-text">苹果服务器的异步回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%83%85%E5%86%B5%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">异常情况的处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Apple-StoreKit-2"><span class="nav-number">7.</span> <span class="nav-text">Apple StoreKit 2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E8%8B%B9%E6%9E%9C%E5%86%85%E8%B4%AD%E9%80%80%E6%AC%BE"><span class="nav-number">8.</span> <span class="nav-text">处理苹果内购退款</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E8%B4%A6%E7%BA%A2%E5%8C%85%E5%8A%9F%E8%83%BD%E6%8E%A5%E5%85%A5IAP"><span class="nav-number">9.</span> <span class="nav-text">转账红包功能接入IAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IAP%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95"><span class="nav-number">10.</span> <span class="nav-text">IAP功能测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">11.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>

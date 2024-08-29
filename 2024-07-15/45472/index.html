@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="对于文件乱码的问题一直有种一头雾水的感觉，最近又碰到了这个问题，正好借着这个机会学习一下文件编码相关的知识。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网页中查看文件乱码处理方案">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-07-15/45472/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="对于文件乱码的问题一直有种一头雾水的感觉，最近又碰到了这个问题，正好借着这个机会学习一下文件编码相关的知识。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/4b114e5b7cd82b2506f6a4b073c06f163c92d680c15d37e41a62215687323d97.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/76e8adf3bac343f2f8ba5edbc68433b3a58e3c3bdf572d843a534ce252428253.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/63eccf39ece42ee181867d9ef04b72672a96d0303a661491db3c6a08a37ef340.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/1f7789f64136ee3f3af6bf887d4074be24b7d7d2bd510b215ab61d17034d0c55.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/84343ae6341a85a655511359d96f11672d0989f37d631849cf1799492993a699.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/171b852247f48147aac2c0aa829397fd367a4fd640ec7820d349c8fe0421ed4e.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/a563da3f3853ae741341fa9a207614cfb0e224dd5b5284efb78c3714c6e0cc50.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/e13ced9dc406e4af61204dd1f919af5f46d715e7b7e652c472d167d68848854f.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/6103c2685817966d93a0b515a1a94c89079dbe579ed2591ac4e9bb4615b9f571.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/5b5c3d71cbf506775839cf05461da315d2ffa4767dacc4192243e8ae1006224e.png">
+<meta property="article:published_time" content="2024-07-15T05:07:12.000Z">
+<meta property="article:modified_time" content="2024-08-29T05:52:45.202Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="编码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/4b114e5b7cd82b2506f6a4b073c06f163c92d680c15d37e41a62215687323d97.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-07-15/45472/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>网页中查看文件乱码处理方案 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-07-15/45472/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网页中查看文件乱码处理方案
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-15 13:07:12" itemprop="dateCreated datePublished" datetime="2024-07-15T13:07:12+08:00">2024-07-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>对于文件乱码的问题一直有种一头雾水的感觉，最近又碰到了这个问题，正好借着这个机会学习一下文件编码相关的知识。</p>
+<span id="more"></span>
+
+<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>网站中包含一个查看文件的功能，目前文件是通过 <code>layer</code> 弹窗的形式来展示，但测试下来部分文件会出现乱码的情况，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/4b114e5b7cd82b2506f6a4b073c06f163c92d680c15d37e41a62215687323d97.png" alt="picture 3"></p>
+<p>这个问题根本原因是：<strong>打开文件时使用的编码，与文件保存时使用的编码，两个编码不一致导致的。</strong></p>
+<p>上面测试的几个出问题的文件，编码方式都是 <code>GBK</code>，而浏览器默认使用 <code>UTF-8</code> 编码打开文件，编码和解码规则不同，因此出现了乱码。</p>
+<p>这里放上 <a target="_blank" rel="noopener" href="http://www.52im.net/thread-2868-1-1.html">IM开发基础知识补课(八)：史上最通俗，彻底搞懂字符乱码问题的本质</a> 这篇文章中关于乱码的描述：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/76e8adf3bac343f2f8ba5edbc68433b3a58e3c3bdf572d843a534ce252428253.png" alt="picture 4">  </p>
+<p>要解释乱码的问题，首先要理解两个关键概念：<strong>字符集</strong> 和 <strong>字符编码</strong>。拿上面的 <code>UTF-8</code> 和 <code>GBK</code> 编码为例，它们使用的字符集和字符编码分别是：</p>
+<ul>
+<li>**<code>GBK</code>**。字符集：<code>GBK</code> 字符集；字符编码：<code>GBK</code> 编码。</li>
+<li>**<code>UTF-8</code>**。字符集：<code>Unicode</code> 字符集；字符编码：<code>UTF-8</code> 编码。</li>
+</ul>
+<p><strong>字符集</strong> 中定义了所有可使用的字符，它包含了 <strong>字符</strong> 和 <strong>字符对应的代码点</strong>。<strong>不同字符集对字符的代码点计算方式是不同的，所以同一个字符在不同 [字符集] 中对应的代码点是不同的</strong>。还是拿 <code>UTF-8</code> 和 <code>GBK</code> 为例：</p>
+<ul>
+<li><strong><code>GBK</code> 字符集</strong> 主要覆盖中文。字符 <strong>[你]</strong> 在 <code>GBK</code> 字符集中的代码点是 <code>0xC4E3</code>。</li>
+<li><strong><code>Unicode</code> 字符集</strong> 是一个全球字符集，它覆盖所有已知的书写系统，其中 <code>GBK</code> 字符集中的所有字符它也全部包含。字符 <strong>[你]</strong> 在 <code>Unicode</code> 字符集中的代码点是 <code>U+4F60</code></li>
+</ul>
+<p><strong>字符编码</strong> 是将字符集中的代码点转换为字节序列的一种方式，计算机能够存储和处理这些字符。<strong>不同的字符编码可以对同一个字符集进行编码</strong>，比如 <code>UTF-8</code>、<code>UTF-16</code>、<code>UTF-32</code> 三种字符编码使用的都是 <code>Unicode</code> 字符集。但三种字符编码不能兼容，如果使用 <code>UTF-8</code> 编码，使用 <code>UTF-16</code> 进行解码，会出现乱码的情况。</p>
+<p>关于字符编码更多的知识，这里就不深入了，比如上面的案例中，还可以继续深究：<strong>为何只有中文部分乱码了，英文、数字、符号都是能够正常展示的？</strong>如果想深入了解建议阅读一下下面几篇文章：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="http://www.52im.net/thread-1693-1-1.html">字符编码那点事：快速理解ASCII、Unicode、GBK和UTF-8</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.52im.net/thread-4210-1-1.html">史诗级计算机字符编码知识分享，万字长文，一文即懂！</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.52im.net/thread-2868-1-1.html">IM开发基础知识补课(八)：史上最通俗，彻底搞懂字符乱码问题的本质</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2014/12/unicode.html">Unicode与JavaScript详解</a></li>
+</ol>
+<blockquote>
+<p>附：在 <a target="_blank" rel="noopener" href="https://w3techs.com/technologies/overview/character_encoding">Usage statistics of character encodings for websites</a> 这个网站统计了目前各种字符编码被使用的比例，如下：<br><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/63eccf39ece42ee181867d9ef04b72672a96d0303a661491db3c6a08a37ef340.png" alt="picture 5">  </p>
+</blockquote>
+<h3 id="处理思路"><a href="#处理思路" class="headerlink" title="处理思路"></a>处理思路</h3><p>经过上面对乱码原因的分析，针对页面文件渲染时的乱码问题，有如下两种处理思路：</p>
+<ol>
+<li>在渲染文件内容前，想办法确认文件的字符编码。</li>
+<li>保存文件时，使用统一的编码进行保存，比如统一按照 <code>UTF-8</code> 格式保存。</li>
+</ol>
+<p>经过调查，服务端和网页端都可以处理，下面将可行的方案列出来。</p>
+<p><strong>网页端处理</strong>。<code>html</code> 代码中可以通过指定 <code>&lt;meta charset=&quot;xxx&quot;&gt;</code> 的形式来指定网页的编码，如果要加载 <code>GBK</code> 编码的文件，那么就指定 <code>charset=&quot;GBK&quot;</code> 就可以了。但是在指定 <code>charset</code> 前，需要先确定文件的编码。有如下几种方式可以尝试：</p>
+<ol>
+<li>通过第三方库检测文件编码，比如 <a target="_blank" rel="noopener" href="https://github.com/aadsm/jschardet">jschardet</a>。</li>
+<li>请求文件 <code>url</code> 返回内容为字节流信息，然后先将文件通过 <code>utf-8</code> 编码读取出来，判断内容中是否包含乱码字符(�)，如果包含再将文件转换为 <code>GBK</code> 编码。（<em>注：其他编码格式的文件还是会出现乱码的问题</em>）</li>
+<li>文件编码由用户自己判断。在页面中增加一个选择框，供用户选择加载文件时使用的字符编码。默认使用 <code>utf-8</code> 加载文件，如果用户发现有乱码的情况，那么自行切换编码格式。</li>
+<li>请求文件 <code>url</code> 返回内容为文本信息(使用默认的编码，也就是 <code>UTF-8</code>)，之后在 <code>JS</code> 端将乱码的内容恢复。(<em><strong>尝试过后发现无法这么处理，这个步骤相当于文件先用 <code>GBK</code> 编码，再用 <code>UTF-8</code> 解码，之后再用 <code>GBK</code> 编码，这么一套操作下来整个编码全乱了</strong></em>)<blockquote>
+<p>在 <a target="_blank" rel="noopener" href="https://blog.outv.im/2019/encoding-guide/">乱码恢复指北</a> 这篇文章中看到，�这类字符是通过 <code>UTF-8</code> 读取 <code>GBK</code> 编码中文内容时，<code>UTF-8</code> 编码将无法显示的字符替换为该符号，对应的码位为 <code>0xFFFD</code>，类似的还是 [锟斤拷] 这类字符(用 <code>UTF-8</code> 读取 <code>GBK</code> 编码的文件，再用 <code>GBK</code> 读取)，这类字符是无法恢复了。<br><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/1f7789f64136ee3f3af6bf887d4074be24b7d7d2bd510b215ab61d17034d0c55.png" alt="picture 6"><br><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/84343ae6341a85a655511359d96f11672d0989f37d631849cf1799492993a699.png" alt="picture 7">  </p>
+</blockquote>
+</li>
+</ol>
+<p><strong>服务端处理</strong>。</p>
+<ol>
+<li>存储文件时(<code>txt</code>、<code>doc</code> 等文本文件)，文件编码统一使用 <code>utf-8</code> 格式进行存储。(<em><strong>尝试过后发现，在 <code>Java</code> 中将 <code>MultipartFile</code> 使用统一字符编码存储时，还是需要知道原文件的编码，否则强行存储会出现乱码情况</strong></em>)</li>
+<li>存储文件时，获取文件的编码格式，将编码格式拼接到 <code>url</code> 尾部，之后读取时根据这个编码格式进行加载。<blockquote>
+<p>注：服务端获取文件编码，可以通过 <a target="_blank" rel="noopener" href="https://tika.apache.org/">Apache Tika</a> 库来处理</p>
+</blockquote>
+</li>
+<li>访问文件 <code>url</code> 目前是请求服务端的 <code>rsdun-articles</code> 服务，在该服务中增加处理，访问文本类文件时，获取文件的编码格式，并直接指定返回响应中的 <code>contentType</code> 为对应的编码，如下：<br><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/171b852247f48147aac2c0aa829397fd367a4fd640ec7820d349c8fe0421ed4e.png" alt="picture 8"><br><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/a563da3f3853ae741341fa9a207614cfb0e224dd5b5284efb78c3714c6e0cc50.png" alt="picture 9">  </li>
+</ol>
+<p>在尝试上面几个方案时，碰到了很多坑。比如文件目前是通过 <code>layer.open()</code> 打开的，这里开启的是一个子 <code>iframe</code> 页面，如果想将在页面头部添加 <code>&lt;meta charset=&#39;GBK&#39;&gt;</code> 这个标识，那么只能在页面加载完成后获取子 <code>iframe</code> 的 <code>document</code> 属性，然后将这个 <code>charset</code> 标识插入到页面中，如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">layer.open(&#123;</span><br><span class="line">    <span class="attr">type</span>: <span class="number">2</span>,</span><br><span class="line">    <span class="attr">title</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">area</span>: [<span class="string">&#x27;1000px&#x27;</span>, <span class="string">&#x27;700px&#x27;</span>],</span><br><span class="line">    <span class="attr">shade</span>: <span class="number">0.5</span>,</span><br><span class="line">    <span class="attr">closeBtn</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">shadeClose</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">content</span>: link,</span><br><span class="line">    <span class="attr">success</span>: <span class="function"><span class="keyword">function</span>(<span class="params">layero, index</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> iframe = layero.find(<span class="string">&#x27;iframe&#x27;</span>)[<span class="number">0</span>];</span><br><span class="line">        <span class="comment">// 管理页面的地址是 &#123;ip:8301&#125;，文件地址是 &#123;ip&#125;，这会出现跨域问题</span></span><br><span class="line">        <span class="keyword">var</span> doc = iframe.contentDocument || iframe.contentWindow.document;</span><br><span class="line">        <span class="keyword">var</span> meta = doc.createElement(<span class="string">&#x27;meta&#x27;</span>);</span><br><span class="line">        meta.setAttribute(<span class="string">&#x27;charset&#x27;</span>, <span class="string">&#x27;GBK&#x27;</span>);</span><br><span class="line">        doc.getElementsByTagName(<span class="string">&#x27;head&#x27;</span>)[<span class="number">0</span>].appendChild(meta);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>但是这样插入会出现跨域问题，导致 <code>charset</code> 标识无法被插入，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/e13ced9dc406e4af61204dd1f919af5f46d715e7b7e652c472d167d68848854f.png" alt="picture 10">  </p>
+<p>解决了跨域问题，<code>charset</code> 成功插入到页面中了，但是页面中的文件内容仍然是乱码。搜索了一下，原因如下：<strong>浏览器在解析 <code>HTML</code> 时会遵循字符集声明，如果未指定，那么默认是 <code>UTF-8</code>。一旦解析开始，字符集设置是固定的。后续尝试通过 <code>JS</code> 修改字符集不会对已经解析的内容产生影响。</strong></p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>结合上面的几个处理思路，最终选用的方案如下：**服务端拦截携带 <code>charset=xxx</code> 后缀的 <code>url</code>(目前进拦截 <code>txt</code> 文件)，这些 <code>URL</code> 请求的返回的 <code>ContentType</code> 会被修改为对应的 <code>charset</code>**，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/6103c2685817966d93a0b515a1a94c89079dbe579ed2591ac4e9bb4615b9f571.png" alt="picture 12">  </p>
+<p>网页端仍然通过 <code>layer</code> 弹窗的形式展示文件内容，<strong>文件字符编码的检测由用户来判断，在弹窗中增加选择框，选择框中提供常用的字符编码，用户可以自行切换</strong>，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/5b5c3d71cbf506775839cf05461da315d2ffa4767dacc4192243e8ae1006224e.png" alt="picture 13">  </p>
+<p>文件编码选择 [由用户自行判断，而不是由程序自动检测] 的原因，是因为自动检测文件编码的方案并不能100%保证检测结果准确，并且这类方案涉及文件 <code>IO</code> 操作，会影响性能。</p>
+<blockquote>
+<p>注：目前 [即时通讯信息检索] 页面的文件中，只有 <code>txt</code> 和 <code>pdf</code> 类文件可以直接预览(图片、语音、视频除外)，其他文件都需要下载后才能查看，出现乱码问题的文件是 <code>txt</code> 类文件，因此上面的处理方案目前仅针对 <code>txt</code> 类文件。</p>
+</blockquote>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://www.51cto.com/article/530080.html">从浏览器到服务端的中文乱码深入分析</a></p>
+<p><a target="_blank" rel="noopener" href="http://feg.netease.com/archives/charset-trivial.html">关于编码的那些事儿</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7032211978324181028">如何在前端识别文件的编码</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.52im.net/thread-1693-1-1.html">字符编码那点事：快速理解ASCII、Unicode、GBK和UTF-8</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html">字符编码笔记：ASCII，Unicode 和 UTF-8</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2014/12/unicode.html">Unicode与JavaScript详解</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/gignupg/Detect-File-Encoding-and-Language/wiki">Detect-File-Encoding-And-Language</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.52im.net/thread-2868-1-1.html">IM开发基础知识补课(八)：史上最通俗，彻底搞懂字符乱码问题的本质</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.outv.im/2019/encoding-guide/">乱码恢复指北</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BC%96%E7%A0%81/" rel="tag"># 编码</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-07-03/43738/" rel="prev" title="Spring Data JPA使用">
+      <i class="fa fa-chevron-left"></i> Spring Data JPA使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024-07-29/24403/" rel="next" title="日志框架和Spring日志适配">
+      日志框架和Spring日志适配 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">处理思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
