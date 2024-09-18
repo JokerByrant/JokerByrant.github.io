@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近在看密码加密相关的知识点，了解到了中间人攻击，对这个操作比较好奇，因此尝试一下自己模拟一个中间人攻击。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="模拟一个中间人攻击">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-08-30/5484/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="最近在看密码加密相关的知识点，了解到了中间人攻击，对这个操作比较好奇，因此尝试一下自己模拟一个中间人攻击。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/933b3f91dd8e8d5b9f0597d3fc0e04e1acab763d990887e6259b3ea2ca3e7562.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3dc21842af47c33f58c797cfa548037238d936e03600be36a683dc0b56e413ea.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/32f049c81bbec0f5fc5a7d1d6ab8471d5c8b0d75dbdaa5d4eb73a99567db7dfb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/024438c2589ccea100f2ea8bf8c1e61224402adeea9276f6e079d554596a6164.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/d79816b1e5d2fd2d7522202020fcda9f1b7446a6c0b3df3b8dc1032f8f93df73.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/09c08acee8f2e171e3222329c4a21d50761a468b49257d1b10e637da4a20942d.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/eaef7920462872d787c870f116e5749834a560ce96a43046baa1115f472d88d6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/73bd0b5d4a80d0e14794901f42bcb17cb6bd8aedeadc7bd95f19098d2cd34581.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/867865a4b51417871e5ceb63d51d553d3e78d365c270d1196114944829ce71f8.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/8a20bd9065376b5a9772fffc5263a39a3ea89c9b22304b10f6355baaec461b15.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/9e48931d86859e05da3bbe533ae0936f5a2fe6871c041f332ca2c62b503643cd.png">
+<meta property="article:published_time" content="2024-08-30T01:39:41.000Z">
+<meta property="article:modified_time" content="2024-09-18T01:43:44.116Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="中间人攻击">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/933b3f91dd8e8d5b9f0597d3fc0e04e1acab763d990887e6259b3ea2ca3e7562.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-08-30/5484/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>模拟一个中间人攻击 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-08-30/5484/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          模拟一个中间人攻击
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-08-30 09:39:41" itemprop="dateCreated datePublished" datetime="2024-08-30T09:39:41+08:00">2024-08-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">安全</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近在看密码加密相关的知识点，了解到了中间人攻击，对这个操作比较好奇，因此尝试一下自己模拟一个中间人攻击。</p>
+<span id="more"></span>
+
+<h3 id="中间人攻击简介"><a href="#中间人攻击简介" class="headerlink" title="中间人攻击简介"></a>中间人攻击简介</h3><p><strong>中间人攻击</strong>（Man-in-the-Middle Attack，简称MITM攻击）是指攻击者与通讯的两端分别建立独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。（来源：<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB">中间人攻击 - 维基百科</a>）</p>
+<p>常见的中间人攻击有如下几种：(<em>来源：chatgpt</em>)</p>
+<ol>
+<li><strong>IP 欺骗（IP Spoofing）</strong>。攻击者伪装成一个合法的网络设备（如路由器或网关），通过伪造 IP 地址或欺骗 ARP 表来进行数据的转发。可以用来劫持网络连接，截获敏感数据。</li>
+<li><strong>ARP 欺骗（ARP Spoofing）</strong>。攻击者通过发送伪造的 ARP 响应，使受害者的 ARP 表将攻击者的 MAC 地址与合法 IP 地址关联。攻击者可以获取到所有通过受害者网络的数据包，包括用户名、密码等敏感信息。</li>
+<li><strong>DNS 欺骗（DNS Spoofing）</strong>。攻击者将域名解析结果劫持，使其解析到恶意 IP 地址。可以用于获取用户输入的敏感信息，或传播恶意软件。</li>
+<li><strong>SSL/TLS 劫持（SSL/TLS Hijacking）</strong>。攻击者在客户端和服务器之间伪装成两端，并截获并篡改 SSL/TLS 加密的通信。攻击者可以解密和篡改加密通信的数据。</li>
+<li><strong>Wi-Fi 热点劫持</strong>。攻击者创建一个伪造的 Wi-Fi 热点，诱骗受害者连接。攻击者可以获取到所有通过该热点的数据，包括敏感的个人信息。</li>
+<li><strong>HTTPS Stripping</strong>。攻击者将浏览器的 HTTPS 请求降级为 HTTP，使通信变为未加密状态，便于攻击者拦截数据。攻击者可以轻易获取和修改传输中的数据。</li>
+<li><strong>恶意中间件</strong>。攻击者利用操作系统或浏览器漏洞安装恶意软件，插入中间件在通信中拦截和篡改数据。恶意中间件可以实现对用户的全方位监控和数据篡改。</li>
+<li><strong>会话劫持（Session Hijacking）</strong>。攻击者窃取会话令牌（Session Token），冒充合法用户。攻击者可以完全控制用户的会话，执行敏感操作如资金转账等。</li>
+<li><strong>Email Hijacking</strong>。攻击者通过入侵邮件服务器或使用社会工程手段获取邮件凭证。可能导致机密信息泄露、财务损失等。</li>
+<li><strong>恶意代理服务器</strong>。攻击者设置一个恶意代理服务器，诱骗受害者使用它进行上网。攻击者可以控制所有通过代理的流量，获取敏感信息。</li>
+<li><strong>蜂窝网络劫持</strong>。攻击者使用伪基站设备拦截或篡改移动设备的通信。攻击者可以监听语音通话、短信或数据流量。</li>
+<li><strong>HTTP Host Header Injection</strong>。攻击者通过篡改 HTTP 请求头中的 Host 信息，伪造请求数据。可以用于钓鱼攻击、数据泄露等。</li>
+<li><strong>脚本注入（Script Injection）</strong>。攻击者向客户端发送恶意脚本，利用浏览器漏洞劫持通信。攻击者可以获取用户的敏感信息或操作权限。</li>
+<li><strong>物理拦截</strong>。物理拦截数据通信设备或网络基础设施。可以完全控制和篡改通信数据，通常用于间谍活动。</li>
+</ol>
+<h3 id="模拟-DNS-欺骗"><a href="#模拟-DNS-欺骗" class="headerlink" title="模拟 DNS 欺骗"></a>模拟 DNS 欺骗</h3><p>直接修改本地的 hosts 文件，文件所在位置：<code>C:\Windows\System32\drivers\etc</code>，我们这里将 <code>www.baidu.com</code> 映射到本地 IP <code>127.0.0.1</code>，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/933b3f91dd8e8d5b9f0597d3fc0e04e1acab763d990887e6259b3ea2ca3e7562.png" alt="picture 0">  </p>
+<p>如下，<code>www.baidu.com</code> 被解析到了 <code>127.0.0.1</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/3dc21842af47c33f58c797cfa548037238d936e03600be36a683dc0b56e413ea.png" alt="picture 1">  </p>
+<p>在浏览器访问 <code>www.baidu.com</code>，出现如下提示信息</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/32f049c81bbec0f5fc5a7d1d6ab8471d5c8b0d75dbdaa5d4eb73a99567db7dfb.png" alt="picture 2">  </p>
+<p>这里模拟的 DNS 欺骗是最简单的做法，在实际案例中，更多是通过劫持 DNS 服务器，以及伪造 DNS 服务器，</p>
+<h3 id="模拟中间人攻击"><a href="#模拟中间人攻击" class="headerlink" title="模拟中间人攻击"></a>模拟中间人攻击</h3><p>这里使用 <a target="_blank" rel="noopener" href="https://www.telerik.com/fiddler">Fiddler</a> 工具来模拟，之前使用过这个工具来捕获微信小程序的网络请求。</p>
+<p>其实 Fiddler 工具本身的抓包原理就是一个中间人攻击：</p>
+<ol>
+<li>Fiddler 接到客户端的 https 请求，将请求转发给服务器。</li>
+<li>服务器生成公钥证书，返回给 Fiddler。Fiddler 拦截下真的公钥证书，并生成伪造的公钥证书给客户端。</li>
+<li>客户端使用伪造的公钥证书加密共享密钥发送给 Fiddler，Fiddler 使用伪造的私钥解密获取共享密钥。</li>
+<li>Fiddler 将解密后的共享密钥，使用真正的公钥加密发送给服务端，服务器使用共享密钥与 Fiddler 通信。</li>
+<li>Fiddler 使用共享密钥与客户端通信</li>
+</ol>
+<p>我们这里调整一下 Fiddler 默认的抓包配置，尝试自己配置来模拟一次中间人攻击，按照 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/lulianqi/p/10558719.html">HTTPS中间人攻击实践（原理·实践）</a> 这篇文档中给出的步骤进行配置即可，下面简单说一下，具体参考上面的文档。</p>
+<p>首先在 <strong>工具-&gt;选项-&gt;Https</strong> 按如下方式配置：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/024438c2589ccea100f2ea8bf8c1e61224402adeea9276f6e079d554596a6164.png" alt="picture 3">  </p>
+<p>之后下载一个插件：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/lulianqi/p/10428551.html#_label0_1">FreeHttp</a>，将 <code>FreeHttp.dll</code> 文件放到 Fiddler 安装目录下，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/d79816b1e5d2fd2d7522202020fcda9f1b7446a6c0b3df3b8dc1032f8f93df73.png" alt="picture 4">  </p>
+<p>之后重启 Fiddler，就能进行配置了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/09c08acee8f2e171e3222329c4a21d50761a468b49257d1b10e637da4a20942d.png" alt="picture 5">  </p>
+<p>使用代理的 HTTPS 请求会利用 Connect 请求建立 SSL 通道，我们修改 Connect 连接目标即可（因为这个时候 SSL 通道还没有建立，目标地址还是明文，我们可以直接修改，这样操作可以模拟网络中存在的攻击）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/eaef7920462872d787c870f116e5749834a560ce96a43046baa1115f472d88d6.png" alt="picture 6">  </p>
+<p>上面的配置相当于是将所有请求的 Https 握手请求转发到本地服务上处理，配置好之后就可以开始模拟了，在 Chrome 浏览器下模拟了如下几种情况：</p>
+<ul>
+<li><p><strong>本地服务没有配置证书</strong>。浏览器会提示如下信息：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/73bd0b5d4a80d0e14794901f42bcb17cb6bd8aedeadc7bd95f19098d2cd34581.png" alt="picture 7">  </p>
+</li>
+<li><p><strong>本地服务配置目标服务的合法证书，相当于模拟攻击者窃取到了服务端的证书文件，然后发起中间人攻击。</strong>这时 Https 握手请求可以通过验证，并且这时对应的请求也会转到本地服务中执行，相当于攻击者成功执行了一次中间人攻击。</p>
+</li>
+<li><p><strong>本地服务配置自定义证书，这是常规的中间人攻击手段，即攻击者使用自定义证书发起中间人攻击。</strong>这时浏览器会提示 <strong>您的连接不是私密连接</strong>，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/867865a4b51417871e5ceb63d51d553d3e78d365c270d1196114944829ce71f8.png" alt="picture 8">  </p>
+<p>如果用户点击继续前往，那么攻击者就可以完成对请求结果的篡改操作，如下，在本地服务中添加了一个自定义的接口，模拟攻击者篡改请求数据的情况：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/8a20bd9065376b5a9772fffc5263a39a3ea89c9b22304b10f6355baaec461b15.png" alt="picture 9">  </p>
+<p>这里仅仅模拟了攻击者篡改请求结果的场景，在真实场景下，攻击者可以做更多复杂的操作，比如将上面的页面设计成知乎登录页的样式，然后用户输入密码后，攻击者就能窃取到用户的账号密码。</p>
+<p>而为了应对这一问题，可以为网站引入 HSTS：<a target="_blank" rel="noopener" href="https://www.ssl.com/zh-CN/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/%E4%BB%80%E4%B9%88%E6%98%AFHST/">什么是HTTP严格传输安全性（HSTS）？</a></p>
+<blockquote>
+<p>HTTP严格传输安全性 （HSTS）是一种网络安全策略机制，旨在保护HTTPS网站免受降级攻击和cookie劫持。 配置为使用HSTS的Web服务器指示Web浏览器（或其他客户端软件）仅使用HTTPS连接，并禁止使用HTTP协议。</p>
+</blockquote>
+<p>引入 HSTS 后，链接只能通过 Https 访问，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/9e48931d86859e05da3bbe533ae0936f5a2fe6871c041f332ca2c62b503643cd.png" alt="picture 10">  </p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本篇在 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/lulianqi/p/10558719.html">HTTPS中间人攻击实践（原理·实践）</a> 的指引下，使用 Fiddler 工具简单模拟了一个中间人攻击。本次模拟比较简单，真实场景下的中间人攻击往往更加复杂和隐蔽。通过这次模拟，意识到网络安全方面的工作还是很重要的，项目之后也可以考虑添加 HSTS 配置来提升 Https 连接安全性。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/12880?time__1311=GqGxuDc7exRDlrzG7DynDnDRhw8zDkDEeD">部分中间人攻击手法简介</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lulianqi/p/10558719.html">HTTPS中间人攻击实践（原理·实践）</a></p>
+<p><a target="_blank" rel="noopener" href="https://kompost.cn/posts/check-and-remove-untrusted-cert/">如何检测与清理不可信的 CA 证书</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB/" rel="tag"># 中间人攻击</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-08-28/13172/" rel="prev" title="腾讯桌面整理图标错乱恢复">
+      <i class="fa fa-chevron-left"></i> 腾讯桌面整理图标错乱恢复
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024-09-06/16495/" rel="next" title="MySQL 报错 Lost connection to MySQL server at 'reading authorization packet'">
+      MySQL 报错 Lost connection to MySQL server at 'reading authorization packet' <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">中间人攻击简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F-DNS-%E6%AC%BA%E9%AA%97"><span class="nav-number">2.</span> <span class="nav-text">模拟 DNS 欺骗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB"><span class="nav-number">3.</span> <span class="nav-text">模拟中间人攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">5.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
