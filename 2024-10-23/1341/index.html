@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="tc_Da-z9B63hr5UDxcMmjC72dU1h43Kw82L65l5U7ps">
+  <meta name="baidu-site-verification" content="code-yltW3it9oB">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jokerbyrant.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文记录一下通过 Zuul 上传文件时，出现 Java Heap Space 报错的处理过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zuul大文件上传失败">
+<meta property="og:url" content="https://jokerbyrant.github.io/2024-10-23/1341/index.html">
+<meta property="og:site_name" content="Sssxh BLOG">
+<meta property="og:description" content="本文记录一下通过 Zuul 上传文件时，出现 Java Heap Space 报错的处理过程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c0703f45918d05f3c10d78b7808ec72ecb20b96faa2b9a1aa6dc8cbfa24e4a8c.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/1d3a0f365ba7409d4263f1f81f343660e3493771ef0d8f265b26f628f3ae6c0b.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/fed290829c74956f25792ba9a85878210bdd72f20cfcb203d69fd634b65047f0.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/9c3839991beb003acd1488bfcce84af47e248011d86a52a91551bc158e5fd3ec.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/6286755ed76e1a79889d9e4462b8dda0d6340bbf691b9565c070bc2b9878ae99.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c367c19d0c9bce33da7edb0178f5a96759a33f4b66b9da6edd54ecd0197c68bb.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/8c0d45c002ea1f14489503715d497a52d70f24feb5df91fe33a7fb50c9d5a82c.png">
+<meta property="article:published_time" content="2024-10-23T01:24:36.000Z">
+<meta property="article:modified_time" content="2024-10-29T01:30:00.557Z">
+<meta property="article:author" content="sxh">
+<meta property="article:tag" content="Zuul">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c0703f45918d05f3c10d78b7808ec72ecb20b96faa2b9a1aa6dc8cbfa24e4a8c.png">
+
+<link rel="canonical" href="https://jokerbyrant.github.io/2024-10-23/1341/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Zuul大文件上传失败 | Sssxh BLOG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sssxh BLOG</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jokerbyrant.github.io/2024-10-23/1341/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+      <meta itemprop="name" content="sxh">
+      <meta itemprop="description" content="人类的悲欢并不相通">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sssxh BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zuul大文件上传失败
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-10-23 09:24:36" itemprop="dateCreated datePublished" datetime="2024-10-23T09:24:36+08:00">2024-10-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">后端技术</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文记录一下通过 Zuul 上传文件时，出现 Java Heap Space 报错的处理过程。</p>
+<span id="more"></span>
+
+<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>App 端上传一个 <code>150M</code> 左右的文件，请求的是 <strong><code>Zuul</code> 网关接口</strong>，出现了 <strong>Java heap space</strong> 的报错，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c0703f45918d05f3c10d78b7808ec72ecb20b96faa2b9a1aa6dc8cbfa24e4a8c.png" alt="picture 0">  </p>
+<p>搜寻了相关博客，这个问题是因为 Spring 默认会把上传的文件加载到内存中，如果文件过大就会出现这个问题。</p>
+<p>这个问题处理起来可以很简单，直接调整 Zuul 网关的 JVM 配置，然后就能解决了。但是这样治标不治本，如果之后上传一个更大的文件，那么还是可能会出现同样的问题。</p>
+<h3 id="尝试解决"><a href="#尝试解决" class="headerlink" title="尝试解决"></a>尝试解决</h3><p>在 Spring 中可以添加如下几个配置，用来对文件上传进行限制，如下：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-boot/api/java/org/springframework/boot/autoconfigure/web/servlet/MultipartProperties.html">Class MultipartProperties</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/1d3a0f365ba7409d4263f1f81f343660e3493771ef0d8f265b26f628f3ae6c0b.png" alt="picture 1">  </p>
+<p>其中 <code>file-size-threshold</code> 可以限制 <strong>当上传的单个文件大小超过这个值后，文件会被写入磁盘</strong>；如果文件大小小于这个值，文件会被保存到内存中。</p>
+<p>将这个配置添加到代码中，如下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 单个文件最大大小</span></span><br><span class="line"><span class="meta">spring.servlet.multipart.max-file-size</span>=<span class="string">1024MB</span></span><br><span class="line"><span class="comment"># 单次上传文件请求最大大小</span></span><br><span class="line"><span class="meta">spring.servlet.multipart.max-request-size</span>=<span class="string">1024MB</span></span><br><span class="line"><span class="comment"># 当单个文件大小超过这个值后，文件会被写入磁盘</span></span><br><span class="line"><span class="meta">spring.servlet.multipart.file-size-threshold</span>=<span class="string">1MB</span></span><br></pre></td></tr></table></figure>
+
+<p>但是添加了这个配置，仍然会报 <strong>Java heap space</strong> 错误。因此猜测这里出现的报错并不是 Spring 给出的，而是 Zuul 网关导致的，下面针对抛出的堆栈信息进行分析。</p>
+<h3 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h3><p>通过打印的堆栈信息，定位到问题是在执行 <code>DebugFilter</code> 类的 <code>shouldFilter()</code> 方法时产生的，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/fed290829c74956f25792ba9a85878210bdd72f20cfcb203d69fd634b65047f0.png" alt="picture 2">  </p>
+<p>这行代码进行了一个 <strong>获取请求输入字节并复制</strong> 的操作，而在进行文件上传时，请求输入字节占用空间很大，因此导致了堆内存溢出，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/9c3839991beb003acd1488bfcce84af47e248011d86a52a91551bc158e5fd3ec.png" alt="picture 3">  </p>
+<p>再回过头看下 <code>DebugFilter</code> 这个类，这个类主要用于 <strong>调试 Zuul 路由和请求处理的过程，它允许在 Zuul 网关的生命周期的不同阶段获取请求和响应的详细信息</strong>。在 <code>shouldFilter()</code> 方法中可以看到它的开启条件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> DynamicBooleanProperty ROUTING_DEBUG = DynamicPropertyFactory</span><br><span class="line">        .getInstance().getBooleanProperty(ZuulConstants.ZUUL_DEBUG_REQUEST, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> DynamicStringProperty DEBUG_PARAMETER = DynamicPropertyFactory</span><br><span class="line">        .getInstance().getStringProperty(ZuulConstants.ZUUL_DEBUG_PARAMETER, <span class="string">&quot;debug&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    HttpServletRequest request = RequestContext.getCurrentContext().getRequest();</span><br><span class="line">    <span class="comment">// 如果请求的地址中携带了 `debug=true` 这个配置，那么就能开启这个过滤器</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="string">&quot;true&quot;</span>.equals(request.getParameter(DEBUG_PARAMETER.get()))) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果配置了 `zuul.debug.request=true`，那么过滤器也能开启</span></span><br><span class="line">    <span class="keyword">return</span> ROUTING_DEBUG.get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里涉及两个 zuul 配置：</p>
+<ul>
+<li><code>zuul.debug.request</code>。默认值为 <code>false</code>，配置为 <code>true</code> 的话，那么过滤器开启。</li>
+<li><code>zuul.debug.parameter</code>。默认值为 <code>debug</code>，在请求地址后面追加 <code>debug=true</code>，或者自定义的值，那么过滤器也能开启。</li>
+</ul>
+<p>而 <code>DebugFilter</code> 过滤器开启后，会将 <code>DebugRouting</code> 和 <code>DebugRequest</code> 两个值设置为 <code>true</code>，这个两个值为 <code>true</code> 时，就会在特定的场景下添加一些 <code>Debug</code> 信息到 <code>RequestContext</code> 中。</p>
+<p><code>DebugFilter</code> 过滤器的功能目前用不到，因此考虑将这个过滤器中产生异常的代码移除，以此来解决问题。不过这个方法还没来得及尝试，我就意识到不可行，因为在阅读源码时，我发现除了 <code>DebugFilter</code> 过滤器外，还有许多其他的过滤器存在，这些过滤器也会导致 <code>Java Heap Space</code> 报错。</p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>到这里似乎卡住了，这时想到去看看官方文档，文档中有说明 Zuul 处理大文件上传的方法：<a target="_blank" rel="noopener" href="https://cloud.spring.io/spring-cloud-netflix/multi/multi__router_and_filter_zuul.html#_uploading_files_through_zuul">Uploading Files through Zuul</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/6286755ed76e1a79889d9e4462b8dda0d6340bbf691b9565c070bc2b9878ae99.png" alt="picture 4">  </p>
+<p>在请求地址中添加 <code>/zuul</code>，比如原先上传文件接口是：<code>https://localhost:5655/api-a/fileUpload/upload</code>，调整之后就是 <code>https://localhost:5655/zuul/api-a/fileUpload/upload</code>。增加这个参数后，<strong>可以绕过 <code>Spring</code> 的 <code>DispatcherServlet</code> 处理请求的过程，而上面出现的 <code>Java Heap Space</code> 错误就是在这个 <code>DispatcherServlet</code> 中出现的</strong>。</p>
+<p>这里的 <code>/zuul</code> 实在 <code>zuul.servlet-path</code> 中进行配置的，默认值为 <code>/zuul</code>，也可以自定义为其他的值。</p>
+<p><strong>因此，针对 Java Heap Space 的处理办法就是，之后 <code>App</code> 端在请求上传文件接口时，在请求路径中添加 <code>/zuul</code> 前缀。</strong></p>
+<h3 id="延伸思考"><a href="#延伸思考" class="headerlink" title="延伸思考"></a>延伸思考</h3><p>在 Zuul 官方文档中提到，在请求地址中增加 <code>/zuul</code> 后，可以绕过 Spring 的 DispatcherServlet。在看到这个描述后，产生了几个疑问：</p>
+<ul>
+<li><strong>Spring 中的 DispatcherServlet 是什么？</strong></li>
+<li><strong>常规请求和添加了 <code>/zuul</code> 的请求在处理过程上有什么区别？</strong></li>
+</ul>
+<p>首先来看下 DispatcherServlet 是什么：</p>
+<blockquote>
+<p>DispatcherServlet 是 Spring MVC 中的核心组件之一，负责处理所有的 HTTP 请求，并将请求分派给相应的控制器进行处理。</p>
+</blockquote>
+<p>再来看下 DispatcherServlet 的工作流程：</p>
+<ul>
+<li><strong>收到请求</strong>：当 Web 服务器接收到 HTTP 请求时，它会将请求转发给 DispatcherServlet。</li>
+<li><strong>解析请求</strong>：通过 URL 信息查找合适的处理器（即 Controller），这是通过 HandlerMapping（处理器映射） 完成的。</li>
+<li><strong>创建请求和响应对象</strong>：一旦找到处理器，DispatcherServlet 会创建一个新的 Request 和 Response 对象，通常是 HttpServletRequestWrapper 和 HttpServletResponseWrapper，这些对象被传递给 Controller 进行处理。</li>
+<li><strong>调用控制器处理请求</strong>：DispatcherServlet 通过 HandlerAdapter 调用找到的 Controller，控制器处理请求并返回一个 ModelAndView 对象。</li>
+<li><strong>视图解析和渲染</strong>：返回的 ModelAndView 包含视图名称和模型数据。DispatcherServlet 通过 ViewResolver（视图解析器） 找到正确的视图，并将模型数据传递给视图进行渲染。</li>
+<li><strong>返回响应</strong>：最后，视图渲染完成后，DispatcherServlet 将响应发送回客户端。</li>
+</ul>
+<p>接着看第二个问题：<strong>常规请求和添加了 <code>/zuul</code> 的请求在处理过程上有什么区别？</strong>（<em>来源：chatgpt</em>）</p>
+<blockquote>
+<p>带有 /zuul 前缀的请求绕过了 Spring MVC 的 DispatcherServlet，直接由 Zuul 的路由和过滤器处理。常规请求在处理过程中可能会经过 Spring MVC 的 DispatcherServlet 进行处理，包括请求映射、控制器处理、异常处理等机制。</p>
+</blockquote>
+<p><strong>DispatcherServlet 是 Web 服务器的请求处理，而我们项目中的 Zuul 充当的角色是网关服务，进行【路由请求】和【执行过滤器逻辑】操作即可，DispatcherServlet 对请求的处理过程在这里似乎有些多余。而添加了 <code>/zuul</code> 前缀的请求，可以绕过 DispatcherServlet 处理请求的过程，那么是否可以将所有经过 Zuul 网关的请求都绕过 DispatcherServlet 呢？</strong></p>
+<h3 id="关闭-Zuul-网关中-DispatcherServlet-请求处理"><a href="#关闭-Zuul-网关中-DispatcherServlet-请求处理" class="headerlink" title="关闭 Zuul 网关中 DispatcherServlet 请求处理"></a>关闭 Zuul 网关中 DispatcherServlet 请求处理</h3><p>带着问题去寻找答案，没有找到相关的处理办法，但是在 <code>zuul</code> 的官方库下找到了其他用户提交的 <code>Issue</code>，这个 <code>Issue</code> 中提到的问题与我想的问题一样：<a target="_blank" rel="noopener" href="https://github.com/Netflix/zuul/issues/311">What is the relationship between DispatcherServlet and ZuulServlet? #311</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/c367c19d0c9bce33da7edb0178f5a96759a33f4b66b9da6edd54ecd0197c68bb.png" alt="picture 5">  </p>
+<p>这个 <code>Issue</code> 中提到的疑问并没有被解答，但是其中提到可以将 <code>servletPath</code> 设置为 <code>/</code> 来使所有经过 Zuul 的请求都绕过 DispatcherServlet。在我们的 Zuul 网关中尝试一下，如下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">zuul.servlet-path</span>=<span class="string">/zuul.servlet-path=/</span></span><br></pre></td></tr></table></figure>
+
+<p>重启 Zuul 网关服务，直接请求文件上传接口，上传一个 <code>150M</code> 的文件，这次没有报错 Java Heap Space，请求成功进入了接口服务（<em>最终也没上传成功，因为接口服务限制只能上传 100M 以内的文件</em>）。</p>
+<p>可以看到，配置生效了，所有经过 Zuul 网关的请求都会绕过 DispatcherServlet。增加了这个配置后的 Zuul 网关发挥的作用才是我们预想的效果，即 Zuul 网关只进行【路由请求】和【执行过滤器逻辑】的操作。</p>
+<h3 id="补充：Zuul-提供的过滤器"><a href="#补充：Zuul-提供的过滤器" class="headerlink" title="补充：Zuul 提供的过滤器"></a>补充：Zuul 提供的过滤器</h3><p><img src="https://cdn.jsdelivr.net/gh/JokerByrant/Images@main/blog/8c0d45c002ea1f14489503715d497a52d70f24feb5df91fe33a7fb50c9d5a82c.png" alt="picture 6">  </p>
+<p>注意其中 <code>ServletDetectionFilter</code> 这个过滤器，它的执行顺序为-3，是最先被执行的过滤器。主要用来检测当前请求是需要通过 Spring 的 DispatcherServlet 处理运行的，还是通过 ZuulServlet 来处理运行的。上面我们配置了 <code>zuul.servlet-path=/</code>，那么所有的请求都会通过 ZuulServlet 来处理，看下它的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Detects whether a request is ran through the &#123;<span class="doctag">@link</span> DispatcherServlet&#125; or</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> ZuulServlet&#125;. The purpose was to detect this up-front at the very beginning of</span></span><br><span class="line"><span class="comment"> * Zuul filter processing and rely on this information in all filters. RequestContext is</span></span><br><span class="line"><span class="comment"> * used such that the information is accessible to classes which do not have a request</span></span><br><span class="line"><span class="comment"> * reference.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Adrian Ivan</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServletDetectionFilter</span> <span class="keyword">extends</span> <span class="title">ZuulFilter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ServletDetectionFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">filterType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> PRE_TYPE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Must run before other filters that rely on the difference between DispatcherServlet</span></span><br><span class="line"><span class="comment">     * and ZuulServlet.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">filterOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> SERVLET_DETECTION_FILTER_ORDER;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        RequestContext ctx = RequestContext.getCurrentContext();</span><br><span class="line">        HttpServletRequest request = ctx.getRequest();</span><br><span class="line">        <span class="keyword">if</span> (!(request <span class="keyword">instanceof</span> HttpServletRequestWrapper)</span><br><span class="line">                &amp;&amp; isDispatcherServletRequest(request)) &#123;</span><br><span class="line">            ctx.set(IS_DISPATCHER_SERVLET_REQUEST_KEY, <span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            ctx.set(IS_DISPATCHER_SERVLET_REQUEST_KEY, <span class="keyword">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isDispatcherServletRequest</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> request.getAttribute(</span><br><span class="line">                DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE) != <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重复读取请求体"><a href="#重复读取请求体" class="headerlink" title="重复读取请求体"></a>重复读取请求体</h3><p>配置 <code>zuul.servlet-path=/</code> 后，请求登录接口时会出现登录失败的情况，经过定位， 问题出现在下面一行代码处：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">myUserDetails = <span class="keyword">new</span> ObjectMapper().readValue(req.getInputStream(), MyUserDetails.class);</span><br></pre></td></tr></table></figure>
+
+<p>代码进行到这里就会出现报错，调查后发现是因为这里进行了 <code>req.getInputStream()</code> 的操作，而 <strong>请求体通过 getInputStream() 读取时，只能读取一次</strong>。如果请求体中 InputStream 已经被访问过了，这里就会获取不到数据。</p>
+<p>在 Zuul 网关自定义的过滤器中，进行了打印请求体的操作，其中包含了 <code>req.getInputStream()</code> 的操作，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 请求参数为空，那么打印请求体</span></span><br><span class="line"><span class="keyword">if</span> (parameterMap == <span class="keyword">null</span> || parameterMap.isEmpty()) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 打印 URL 编码表单数据，包含 multipart 类型的请求体无需打印</span></span><br><span class="line">        <span class="keyword">if</span> (request.getContentType() == <span class="keyword">null</span> || !request.getContentType().startsWith(<span class="string">&quot;multipart/&quot;</span>)) &#123;</span><br><span class="line">            String requestBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);</span><br><span class="line">            <span class="keyword">if</span> (StringUtils.isNotBlank(requestBody)) &#123;</span><br><span class="line">                Map&lt;String, String&gt; formData = Arrays.stream(requestBody.split(<span class="string">&quot;&amp;&quot;</span>))</span><br><span class="line">                        .map(part -&gt; part.split(<span class="string">&quot;=&quot;</span>))</span><br><span class="line">                        .collect(Collectors.toMap(</span><br><span class="line">                                arr -&gt; arr[<span class="number">0</span>],</span><br><span class="line">                                arr -&gt; arr.length &gt; <span class="number">1</span> ? arr[<span class="number">1</span>] : <span class="string">&quot;&quot;</span></span><br><span class="line">                        ));</span><br><span class="line">                log.info(<span class="string">&quot;请求体：&#123;&#125;&quot;</span>, URLDecoder.decode(JSON.toJSONString(formData), StandardCharsets.UTF_8.name()));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;请求体信息获取失败！&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里打印请求体的操作并不是必要的，因此直接将这段代码移除了。</p>
+<p><strong>那为什么没有添加 <code>/zuul</code> 前缀的请求不存在这个问题呢？</strong>（<em>来源：chatgpt</em>）</p>
+<blockquote>
+<p>因为没有添加 <code>/zuul</code> 前缀的请求是完全交由 Spring MVC 处理的，默认的 DispatcherServlet 处理流程能够确保在控制器或中间件逻辑中多次访问请求体。此外，Spring 的 HttpServletRequestWrapper 机制可以缓存请求体数据，使得同一个请求的请求体可以被多次读取。</p>
+</blockquote>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>App 端通过 Zuul 网关上传大文件时，出现了 Java heap space 内存溢出错误。这个问题可以通过调整 JVM 配置来解决，但是考虑这样调整只能治标不治本，之后如果上传更大的文件仍然会产生问题，因此尝试找到问题产生的原因并解决。</p>
+<p>初步猜测问题是 Spring 文件配置的原因，因此增加了 <code>file-size-threshold</code> 配置。Spring 默认将上传的文件加载到内存中，而这个配置的作用是 <strong>当单个文件大小超过这个值后，文件会被写入磁盘</strong>，但是添加之后并没有生效。</p>
+<p>之后通过报错打印的堆栈信息定位到报错是在 <code>DebugFilter</code> 过滤器中产生的，这个过滤器进行了 <strong>读取请求字节流</strong> 的操作，因此将 <code>DebugFilter</code> 过滤器禁用，但是没有实施，因为意识到可能还有其他的过滤器也进行了 <strong>读取请求字节流</strong> 的操作。</p>
+<p>之后继续寻找解决办法，在 Spring Cloud Zuul 官方文档中找到了处理办法，<strong>在请求地址中增加 <code>/zuul</code> 前缀</strong>，尝试之后成功了，没有出现 Java Heap Space 报错。</p>
+<p>问题虽然解决了，但是其背后的原理并没有搞懂。因此继续调查 <code>/zuul</code> 前缀是如何生效的，了解到这样处理 <strong>可以绕过 <code>Spring</code> 的 <code>DispatcherServlet</code> 处理请求的过程</strong>。其中 DispatcherServlet 是 Spring MVC 中的核心组件之一，负责处理所有的 HTTP 请求，并将请求分派给相应的控制器进行处理。<strong>默认情况下，所有经过 Zuul 网关的请求，都会经过 DispatcherServlet 进行处理。</strong>而我们的 Zuul 网关服务只需要进行【路由请求】和【执行过滤器逻辑】就可以了，DispatcherServlet 的处理过程在这里并没有什么用，只会额外占用请求资源，因此思考是否可以 <strong>将所有经过 Zuul 网关的请求都绕过 DispatcherServlet</strong>。</p>
+<p>针对这个问题继续调查，在官方库下寻找对应的 Issue，可以通过增加 zuul.servlet-path=/ 这个配置，这样所有的请求都会绕过 DispatcherServlet。这么处理后，Zuul 网关处理请求的效率也得到了提升（文件上传请求效率提升很明显）。</p>
+<p>至此，整个优化工作完成了。出现这个问题还是因为对 <code>Zuul</code> 和 <code>Spring MVC</code> 的工作原理理解不够深入导致的，之后还是要加强一下。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a target="_blank" rel="noopener" href="https://www.lpnote.com/2017/05/02/spring-boot-fileupload-problem-analysis/">SpringBoot文件上传解析</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.blogjava.net/yongboy/archive/2011/01/15/346202.html">Servlet 3.0笔记之超方便的文件上传支持</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-boot/api/java/org/springframework/boot/autoconfigure/web/servlet/MultipartProperties.html">Class MultipartProperties</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.spring.io/spring-cloud-netflix/multi/multi__router_and_filter_zuul.html#_uploading_files_through_zuul">Uploading Files through Zuul</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/what-is-dispatcher-servlet-in-spring/">What is Dispatcher Servlet in Spring?</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Netflix/zuul/issues/311">What is the relationship between DispatcherServlet and ZuulServlet? #311</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/spring-cloud/spring-cloud-netflix/issues/546">Problem with the alternative “/zuul” path bypassing DispatcherServlet in Zuul #546</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Zuul/" rel="tag"># Zuul</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024-10-17/32349/" rel="prev" title="Java 对接微信支付">
+      <i class="fa fa-chevron-left"></i> Java 对接微信支付
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text">尝试解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E4%BC%B8%E6%80%9D%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">延伸思考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%97%AD-Zuul-%E7%BD%91%E5%85%B3%E4%B8%AD-DispatcherServlet-%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">关闭 Zuul 网关中 DispatcherServlet 请求处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9AZuul-%E6%8F%90%E4%BE%9B%E7%9A%84%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">7.</span> <span class="nav-text">补充：Zuul 提供的过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E8%AF%BB%E5%8F%96%E8%AF%B7%E6%B1%82%E4%BD%93"><span class="nav-number">8.</span> <span class="nav-text">重复读取请求体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">10.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="sxh"
+      src="https://fastly.jsdelivr.net/gh/JokerByrant/Images@main/blog/16996066179231699606617191.png">
+  <p class="site-author-name" itemprop="name">sxh</p>
+  <div class="site-description" itemprop="description">人类的悲欢并不相通</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">68</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sxh</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击礼花效果 -->
+<script type="text/javascript" src="/js/firework.js"></script>
+</body>
+</html>
